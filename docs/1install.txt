@@ -1,0 +1,32 @@
+CREANDO FRONTEND
+npm create vite@latest frontend
+    react
+    javascript
+crear repositorio chatjosu en github
+en consola ya en vsc poner
+    git init
+    git add .
+    git commit -m "my first commit"
+    git remote add origin https://github.com/JasonRodriguezGarcia/chatjosu.git
+    git branch -M main
+    git push -u origin main
+cd frontend
+
+INSTALAR MUI CON
+npm install @mui/material @emotion/react @emotion/styled @mui/icons-material
+
+PARA PODER USAR RUTAS EN React
+npm install react-router-dom
+
+USAR LA IA GEMINI
+npm install @google/genai
+
+Gemini en google
+https://console.cloud.google.com/home/dashboard?project=gen-lang-client-0498912020
+https://console.cloud.google.com/apis/credentials?project=gen-lang-client-0498912020
+
+https://aistudio.google.com/
+
+desde VSC a qué modelo de ia tenemos acceso:
+curl "https://generativelanguage.googleapis.com/v1/models?key=MIAPIKEY"
+

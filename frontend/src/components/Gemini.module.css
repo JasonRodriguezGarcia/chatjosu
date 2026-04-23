@@ -1,0 +1,33 @@
+.gemini {
+
+    border: 1px solid;
+    padding: 5px;
+    border-radius: 5px;
+    margin: auto;
+    margin-top: 20px;
+    text-align: center;
+    width: 60vw;
+    font-weight: bold;
+    .bot {
+        color: red;
+        text-align: right;
+    }
+    .user {
+        color: blue;
+        text-align: left;
+    }
+    ul {
+        list-style: none;
+    }
+    .sendingBox {
+        border: 1px solid;
+        border-radius: 5px;
+        padding: 10px;
+        display: flex;
+        /* flex-direction: column; */
+
+        TextField {
+            width: 50%;
+        }
+    }
+}

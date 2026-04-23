@@ -2,8 +2,9 @@ chatbot
 app relacionadas a ong, 
 	consulta
 	consultaría un excel pasado a json¿?
-	rol: eres un profesional de la saludy ongs. Informa al usuario de como contactar con la ong más adecuada según los datos del excel (json)
+	rol: eres un profesional de la salud y ongs. Informa al usuario de como contactar con la ong más adecuada según los datos del excel (json)
 
+iot
 1 Crear API en mi backend para que al consultarla, envíe datos a Josu.
 
 2 Modificar mi anemómetro para que vía wifi de Josu, haga las mismas consultas del punto 1.
