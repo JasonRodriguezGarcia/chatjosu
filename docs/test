@@ -1,4 +1,4 @@
-curl "https://generativelanguage.googleapis.com/v1/models?key=AIzaSyACi1sN2XrHtpdyPYOPtDXpsAS56Pd_Qo8"                                  
+curl "https://generativelanguage.googleapis.com/v1/models?key=xxxxxxxxxxxxxxxxxxxxxxPd_Qo8"                                  
                                                                                                                        
                           
 StatusCode        : 200
@@ -26,7 +26,7 @@ Links             : {}
 ParsedHtml        : mshtml.HTMLDocumentClass
 RawContentLength  : 3795
 
-curl "https://generativelanguage.googleapis.com/v1/models?key=AIzaSyBCpMFcAY1pKOQoVpKg6QkbayZ30XQF_7E"                                                                                                                       
+curl "https://generativelanguage.googleapis.com/v1/models?key=xxxxxxxxxxxxxxxyZ30XQF_7E"                                                                                                                       
                                                                                                                                            
                                                                                                                                            
 StatusCode        : 200                                                                                                                    
