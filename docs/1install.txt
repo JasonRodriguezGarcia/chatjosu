@@ -71,6 +71,8 @@ npm install --save-dev nodemon  // para que al cambiar código se ejecute expres
                                 // npm run dev)
 npm install cors                // para autorizar el uso de backend por determinadas urls
 
+npm install dotenv
+
 en el package.json
 MODIFICAR EL PACKAGE.JSON CREADO PARA USAR EL MODO DE TRABAJO MODERNO "ES MODULE" (EL MODO VIEJO ES "COMMONJS") Y PARA
 EJECUTAR index.js Y ARRANCAR EL SERVIDOR

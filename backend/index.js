@@ -2,17 +2,20 @@ import express from "express";
 import path from "path";
 import cors from 'cors';
 import { fileURLToPath } from "url";
+import dotenv from 'dotenv';
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-
+const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS.split(',');
 // Middleware
 // para configurar cors
 const corsOptions = { 
-    origin: "http://localhost:5173",
+    origin: ALLOWED_ORIGINS
+    // origin: "http://localhost:5173",
     // methods:["POST"] // sin esta línea se deja todos los methods
 }
 app.use(cors());
