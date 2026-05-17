@@ -1,3 +1,7 @@
+// TO DO:
+//  - Try/catch on api calls
+//  - Security check in backend&frontend
+
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DataFile from "../assets/Excel web Asociacionestest.json"
@@ -180,7 +184,7 @@ const Chat3 = () => {
             <Dialog open={dialogOpen} onClose={handleCloseDialog} fullWidth>
                 <DialogTitle>
                     <Stack spacing={1} > 
-                        💬 Chat Room
+                        💬 Chat de ayuda a personas
                     </Stack>
                 </DialogTitle>
                 <DialogContent>
@@ -232,7 +236,7 @@ const Chat3 = () => {
                                     fullWidth
                                     id="mensaje"
                                     name="mensaje" // para evitar avisos en consola del navegador
-                                    label="Introduzca mensaje"
+                                    label="Escribe qué necesitas"
                                     placeholder=""
                                     value={input}
                                     required
@@ -261,13 +265,13 @@ const Chat3 = () => {
                                     id="provincia-label"
                                     // htmlFor="select-provincia"
                                     >
-                                    Provincia
+                                    Dime tu provincia
                                 </InputLabel>
                                 <Select
                                     labelId="provincia-label"
                                     id="provincia-select"
                                     name="provincia"
-                                    label="Provincia"
+                                    label="Dime tu Provincia"
                                     value={selectedProvincia}
                                     onChange={handleSetSelectedProvincia}
                                     >
