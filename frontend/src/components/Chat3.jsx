@@ -30,7 +30,7 @@ import {
 
 // Esto es VITE y la variable de entorno se recupera así
 const GEMINI_API_KEY = import.meta.env.VITE_APP_GEMINI_API_KEY 
-
+const VITE_BACKEND_URL_RENDER = import.meta.env.VITE_BACKEND_URL_RENDER
 const Chat3 = () => {
     const navigate = useNavigate();
     const [provincias, setProvincias] = useState([])
@@ -47,7 +47,8 @@ const Chat3 = () => {
     useEffect(()=> {
         const fetchingProvincias = async () => {    
             const response = await fetch(
-                    `http://localhost:5000/api/provincias`,
+                    // `http://localhost:5000/api/provincias`,
+                    `${VITE_BACKEND_URL_RENDER}/api/provincias`,
                     {
                         method: 'GET',
                         headers: {
