@@ -9,7 +9,6 @@ import ChatJosuPage3 from './pages/ChatJosuPage3';
 function App() {
   return (
     <BrowserRouter>
-      {/* <CochesSummary /> */}
       <Routes>
 
         <Route path="/" element={<HomePage />} />
@@ -18,7 +17,6 @@ function App() {
         <Route path="/chatjosu3" element={<ChatJosuPage3 />} />
 
       </Routes>
-
     </BrowserRouter>
   )
 }

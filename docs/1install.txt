@@ -1,7 +1,12 @@
+*****************
+*****************
 CREANDO FRONTEND
+*****************
+*****************
 npm create vite@latest frontend
     react
     javascript
+cd frontend
 crear repositorio chatjosu en github
 en consola ya en vsc poner
     git init
@@ -32,4 +37,147 @@ https://aistudio.google.com/api-keys?project=gen-lang-client-0470477314
 
 desde VSC a qué modelo de ia tenemos acceso:
 curl "https://generativelanguage.googleapis.com/v1/models?key=MIAPIKEY"
+
+Como el resultado de la api de Gemini está en MARKDOWN, el texto se puede manipular para se que no se muestre en una línea
+Para ello primer instalaremos:
+    npm install react-markdown
+Lo usaremos en el código con
+    import ReactMarkdown from "react-markdown";
+
+    <ReactMarkdown>
+    {texto}
+    </ReactMarkdown>
+Conseguiremos 
+    Negritas ✅
+    Listas numeradas ✅
+    Links clicables ✅
+    Saltos de línea correctos ✅
+
+API para conseguir provincias y municios de España
+    https://datos.gob.es/es/accessible-apidata
+
+*****************
+*****************
+CREANDO BACKEND
+*****************
+*****************
+crear directorio backend
+    md backend
+    cd backend
+
+INSTALAR LOS PAQUETES EXPRESS, NODEMON Y CORS
+npm install express             // instalación de express
+npm install --save-dev nodemon  // para que al cambiar código se ejecute express de nuevo (en modo desarollo->
+                                // npm run dev)
+npm install cors                // para autorizar el uso de backend por determinadas urls
+
+en el package.json
+MODIFICAR EL PACKAGE.JSON CREADO PARA USAR EL MODO DE TRABAJO MODERNO "ES MODULE" (EL MODO VIEJO ES "COMMONJS") Y PARA
+EJECUTAR index.js Y ARRANCAR EL SERVIDOR
+"type": "module",
+"scripts": {
+    "start": "node index.js", // ojo en los apuntes pone "node server/server.js"
+    "dev": "nodemon index.js"  // ojo en los apuntes pone "nodemon server/server.js"
+
+  },
+
+CREAR UN INDEX.JS CON EL SIGUIENTE CÓDIGO PARA HACER PRUEBAS CON LA BARRA DEL NAVEGADOR:
+
+
+********************
+* INICIO DE CÓDIGO *
+********************
+import express from "express";
+import path from "path";
+import cors from 'cors';
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+
+// API Route Example
+app.get("/api/message", (req, res) => {
+  res.json({ message: "Hello from Express!" });
+});
+
+// **OPCIONAL**
+// Serve React Frontend 
+//app.use(express.static(path.join(__dirname, "../build")));
+
+//app.get("*", (req, res) => {
+//  res.sendFile(path.join(__dirname, "../build", "index.html"));
+//});
+// **END OPCIONAL**
+
+// Start Server
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});
+
+
+Para que al dar F5 estando en cualquier ruta como pueda ser https://calendar2-6wyj.onrender.com/holidays el navegador
+no nos devuelva NOT FOUND
+
+En Render tenemos que configurar en frontend el apartado Redirect/Rewrite con los siguiente parámetros
+    - Usando Vite
+        Source:	/*
+        Destination: /index.html
+        Action:	Rewrite
+
+Diferencia entre Redirect y Rewrite
+🔁 1. Redirect (Redirección)
+
+Cambia la URL del navegador.
+Le dice al navegador: "Ve a otra dirección"
+El navegador recarga la página con la nueva URL.
+Ejemplo:
+
+Si alguien entra a tusitio.com/login
+Lo rediriges a tusitio.com/iniciar-sesion
+👉 La URL cambia visiblemente
+👉 Útil para redirecciones permanentes, migración de rutas, etc.
+
+📝 2. Rewrite (Reescritura)
+NO cambia la URL del navegador.
+El servidor responde con otro archivo internamente, pero la URL se mantiene.
+
+Ejemplo típico en SPAs (React, Vite, Vue):
+Usuario entra a tusitio.com/dashboard
+Render no encuentra un archivo /dashboard
+
+Pero con la regla:
+/* → /index.html (Rewrite)
+Render devuelve index.html, y React Router se encarga de mostrar la vista correcta.
+👉 Reglas de Rewrite son esenciales para Single Page Applications.
+Las Redirect and Rewrite Rules (Reglas de redirección y reescritura) son configuraciones que te permiten controlar 
+cómo un servidor maneja las URLs que le llegan.
+Render (y otros servicios como Netlify o Vercel) las usan para saber qué hacer con cada ruta que visita el usuario.
+Como Vite/React Router manejan las rutas del lado del cliente, el servidor debe siempre devolver index.html para 
+cualquier ruta que NO sea un archivo real.
+
+Por eso configuras:
+Source	Destination	Action
+/*	/index.html	Rewrite
+✔️ ¿Para qué sirve esto en la práctica?
+
+Para que al recargar una página como /profile, no salga un 404.
+Para que las rutas del frontend funcionen correctamente.
+Para servir tu SPA desde un solo archivo inicial.
+
+SI EL BACKEND Y EL FRONTEND ESTÁN EL EL MISMO Servidor también BASTARÍA PONER EN EXPRESS
+// **OPCIONAL**
+// Serve React Frontend 
+//app.use(express.static(path.join(__dirname, "../build")));
+
+//app.get("*", (req, res) => {
+//  res.sendFile(path.join(__dirname, "../build", "index.html"));
+//});
+// **END OPCIONAL**
 

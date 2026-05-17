@@ -5,7 +5,7 @@ import { GoogleGenAI } from "@google/genai";
 import ReactMarkdown from "react-markdown"; // Para tunear el resultado de la IA de Gémini
 const GEMINI_API_KEY = import.meta.env.VITE_APP_GEMINI_API_KEY
 
-function Chat2() {
+const Chat2 = () => {
     // const [connected, setConnected] = useState(true);
     const [input, setInput]= useState('')
     const [messages, setMessages] = useState([])
@@ -21,9 +21,22 @@ function Chat2() {
 
     useEffect(()=> {
         const fetchingProvincias = async () => {    
-            const response = await fetch("http://datos.gob.es/apidata/nti/territory/Province?_pageSize=100&_sort=label")
+            // const response = await fetch("http://datos.gob.es/apidata/nti/territory/Province?_pageSize=100&_sort=label")
+            const response = await fetch(
+                    `http://localhost:5000/api/provincias`,
+                    {
+                        method: 'GET',
+                        // method: 'POST', // CAMBIADO A POST PARA PODER EJECUTAR EN BACKEND CSRFTOKEN PARA MAYOR SEGURIDAD
+                        // credentials: 'include', // IMPORTANTE: esto permite usar la cookie
+                        headers: {
+                            // 'Authorization': `Bearer ${token}`,
+                            'Content-type': 'application/json; charset=UTF-8',
+                            // 'X-CSRF-Token': csrfToken,
+                        }
+                    })
             const data = await response.json()
-            const datosProvincias = data.result.items
+            // const datosProvincias = data.result.items
+            const datosProvincias = data
             console.log("Provincias: ", datosProvincias)
             setProvincias(datosProvincias)
             setSelectedProvincia(datosProvincias[0].label)  // Seleccionamos la primera por defecto
