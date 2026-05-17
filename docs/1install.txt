@@ -124,8 +124,8 @@ app.listen(PORT, () => {
 });
 
 
-Para que al dar F5 estando en cualquier ruta como pueda ser https://calendar2-6wyj.onrender.com/holidays el navegador
-no nos devuelva NOT FOUND
+Una vez desplegado el proyecto, para que al dar F5 estando en cualquier ruta del Frontend como
+pueda ser https://calendar2-6wyj.onrender.com/holidays el navegador no nos devuelva NOT FOUND
 
 En Render tenemos que configurar en frontend el apartado Redirect/Rewrite con los siguiente parámetros
     - Usando Vite

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import DataFile from "../assets/Excel web Asociacionestest.json"
 import { GoogleGenAI } from "@google/genai";
 import ReactMarkdown from "react-markdown"; // Para tunear el resultado de la IA de Gémini
+import useLoading from "../hooks/useLoading"
 // MUI
 import {
     Box,
@@ -43,7 +44,8 @@ const Chat3 = () => {
     // NO NEEDED API_KEY DUE TO ALREADY IN .ENV FILE 
     const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY }); 
     const bottomRef = useRef(null);
-
+    const { setIsLoading, WaitingMessage } = useLoading()
+    
     useEffect(()=> {
         const fetchingProvincias = async () => {    
             const response = await fetch(
@@ -98,7 +100,7 @@ const Chat3 = () => {
             color: "red", 
             backgroundColor: "#E0E0E0", 
             align: "right", 
-            margin: "0 0 0 50px", 
+            margin: "5px 0 0 50px", 
             padding: "10px", 
             borderRadius: "10px", 
             message: input
@@ -109,6 +111,7 @@ const Chat3 = () => {
     }
 
     const checkWithIA = async (inputMessage) => {
+        setIsLoading(true)
         const response = await fetch( 
             // "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent",
             // "https://generativelanguage.googleapis.com/v1/models/gemini-3-flash-preview:generateContent", 
@@ -153,12 +156,13 @@ const Chat3 = () => {
             color: "green", 
             backgroundColor: "#EDEEEE", 
             align: "left", 
-            margin: "0 0 0 0", 
+            margin: "5px 0 0 0", 
             padding: "10px", 
             borderRadius: "10px", 
             message: `RESPUESTA: ${textProcessed}`
         }
         setMessages(prev=> [...prev, repliedMessage])
+        setIsLoading(false)
     }
 
     const handleSetSelectedProvincia = (e) => {
@@ -168,6 +172,7 @@ const Chat3 = () => {
 
     return (
         <Box component="form" noValidate autoComplete="off">
+            <WaitingMessage />
             <Dialog open={dialogOpen} onClose={handleCloseDialog} fullWidth>
                 <DialogTitle>
                     <Stack spacing={1} > 
@@ -193,7 +198,17 @@ const Chat3 = () => {
                                         borderRadius: message.borderRadius
                                 }}
                                 >
-                                    <ReactMarkdown>
+                                    <ReactMarkdown
+                                        components={{
+                                            a: ({node, ...props}) => (
+                                                <a
+                                                    {...props}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                />
+                                            )
+                                        }}
+                                    >
                                         {message.message}
                                     </ReactMarkdown>
                                 </div>
@@ -236,31 +251,38 @@ const Chat3 = () => {
                             </FormControl>
                         </Stack>
                         <Stack direction="row" spacing={1} sx={{ width: "100%" }}>  
-                            <FormControl fullWidth margin='dense'>
-                                {/* >Programa *<*/}
-                                <InputLabel 
-                                    id="provincia-label"
-                                    // htmlFor="select-provincia"
-                                    >
-                                    Provincia
-                                </InputLabel>
-                                <Select
-                                    labelId="provincia-label"
-                                    id="provincia-select"
-                                    name="provincia"
-                                    label="Provincia"
-                                    value={selectedProvincia}
-                                    onChange={handleSetSelectedProvincia}
-                                    >
-                                    {provincias.map((provincia,index) => (
-                                        <MenuItem key={index} id={provincia.label} value={provincia.label}>{provincia.label}</MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
+                            { !provincias? "Cargando provincias ...": ""}
+                            { provincias &&
+                                <FormControl fullWidth margin='dense'>
+                                    {/* >Programa *<*/}
+                                    <InputLabel 
+                                        id="provincia-label"
+                                        // htmlFor="select-provincia"
+                                        >
+                                        Provincia
+                                    </InputLabel>
+                                    <Select
+                                        labelId="provincia-label"
+                                        id="provincia-select"
+                                        name="provincia"
+                                        label="Provincia"
+                                        value={selectedProvincia}
+                                        onChange={handleSetSelectedProvincia}
+                                        >
+                                        {provincias.map((provincia,index) => (
+                                            <MenuItem key={index} id={provincia.label} value={provincia.label}>{provincia.label}</MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            }
                             {/* Enviar */}
                             <Button  onClick={handleSend} variant="contained">Enviar</Button>
                             {/* Cancelar */}
-                            <Button onClick={() => setDialogOpen(false)}color="error" variant="contained">Cancelar</Button>
+                            <Button onClick={() => { 
+                                    setDialogOpen(false)
+                                    handleDisconnect()
+                                }}
+                                color="error" variant="contained">Cancelar</Button>
                         </Stack>
                     </Stack>
                 </DialogActions>
