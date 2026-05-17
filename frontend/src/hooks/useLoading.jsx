@@ -4,6 +4,11 @@ import { Backdrop, CircularProgress } from "@mui/material";
 const useLoading = () => {
 
     const [isLoading, setIsLoading] = useState(false)
+    const [waitingMessageTextNumber, setWaitingMessageTextNumber] = useState(0)
+    const [waitingMessageText, setWaitingMessageText] = useState([
+        "Esperando respuesta",
+        "Cargando datos provincias"
+    ])
 
     const WaitingMessage = () => {
         return (
@@ -12,13 +17,14 @@ const useLoading = () => {
                 open={isLoading}
                 >
                 <CircularProgress color="inherit" />
-                    <b>Waiting reply ... </b>
+                    {/* <b>Waiting reply ... </b> */}
+                    <b>{waitingMessageText[waitingMessageTextNumber]} ... </b>
             </Backdrop>
         )
     }
 
     return {
-        isLoading, setIsLoading, WaitingMessage
+        isLoading, setIsLoading, waitingMessageTextNumber, setWaitingMessageTextNumber, WaitingMessage
     }
 }
 

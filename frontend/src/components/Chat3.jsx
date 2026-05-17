@@ -44,10 +44,12 @@ const Chat3 = () => {
     // NO NEEDED API_KEY DUE TO ALREADY IN .ENV FILE 
     const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY }); 
     const bottomRef = useRef(null);
-    const { setIsLoading, WaitingMessage } = useLoading()
+    const { setIsLoading, setWaitingMessageTextNumber, WaitingMessage } = useLoading()
     
     useEffect(()=> {
-        const fetchingProvincias = async () => {    
+        const fetchingProvincias = async () => {
+            setIsLoading(true)
+            setWaitingMessageTextNumber(1)
             const response = await fetch(
                     // `http://localhost:5000/api/provincias`,
                     `${VITE_BACKEND_URL_RENDER}/api/provincias`,
@@ -62,6 +64,7 @@ const Chat3 = () => {
             console.log("Provincias: ", datosProvincias)
             setProvincias(datosProvincias)
             setSelectedProvincia(datosProvincias[0].label)  // Seleccionamos la primera por defecto
+            setIsLoading(false)
         }
         fetchingProvincias()
     }, [])
@@ -112,6 +115,7 @@ const Chat3 = () => {
 
     const checkWithIA = async (inputMessage) => {
         setIsLoading(true)
+        setWaitingMessageTextNumber(0)
         const response = await fetch( 
             // "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent",
             // "https://generativelanguage.googleapis.com/v1/models/gemini-3-flash-preview:generateContent", 
@@ -251,30 +255,27 @@ const Chat3 = () => {
                             </FormControl>
                         </Stack>
                         <Stack direction="row" spacing={1} sx={{ width: "100%" }}>  
-                            { !provincias? "Cargando provincias ...": ""}
-                            { provincias &&
-                                <FormControl fullWidth margin='dense'>
-                                    {/* >Programa *<*/}
-                                    <InputLabel 
-                                        id="provincia-label"
-                                        // htmlFor="select-provincia"
-                                        >
-                                        Provincia
-                                    </InputLabel>
-                                    <Select
-                                        labelId="provincia-label"
-                                        id="provincia-select"
-                                        name="provincia"
-                                        label="Provincia"
-                                        value={selectedProvincia}
-                                        onChange={handleSetSelectedProvincia}
-                                        >
-                                        {provincias.map((provincia,index) => (
-                                            <MenuItem key={index} id={provincia.label} value={provincia.label}>{provincia.label}</MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-                            }
+                            <FormControl fullWidth margin='dense'>
+                                {/* >Programa *<*/}
+                                <InputLabel 
+                                    id="provincia-label"
+                                    // htmlFor="select-provincia"
+                                    >
+                                    Provincia
+                                </InputLabel>
+                                <Select
+                                    labelId="provincia-label"
+                                    id="provincia-select"
+                                    name="provincia"
+                                    label="Provincia"
+                                    value={selectedProvincia}
+                                    onChange={handleSetSelectedProvincia}
+                                    >
+                                    {provincias.map((provincia,index) => (
+                                        <MenuItem key={index} id={provincia.label} value={provincia.label}>{provincia.label}</MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
                             {/* Enviar */}
                             <Button  onClick={handleSend} variant="contained">Enviar</Button>
                             {/* Cancelar */}
