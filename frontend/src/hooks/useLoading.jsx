@@ -7,7 +7,7 @@ const useLoading = () => {
     const [waitingMessageTextNumber, setWaitingMessageTextNumber] = useState(0)
     const [waitingMessageText, setWaitingMessageText] = useState([
         "Esperando respuesta",
-        "Cargando datos provincias"
+        "Cargando datos de provincias"
     ])
 
     const WaitingMessage = () => {

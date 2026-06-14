@@ -26,6 +26,11 @@ function HomePage() {
             <Button variant="contained" color="primary" onClick={() => goToChat(3)}>
                 Go to Chat v3
             </Button>
+            <br />
+            <br />
+            <Button variant="contained" color="primary" onClick={() => goToChat(4)}>
+                Go to Chat v4
+            </Button>
         </div>
     );
 }

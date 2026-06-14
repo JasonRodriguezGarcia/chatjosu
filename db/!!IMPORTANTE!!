@@ -1,0 +1,47 @@
+SCRIPT PARA HACER UNA COPIA DE UN SCHEMA QUE COPIA LAS TABLAS Y SUS RELACIONES
+
+-- 1️⃣ Crear el nuevo schema
+CREATE SCHEMA IF NOT EXISTS calendar3;
+
+-- 2️⃣ Copiar todas las tablas con estructura y datos
+DO $$
+DECLARE
+    tbl RECORD;
+BEGIN
+    FOR tbl IN
+        SELECT table_name
+        FROM information_schema.tables
+        WHERE table_schema = 'erroak'
+    LOOP
+        -- Crear tabla en calendar3 con la misma estructura (incluye PK, defaults, check constraints, indexes)
+        EXECUTE format('CREATE TABLE calendar3.%I (LIKE erroak.%I INCLUDING ALL);', tbl.table_name, tbl.table_name);
+        
+        -- Copiar datos, permitiendo sobrescribir columnas identity
+        EXECUTE format('INSERT INTO calendar3.%I OVERRIDING SYSTEM VALUE SELECT * FROM erroak.%I;', tbl.table_name, tbl.table_name);
+    END LOOP;
+END;
+$$;
+
+-- 3️⃣ Recrear foreign keys apuntando al nuevo schema
+DO $$
+DECLARE
+    fk RECORD;
+BEGIN
+    FOR fk IN
+        SELECT
+            conname,
+            conrelid::regclass AS table_from,
+            confrelid::regclass AS table_to,
+            pg_get_constraintdef(oid) AS definition
+        FROM pg_constraint
+        WHERE contype = 'f'
+          AND connamespace = 'erroak'::regnamespace
+    LOOP
+        -- Reemplaza el schema 'erroak' por 'calendar3' en la definición de la FK
+        EXECUTE format('ALTER TABLE calendar3.%I ADD CONSTRAINT %I %s;',
+                       split_part(fk.table_from::text, '.', 2),
+                       fk.conname,
+                       replace(fk.definition, 'erroak.', 'calendar3.'));
+    END LOOP;
+END;
+$$;

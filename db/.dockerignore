@@ -1,0 +1,15 @@
+# Ignorar archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Ignorar configuraciones locales
+*.log
+*.env
+
+# Ignorar carpetas innecesarias
+node_modules
+__pycache__/
+venv/
+.git
+.gitignore
+*.sh

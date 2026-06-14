@@ -1,0 +1,76 @@
+📄 README.md
+
+# PostgreSQL + pgAdmin con Docker Compose
+
+Este proyecto configura un entorno completo de PostgreSQL con pgAdmin usando Docker Compose.
+
+---
+
+## 📦 Servicios incluidos
+
+- **PostgreSQL** – Base de datos relacional (puerto `5432`)
+- **pgAdmin** – Interfaz web para administrar PostgreSQL (puerto `5050`)
+
+---
+
+## 🚀 Cómo usar
+
+### 🟢 Iniciar el entorno sin perder datos
+
+```bash
+./start_postgres_pgadmin.sh
+Levanta los contenedores definidos en docker-compose.yml.
+
+Conserva las bases de datos y configuraciones previas.
+
+⏹️ Detener los servicios (sin borrar datos)
+bash
+Copiar
+Editar
+./stop_postgres_pgadmin.sh
+Pausa los contenedores.
+
+Puedes reactivarlos más tarde sin pérdida.
+
+💣 Reiniciar el entorno desde cero
+bash
+./setup_postgres_pgadmin.sh
+Elimina contenedores y volúmenes (down -v).
+
+Vuelve a crear todo desde limpio.
+
+🌐 Acceso a pgAdmin
+URL: http://localhost:5050
+
+Usuario: ja.rodriguez@aulanz.net
+
+Contraseña: postgres
+
+📁 Volúmenes Docker usados
+postgres_data → Guarda los datos de PostgreSQL
+
+pgadmin_data → Guarda la configuración de pgAdmin
+
+Los datos solo se pierden si ejecutas docker-compose down -v.
+
+🔄 Comandos útiles
+Acción	Comando
+Iniciar contenedores	docker-compose up -d
+Detener contenedores	docker-compose stop
+Eliminar contenedores (mantener datos)	docker-compose down
+Eliminar contenedores y datos	docker-compose down -v
+
+📂 Estructura sugerida del proyecto
+.
+├── docker-compose.yml
+├── README.md
+├── setup_postgres_pgadmin.sh
+├── start_postgres_pgadmin.sh
+└── stop_postgres_pgadmin.sh
+✅ Requisitos
+Docker
+
+Docker Compose
+
+Permisos de ejecución para los scripts (chmod +x *.sh)
+

@@ -183,3 +183,61 @@ SI EL BACKEND Y EL FRONTEND ESTÁN EL EL MISMO Servidor también BASTARÍA PONER
 //});
 // **END OPCIONAL**
 
+
+
+Para instalar EN BACKEND ExcelJS necesario para pasar un fichero excell a Json:
+    npm install exceljs
+
+Código para evolverlo directamente desde Express un json con la conversión del Excel
+vale para tener una idea de cómo hacer la conversión de excel a json
+
+import express from 'express';
+import ExcelJS from 'exceljs';
+
+const app = express();
+
+app.get('/data', async (req, res) => {
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.readFile('./data/datos.xlsx');
+
+  const worksheet = workbook.getWorksheet(1);
+
+  const headers = worksheet.getRow(1).values.slice(1);
+  const data = [];
+
+  worksheet.eachRow((row, rowNumber) => {
+    if (rowNumber === 1) return;
+
+    const obj = {};
+
+    headers.forEach((header, index) => {
+      obj[header] = row.getCell(index + 1).value;
+    });
+
+    data.push(obj);
+  });
+
+  return res.json(data); // 👈 esto es lo importante
+});
+
+Cómo lo usarías en React
+const res = await fetch('http://localhost:3000/data');
+const data = await res.json();
+
+console.log(data);
+
+******************
+******************
+Instalando Postgres en backend
+    npm install pg
+
+añadiendo en .env los detalles de la base de datos en una variable en formato json 
+DEBE IR TODO JUNTO SIN SALTOS DE LINEA
+    DATABASE_DETAILS={"DATABASE_USER":"postgres.slipxykygueybdeveqtx","DATABASE_HOST":"aws-0-eu-west-3.pooler.supabase.com","DATABASE_DATABASE":"postgres","DATABASE_PASSWORD":"1Jason2Rosita4","DATABASE_PORT":"5432"}
+
+añadiendo fichero en backend con el uso del pool de postgresql que permite el acceso a la base de datos
+    db-pg.js
+
+******************
+******************
+
