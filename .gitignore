@@ -26,5 +26,8 @@ node_modules
 node_modules/
 **/node_modules/
 .env
-.env*
-**/.env*
+**/.env
+# Local environment files
+.env
+backend/.env
+frontend/.env
