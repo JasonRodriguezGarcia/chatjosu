@@ -9,13 +9,36 @@ dotenv.config();
 import pool from './db-pg.js';
 
 const SCHEMA_NAME = process.env.SCHEMA_NAME;
+if (!SCHEMA_NAME || !/^[A-Za-z0-9_]+$/.test(SCHEMA_NAME)) {
+  throw new Error("SCHEMA_NAME must contain only letters, numbers, and underscores.");
+}
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const app = express(); 
+const app = express();
 const PORT = process.env.PORT || 5000;
-const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS.split(','); // devuelve un array tras separar con comas
-app.locals.GEMINI_API_KEY = process.env.GEMINI_API_KEY; // Genera una variable GLOBAL accesible desde cualquier lugar de la app
+
+const allowedOriginsValue = process.env.ALLOWED_ORIGINS?.trim();
+if (!allowedOriginsValue) {
+  throw new Error("ALLOWED_ORIGINS is required.");
+}
+
+const ALLOWED_ORIGINS = allowedOriginsValue
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+if (ALLOWED_ORIGINS.length === 0) {
+  throw new Error("ALLOWED_ORIGINS must contain at least one origin.");
+}
+
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY?.trim();
+if (!GEMINI_API_KEY) {
+  throw new Error("GEMINI_API_KEY is required.");
+}
+
+app.locals.GEMINI_API_KEY = GEMINI_API_KEY;
 
 //
 // functions
@@ -64,10 +87,8 @@ console.log("datos tags: ", tags)
 // Middleware
 
 // Configurar cors
-const corsOptions = { 
-    origin: ALLOWED_ORIGINS
-    // origin: "http://localhost:5173",
-    // methods:["POST"] // sin esta línea se deja todos los methods
+const corsOptions = {
+  origin: ALLOWED_ORIGINS,
 };
 
 // Llama a la conversión del fichero excel de contexto y a la vez lo traduce a un objeto compatible Json
@@ -78,7 +99,7 @@ const excelContentData = await loadExcelContentData();
 app.locals.excelContentData = excelContentData;
 // console.log ("ExcelData: ", excelContentData)
 
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // API Route Example
