@@ -3,6 +3,8 @@ import { describe, expect, it, vi } from "vitest";
 import HelpChat from "../HelpChat";
 import {
   associationResponse,
+  isLocationRequest,
+  locationResponse,
   provincesResponse,
 } from "../../test/helpchatTestUtils";
 
@@ -11,6 +13,10 @@ describe("HelpChat structured resources", () => {
     globalThis.fetch = vi.fn((url) => {
       if (String(url).includes("/provincias")) {
         return Promise.resolve(provincesResponse());
+      }
+
+      if (isLocationRequest(url)) {
+        return Promise.resolve(locationResponse({ province: "Burgos" }));
       }
 
       return Promise.resolve(associationResponse());

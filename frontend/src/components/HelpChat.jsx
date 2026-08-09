@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import AssociationCard from "./AssociationCard";
 import { normalizeConversationContext } from "../helpchat/conversationContext";
+import { normalizeDetectedLocation } from "../helpchat/location";
 import {
   Box,
   Button,
@@ -100,6 +101,7 @@ const HelpChat = () => {
   const requestQueueRef = useRef([]);
   const processingQueueRef = useRef(false);
   const conversationContextRef = useRef(null);
+  const manualProvinciaRef = useRef(false);
 
   useEffect(() => {
     const fetchingProvincias = async () => {
@@ -116,11 +118,50 @@ const HelpChat = () => {
         }
 
         const data = await response.json();
-
-          const datosProvincias = Array.isArray(data) ? data : [];
+        const datosProvincias = Array.isArray(data) ? data : [];
 
         setProvincias(datosProvincias);
-        setSelectedProvincia(datosProvincias[0]?.label ?? "");
+
+        if (!manualProvinciaRef.current) {
+          setSelectedProvincia(datosProvincias[0]?.label ?? "");
+        }
+
+        try {
+          const locationResponse = await fetch("/api/v1/helpchat/location", {
+            method: "GET",
+            headers: {
+              "Content-type": "application/json; charset=UTF-8",
+            },
+          });
+
+          if (!locationResponse.ok) {
+            return;
+          }
+
+          const detectedLocation = normalizeDetectedLocation(
+            await locationResponse.json(),
+          );
+
+          if (!detectedLocation || manualProvinciaRef.current) {
+            return;
+          }
+
+          const matchedProvince = datosProvincias.find(
+            (provincia) =>
+              typeof provincia?.label === "string" &&
+              provincia.label.localeCompare(
+                detectedLocation.province,
+                "es",
+                { sensitivity: "base" },
+              ) === 0,
+          );
+
+          if (matchedProvince) {
+            setSelectedProvincia(matchedProvince.label);
+          }
+        } catch {
+          // GeoIP es una mejora silenciosa: el selector manual sigue disponible.
+        }
       } catch (err) {
         console.error("Error al obtener provincias:", err);
       }
@@ -316,6 +357,7 @@ const HelpChat = () => {
   };
 
   const handleSetSelectedProvincia = (event) => {
+    manualProvinciaRef.current = true;
     setSelectedProvincia(event.target.value);
   };
 

@@ -92,3 +92,19 @@ export const conversationContextV1 = ({
   },
   resourcesShown,
 });
+
+export const isLocationRequest = (url) =>
+  String(url).includes("/api/v1/helpchat/location");
+
+export const locationResponse = ({
+  country = "ES",
+  province = "Gipuzkoa",
+  municipality = "Donostia / San Sebastián",
+} = {}) =>
+  jsonResponse({
+    country,
+    province,
+    municipality,
+    source: "ip",
+    confidence: "coarse",
+  });

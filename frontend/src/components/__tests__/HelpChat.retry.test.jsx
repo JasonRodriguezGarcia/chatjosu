@@ -10,6 +10,8 @@ import {
   associationResponse,
   deferred,
   jsonResponse,
+  isLocationRequest,
+  locationResponse,
   provincesResponse,
 } from "../../test/helpchatTestUtils";
 
@@ -26,6 +28,10 @@ describe("HelpChat retry queue semantics", () => {
     globalThis.fetch = vi.fn((url, options = {}) => {
       if (String(url).includes("/provincias")) {
         return Promise.resolve(provincesResponse());
+      }
+
+      if (isLocationRequest(url)) {
+        return Promise.resolve(locationResponse({ province: "Burgos" }));
       }
 
       iacallCount += 1;

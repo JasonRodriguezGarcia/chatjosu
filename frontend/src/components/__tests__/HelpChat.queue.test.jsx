@@ -9,6 +9,8 @@ import HelpChat from "../HelpChat";
 import {
   associationResponse,
   deferred,
+  isLocationRequest,
+  locationResponse,
   provincesResponse,
 } from "../../test/helpchatTestUtils";
 
@@ -22,6 +24,10 @@ describe("HelpChat request queue", () => {
     globalThis.fetch = vi.fn((url, options = {}) => {
       if (String(url).includes("/provincias")) {
         return Promise.resolve(provincesResponse());
+      }
+
+      if (isLocationRequest(url)) {
+        return Promise.resolve(locationResponse({ province: "Burgos" }));
       }
 
       iacallCount += 1;
@@ -101,6 +107,6 @@ describe("HelpChat request queue", () => {
       "Y vive sola",
     ]);
 
-    expect(globalThis.fetch).toHaveBeenCalledTimes(4);
+    expect(iacallCount).toBe(3);
   });
 });

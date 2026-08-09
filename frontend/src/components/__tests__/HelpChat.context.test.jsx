@@ -10,6 +10,8 @@ import {
   associationResponse,
   conversationContextV1,
   deferred,
+  isLocationRequest,
+  locationResponse,
   provincesResponse,
 } from "../../test/helpchatTestUtils";
 
@@ -23,6 +25,10 @@ describe("HelpChat conversational context", () => {
     globalThis.fetch = vi.fn((url, options = {}) => {
       if (String(url).includes("/provincias")) {
         return Promise.resolve(provincesResponse());
+      }
+
+      if (isLocationRequest(url)) {
+        return Promise.resolve(locationResponse({ province: "Burgos" }));
       }
 
       iacallCount += 1;

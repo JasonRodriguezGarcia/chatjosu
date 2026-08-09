@@ -7,6 +7,8 @@ import { describe, expect, it, vi } from "vitest";
 import HelpChat from "../HelpChat";
 import {
   associationResponse,
+  isLocationRequest,
+  locationResponse,
   provincesResponse,
 } from "../../test/helpchatTestUtils";
 
@@ -17,6 +19,10 @@ describe("HelpChat composer", () => {
     globalThis.fetch = vi.fn((url) => {
       if (String(url).includes("/provincias")) {
         return Promise.resolve(provincesResponse());
+      }
+
+      if (isLocationRequest(url)) {
+        return Promise.resolve(locationResponse({ province: "Burgos" }));
       }
 
       iacallCount += 1;

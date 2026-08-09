@@ -9,6 +9,8 @@ import HelpChat from "../HelpChat";
 import {
   associationResponse,
   conversationContextV1,
+  isLocationRequest,
+  locationResponse,
   provincesResponse,
 } from "../../test/helpchatTestUtils";
 
@@ -28,6 +30,10 @@ describe("HelpChat clarification flow", () => {
     globalThis.fetch = vi.fn(async (url, options = {}) => {
       if (String(url).includes("/provincias")) {
         return provincesResponse();
+      }
+
+      if (isLocationRequest(url)) {
+        return locationResponse({ province: "Burgos" });
       }
 
       callCount += 1;
