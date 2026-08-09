@@ -67,3 +67,28 @@ export const associationResponse = ({
       },
     ],
   });
+
+export const conversationContextV1 = ({
+  relationship = null,
+  activeNeeds = [],
+  currentGoal = null,
+  facts = [],
+  constraints = [],
+  province = null,
+  municipality = null,
+  resourcesShown = [],
+} = {}) => ({
+  version: 1,
+  subject: {
+    relationship,
+  },
+  activeNeeds,
+  currentGoal,
+  facts,
+  constraints,
+  territory: {
+    province,
+    municipality,
+  },
+  resourcesShown,
+});

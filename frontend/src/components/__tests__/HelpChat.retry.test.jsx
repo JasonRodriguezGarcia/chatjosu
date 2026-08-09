@@ -46,8 +46,8 @@ describe("HelpChat retry queue semantics", () => {
 
     render(<HelpChat />);
 
-    await screen.findByRole("button", {
-      name: /Cambiar provincia.*Burgos/i,
+    await screen.findByRole("combobox", {
+      name: /Provincia actual.*Burgos/i,
     });
 
     const input = screen.getByRole("textbox", { name: /Escribe qué necesitas/i });

@@ -8,6 +8,7 @@ import { describe, expect, it, vi } from "vitest";
 import HelpChat from "../HelpChat";
 import {
   associationResponse,
+  conversationContextV1,
   deferred,
   provincesResponse,
 } from "../../test/helpchatTestUtils";
@@ -48,8 +49,8 @@ describe("HelpChat conversational context", () => {
 
     render(<HelpChat />);
 
-    await screen.findByRole("button", {
-      name: /Cambiar provincia.*Burgos/i,
+    await screen.findByRole("combobox", {
+      name: /Provincia actual.*Burgos/i,
     });
 
     const input = screen.getByRole("textbox", {
@@ -80,11 +81,11 @@ describe("HelpChat conversational context", () => {
       ...associationResponse(),
       json: async () => ({
         ...firstData,
-        context: {
-          activeNeeds: ["ALZHEIMER"],
-          relationship: "madre",
-          facts: [],
-        },
+        context: conversationContextV1({
+            relationship: "madre",
+            activeNeeds: ["alzheimer"],
+            province: "Burgos",
+          }),
       }),
     });
 
@@ -95,11 +96,11 @@ describe("HelpChat conversational context", () => {
     expect(requestBodies[1]).toMatchObject({
       inputMessage: "Además vive sola",
       selectedProvincia: "Burgos",
-      conversationContext: {
-        activeNeeds: ["ALZHEIMER"],
-        relationship: "madre",
-        facts: [],
-      },
+      conversationContext: conversationContextV1({
+          relationship: "madre",
+          activeNeeds: ["alzheimer"],
+          province: "Burgos",
+        }),
     });
   });
 });

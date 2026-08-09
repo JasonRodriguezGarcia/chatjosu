@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import AssociationCard from "./AssociationCard";
+import { normalizeConversationContext } from "../helpchat/conversationContext";
 import {
   Box,
   Button,
   FormControl,
-  InputLabel,
   MenuItem,
   Select,
   Stack,
@@ -95,7 +95,6 @@ const HelpChat = () => {
   const [isSending, setIsSending] = useState(false);
   const [requestError, setRequestError] = useState(null);
   const [lastFailedRequest, setLastFailedRequest] = useState(null);
-  const [isEditingProvincia, setIsEditingProvincia] = useState(false);
 
   const bottomRef = useRef(null);
   const requestQueueRef = useRef([]);
@@ -177,7 +176,12 @@ const HelpChat = () => {
           typeof data.context === "object" &&
           !Array.isArray(data.context)
         ) {
-          conversationContextRef.current = data.context;
+          const nextConversationContext =
+            normalizeConversationContext(data.context);
+
+          if (nextConversationContext) {
+            conversationContextRef.current = nextConversationContext;
+          }
         }
 
       const resources = Array.isArray(data?.associations)
@@ -300,7 +304,6 @@ const HelpChat = () => {
 
   const handleSetSelectedProvincia = (event) => {
     setSelectedProvincia(event.target.value);
-    setIsEditingProvincia(false);
   };
 
   const handleSuggestion = (suggestion) => {
@@ -371,72 +374,64 @@ const HelpChat = () => {
           </Typography>
         </Stack>
 
-        {!isEditingProvincia ? (
-          <Button
-            type="button"
-            size="small"
-            aria-label={`Cambiar provincia. Provincia actual: ${
-              selectedProvincia || "sin seleccionar"
-            }`}
-            disabled={provincias.length === 0}
-            onClick={() => setIsEditingProvincia(true)}
+        <FormControl
+          size="small"
+          disabled={provincias.length === 0}
+          sx={{
+            minWidth: { xs: 150, sm: 170 },
+            maxWidth: "100%",
+          }}
+        >
+          <Select
+            id="provincia-select"
+            name="provincia"
+            value={selectedProvincia}
+            displayEmpty
+            onChange={handleSetSelectedProvincia}
+            inputProps={{
+              "aria-label": `Provincia actual: ${
+                selectedProvincia || "sin seleccionar"
+              }`,
+            }}
+            renderValue={(value) =>
+              `📍 ${value || "Ubicación"}`
+            }
             sx={{
-              maxWidth: "100%",
               bgcolor: BRAND.plumSoft,
               color: BRAND.text,
-              border: 1,
-              borderColor: BRAND.border,
               borderRadius: 999,
-              px: 1.5,
-              py: 0.75,
-              textTransform: "none",
               fontWeight: 500,
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              "&:hover": {
-                bgcolor: BRAND.plumSoft,
+              "& .MuiSelect-select": {
+                py: 0.75,
+                pl: 1.5,
+                pr: 4,
+              },
+              "& .MuiOutlinedInput-notchedOutline": {
+                borderColor: BRAND.border,
+              },
+              "&:hover .MuiOutlinedInput-notchedOutline": {
                 borderColor: BRAND.plum,
               },
-              "&:focus-visible": {
+              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                borderColor: BRAND.plum,
+              },
+              "&.Mui-focused": {
                 outline: `3px solid ${BRAND.yellow}`,
                 outlineOffset: 2,
               },
             }}
           >
-            📍 {selectedProvincia || "Ubicación"}
-          </Button>
-        ) : (
-          <FormControl
-            size="small"
-            sx={{
-              minWidth: { xs: "100%", sm: 170 },
-              bgcolor: BRAND.surface,
-              borderRadius: 2,
-            }}
-          >
-            <InputLabel id="provincia-label">Provincia</InputLabel>
-
-            <Select
-              labelId="provincia-label"
-              id="provincia-select"
-              name="provincia"
-              label="Provincia"
-              value={selectedProvincia}
-              onChange={handleSetSelectedProvincia}
-            >
-              {provincias.map((provincia) => (
-                <MenuItem
-                  key={provincia.label}
-                  id={provincia.label}
-                  value={provincia.label}
-                >
-                  {provincia.label}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        )}
+            {provincias.map((provincia) => (
+              <MenuItem
+                key={provincia.label}
+                id={provincia.label}
+                value={provincia.label}
+              >
+                {provincia.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </Toolbar>
 
       <Box

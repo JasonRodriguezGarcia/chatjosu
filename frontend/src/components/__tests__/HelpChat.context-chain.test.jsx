@@ -8,6 +8,7 @@ import { describe, expect, it, vi } from "vitest";
 import HelpChat from "../HelpChat";
 import {
   associationResponse,
+  conversationContextV1,
   deferred,
   provincesResponse,
 } from "../../test/helpchatTestUtils";
@@ -48,18 +49,20 @@ describe("HelpChat conversational context chain", () => {
         return secondRequest.promise;
       }
 
-      return responseWithContext({
-        activeNeeds: ["ALZHEIMER", "AISLAMIENTO"],
-        relationship: "madre",
-        facts: ["vive sola"],
-        relevantProvince: "Burgos",
-      });
+      return responseWithContext(
+        conversationContextV1({
+          relationship: "madre",
+          activeNeeds: ["alzheimer", "soledad"],
+          facts: ["vive sola"],
+          province: "Burgos",
+        }),
+      );
     });
 
     render(<HelpChat />);
 
-    await screen.findByRole("button", {
-      name: /Cambiar provincia.*Burgos/i,
+    await screen.findByRole("combobox", {
+      name: /Provincia actual.*Burgos/i,
     });
 
     const input = screen.getByRole("textbox", {
@@ -89,29 +92,36 @@ describe("HelpChat conversational context chain", () => {
     expect(requestBodies[0].conversationContext).toBeNull();
 
     firstRequest.resolve(
-      await responseWithContext({
-        activeNeeds: ["ALZHEIMER"],
-        relationship: "madre",
-        facts: [],
-      }),
+      await responseWithContext(
+        conversationContextV1({
+          relationship: "madre",
+          activeNeeds: ["alzheimer"],
+          province: "Burgos",
+        }),
+      ),
     );
 
     await waitFor(() => {
       expect(iacallCount).toBe(2);
     });
 
-    expect(requestBodies[1].conversationContext).toEqual({
-      activeNeeds: ["ALZHEIMER"],
-      relationship: "madre",
-      facts: [],
-    });
+    expect(requestBodies[1].conversationContext).toEqual(
+      conversationContextV1({
+        relationship: "madre",
+        activeNeeds: ["alzheimer"],
+        province: "Burgos",
+      }),
+    );
 
     secondRequest.resolve(
-      await responseWithContext({
-        activeNeeds: ["ALZHEIMER", "AISLAMIENTO"],
-        relationship: "madre",
-        facts: ["vive sola"],
-      }),
+      await responseWithContext(
+        conversationContextV1({
+          relationship: "madre",
+          activeNeeds: ["alzheimer", "soledad"],
+          facts: ["vive sola"],
+          province: "Burgos",
+        }),
+      ),
     );
 
     await waitFor(() => {
@@ -120,11 +130,12 @@ describe("HelpChat conversational context chain", () => {
 
     expect(requestBodies[2]).toMatchObject({
       inputMessage: "Ella vive en Burgos",
-      conversationContext: {
-        activeNeeds: ["ALZHEIMER", "AISLAMIENTO"],
+      conversationContext: conversationContextV1({
         relationship: "madre",
+        activeNeeds: ["alzheimer", "soledad"],
         facts: ["vive sola"],
-      },
+        province: "Burgos",
+      }),
     });
   });
 });

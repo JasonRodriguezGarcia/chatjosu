@@ -25,8 +25,8 @@ describe("HelpChat composer", () => {
 
     render(<HelpChat />);
 
-    await screen.findByRole("button", {
-      name: /Cambiar provincia.*Burgos/i,
+    await screen.findByRole("combobox", {
+      name: /Provincia actual.*Burgos/i,
     });
 
     const input = screen.getByRole("textbox", {

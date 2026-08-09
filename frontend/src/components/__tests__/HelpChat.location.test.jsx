@@ -8,24 +8,18 @@ import HelpChat from "../HelpChat";
 import { provincesResponse } from "../../test/helpchatTestUtils";
 
 describe("HelpChat location control", () => {
-  it("changes province using the compact location control", async () => {
+  it("changes province using the single-click location control", async () => {
     globalThis.fetch = vi.fn(() =>
       Promise.resolve(provincesResponse()),
     );
 
     render(<HelpChat />);
 
-    const locationButton = await screen.findByRole("button", {
-      name: /Cambiar provincia.*Burgos/i,
+    const select = await screen.findByRole("combobox", {
+      name: /Provincia actual.*Burgos/i,
     });
 
-    expect(locationButton).toBeInTheDocument();
-
-    fireEvent.click(locationButton);
-
-    const select = screen.getByRole("combobox", {
-      name: /Provincia/i,
-    });
+    expect(select).toBeInTheDocument();
 
     fireEvent.mouseDown(select);
 
@@ -36,8 +30,8 @@ describe("HelpChat location control", () => {
     fireEvent.click(gipuzkoa);
 
     expect(
-      screen.getByRole("button", {
-        name: /Cambiar provincia.*Gipuzkoa/i,
+      screen.getByRole("combobox", {
+        name: /Provincia actual.*Gipuzkoa/i,
       }),
     ).toBeInTheDocument();
   });

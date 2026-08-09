@@ -1,5 +1,4 @@
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import HelpChat from "../HelpChat";
 import {
@@ -9,8 +8,6 @@ import {
 
 describe("HelpChat structured resources", () => {
   it("renders a conversational reply and structured resources", async () => {
-    const user = userEvent.setup();
-
     globalThis.fetch = vi.fn((url) => {
       if (String(url).includes("/provincias")) {
         return Promise.resolve(provincesResponse());
@@ -21,15 +18,17 @@ describe("HelpChat structured resources", () => {
 
     render(<HelpChat />);
 
-    await screen.findByRole("button", {
-      name: /Cambiar provincia.*Burgos/i,
+    await screen.findByRole("combobox", {
+      name: /Provincia actual.*Burgos/i,
     });
 
     const input = screen.getByRole("textbox", { name: /Escribe qué necesitas/i });
 
-    await user.type(input, "Necesito ayuda para un familiar");
+    fireEvent.change(input, {
+      target: { value: "Necesito ayuda para un familiar" },
+    });
 
-    await user.click(
+    fireEvent.click(
       screen.getByRole("button", { name: "Enviar" }),
     );
 
