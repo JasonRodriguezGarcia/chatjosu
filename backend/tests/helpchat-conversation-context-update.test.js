@@ -312,3 +312,34 @@ test(
     );
   }
 );
+
+test(
+  "resolución múltiple persiste varias necesidades activas",
+  async () => {
+    const {
+      persistResolvedActiveNeeds,
+    } = await import(
+      "../helpchat/conversation-context-update-v1.js"
+    );
+
+    const result =
+      persistResolvedActiveNeeds({
+        conversationContext:
+          context({
+            activeNeeds: [],
+          }),
+        tags: [
+          TAGS[0],
+          TAGS[1],
+        ],
+      });
+
+    assert.deepEqual(
+      result.activeNeeds,
+      [
+        "ALZHEIMER",
+        "ENFERMEDAD NEUROLÓGICA PARCKINSON",
+      ]
+    );
+  }
+);

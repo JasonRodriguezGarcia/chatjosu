@@ -81,3 +81,66 @@ test(
     );
   }
 );
+
+test(
+  "resuelve varios anchors explícitos sin perder compatibilidad",
+  async () => {
+    const {
+      resolveSemanticAnchors,
+      resolveSemanticAnchor,
+    } = await import(
+      "../helpchat/semantic-fast-gates.js"
+    );
+
+    assert.deepEqual(
+      resolveSemanticAnchors(
+        "soy alcohólico y tengo depresión"
+      ).map(
+        (tag) =>
+          tag.descripcion
+      ),
+      [
+        "ALCOHOLISMO",
+        "SALUD MENTAL",
+      ]
+    );
+
+    assert.equal(
+      resolveSemanticAnchor(
+        "soy alcohólico y tengo depresión"
+      ),
+      null
+    );
+  }
+);
+
+test(
+  "amplía anchors explícitos de alcohol y depresión",
+  async () => {
+    const {
+      resolveSemanticAnchors,
+    } = await import(
+      "../helpchat/semantic-fast-gates.js"
+    );
+
+    assert.deepEqual(
+      resolveSemanticAnchors(
+        "soy alcohólico"
+      ).map(
+        (tag) =>
+          tag.descripcion
+      ),
+      ["ALCOHOLISMO"]
+    );
+
+    assert.deepEqual(
+      resolveSemanticAnchors(
+        "tengo depresión"
+      ).map(
+        (tag) =>
+          tag.descripcion
+      ),
+      ["SALUD MENTAL"]
+    );
+  }
+);

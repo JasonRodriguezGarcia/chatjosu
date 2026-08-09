@@ -3,7 +3,7 @@ import {
 } from "../helpchat/conversation-context-v1.js";
 
 import {
-  resolveSemanticAnchor,
+  resolveSemanticAnchors,
   isClearlyInsufficient,
 } from "../helpchat/semantic-fast-gates.js";
 
@@ -126,25 +126,38 @@ export function createHelpchatUnderstandingRouter({
         conversationContext
       );
 
-    const anchor =
-      resolveSemanticAnchor(
+    const anchors =
+      resolveSemanticAnchors(
         inputMessage
       );
 
-    if (anchor) {
-      return resolvedResult({
-        tag: anchor,
-        context,
-        provider: "anchor",
-        model: "semantic-fast-gates-v1",
-        durationMs:
-          Math.round(
-            (
-              performance.now() -
-              startedAt
-            ) * 10
-          ) / 10,
-      });
+    if (anchors.length > 0) {
+      const primary =
+        anchors[0];
+
+      return {
+        ...resolvedResult({
+          tag: primary,
+          context,
+          provider: "anchor",
+          model: "semantic-fast-gates-v1",
+          durationMs:
+            Math.round(
+              (
+                performance.now() -
+                startedAt
+              ) * 10
+            ) / 10,
+        }),
+
+        resolvedNeeds:
+          anchors.map(
+            (tag) => ({
+              ...tag,
+              source: "anchor",
+            })
+          ),
+      };
     }
 
     if (

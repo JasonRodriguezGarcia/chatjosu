@@ -234,3 +234,25 @@ export function preferContextResolution({
     diagnostics: null,
   };
 }
+
+export function persistResolvedActiveNeeds({
+  conversationContext,
+  tags = [],
+}) {
+  let next =
+    conversationContext;
+
+  for (
+    const tag
+    of tags
+  ) {
+    next =
+      persistResolvedActiveNeed({
+        conversationContext:
+          next,
+        tag,
+      });
+  }
+
+  return next;
+}

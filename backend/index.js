@@ -27,10 +27,15 @@ import {
 } from "./helpchat/conversation-context-enricher-v1.js";
 import {
   persistResolvedActiveNeed,
+  persistResolvedActiveNeeds,
   preferContextResolution,
   resolveSingleActiveOperationalTag,
   updateConversationContextV1,
 } from "./helpchat/conversation-context-update-v1.js";
+import {
+  mergeMultiNeedSearchResults,
+  resolveMultipleNeeds,
+} from "./helpchat/multi-need-v1.js";
 import {
 createHelpchatLocationResolver,
 helpchatClientIp,
@@ -705,6 +710,18 @@ app.post(
             understanding = {
                 status: "resolved",
                 tag: fallbackTag,
+                resolvedNeeds: [
+                    {
+                        tag_id:
+                            Number(
+                                fallbackTag.tag_id
+                            ),
+                        descripcion:
+                            fallbackTag.descripcion,
+                        source:
+                            "gemini",
+                    },
+                ],
                 context:
                     conversationContext,
                 needsClarification: false,
@@ -810,24 +827,84 @@ app.post(
             throw error;
         }
 
-        understanding.context =
-            persistResolvedActiveNeed({
+        const resolvedNeeds =
+            await resolveMultipleNeeds({
+                inputMessage,
                 conversationContext:
                     understanding.context ||
                     conversationContext,
-                tag,
+                primaryUnderstanding:
+                    understanding,
+                understand:
+                    app.locals.understandHelpchat,
+            });
+
+        if (
+            resolvedNeeds.length === 0
+        ) {
+            resolvedNeeds.push({
+                tag_id:
+                    Number(
+                        tag.tag_id
+                    ),
+                descripcion:
+                    tag.descripcion,
+                source:
+                    understanding.provider ||
+                    null,
+            });
+        }
+
+        understanding.resolvedNeeds =
+            resolvedNeeds;
+
+        understanding.context =
+            persistResolvedActiveNeeds({
+                conversationContext:
+                    understanding.context ||
+                    conversationContext,
+                tags:
+                    resolvedNeeds,
             });
 
         const searchStartedAt =
             performance.now();
 
-        const searchResult = await findAssociationsForHelpchat({
-            pool,
-            schemaName: SCHEMA_NAME,
-            tagId: tag.tag_id,
-            selectedProvince: effectiveProvince,
-            limit: 5,
-        });
+        const searchResults =
+            await Promise.all(
+                resolvedNeeds.map(
+                    (need) =>
+                        findAssociationsForHelpchat({
+                            pool,
+                            schemaName:
+                                SCHEMA_NAME,
+                            tagId:
+                                need.tag_id,
+                            selectedProvince:
+                                effectiveProvince,
+                            limit: 5,
+                        })
+                )
+            );
+
+        const mergedSearch =
+            mergeMultiNeedSearchResults({
+                resolvedNeeds,
+                searchResults,
+                limit: 5,
+            });
+
+        const primarySearchResult =
+            searchResults[0];
+
+        const searchResult = {
+            ...primarySearchResult,
+            ...mergedSearch,
+            resolvedProvince:
+                primarySearchResult
+                    ?.resolvedProvince ||
+                effectiveProvince,
+        };
 
         const searchMs =
             performance.now() -
@@ -836,25 +913,43 @@ app.post(
         const historyStartedAt =
             performance.now();
 
+        const savedTags =
+            await Promise.all(
+                resolvedNeeds.map(
+                    (need) =>
+                        app.locals.tagSaving(
+                            need.descripcion,
+                            HELPCHAT_STORE_INPUT_MESSAGE
+                                ? inputMessage
+                                : "[not-stored]"
+                        )
+                )
+            );
+
         const savedTag =
-            await app.locals.tagSaving(
-            tag.descripcion,
-            HELPCHAT_STORE_INPUT_MESSAGE
-                ? inputMessage
-                : "[not-stored]"
-        );
+            savedTags[0] ||
+            null;
 
         const historyMs =
             performance.now() -
             historyStartedAt;
 
-        const associations = searchResult.associations;
+        const associations =
+            searchResult.associations;
+
+        const resolvedNeedText =
+            understanding.resolvedNeeds
+                .map(
+                    (need) =>
+                        need.descripcion
+                )
+                .join(", ");
 
         let message;
 
         if (associations.length === 0) {
             message =
-                `He identificado tu consulta como **${tag.descripcion}**, ` +
+                `He identificado tu consulta como **${resolvedNeedText}**, ` +
                 `pero no he encontrado asociaciones en el catálogo disponible ` +
                 `para **${effectiveProvince}** ni recursos nacionales registrados ` +
                 `con esta categoría.`;
@@ -866,20 +961,20 @@ app.post(
                     `He encontrado ${searchResult.localCount} opción` +
                     `${searchResult.localCount === 1 ? "" : "es"} ` +
                     `relacionada${searchResult.localCount === 1 ? "" : "s"} ` +
-                    `con **${tag.descripcion}** en **${searchResult.resolvedProvince}**.`;
+                    `con **${resolvedNeedText}** en **${searchResult.resolvedProvince}**.`;
             } else if (searchResult.fallbackType === "neighbor_province") {
                 localText =
                     `No he encontrado opciones registradas en **${effectiveProvince}**, ` +
-                    `pero sí recursos relacionados con **${tag.descripcion}** ` +
+                    `pero sí recursos relacionados con **${resolvedNeedText}** ` +
                     `en provincias limítrofes disponibles en el catálogo.`;
             } else if (searchResult.fallbackType === "national") {
                 localText =
                     `No he encontrado opciones registradas en **${effectiveProvince}**, ` +
                     `pero sí recursos de ámbito nacional relacionados con ` +
-                    `**${tag.descripcion}**.`;
+                    `**${resolvedNeedText}**.`;
             } else {
                 localText =
-                    `He encontrado recursos relacionados con **${tag.descripcion}**.`;
+                    `He encontrado recursos relacionados con **${resolvedNeedText}**.`;
             }
 
             const lines = associations.map((association, index) => {
@@ -927,6 +1022,12 @@ app.post(
 
         console.log("Helpchat procesado:", {
             tag: tag.descripcion,
+            resolvedNeeds:
+                understanding.resolvedNeeds
+                    .map(
+                        (need) =>
+                            need.descripcion
+                    ),
             requestedProvince: selectedProvincia,
             effectiveProvince,
             resolvedProvince: searchResult.resolvedProvince,
@@ -941,6 +1042,8 @@ app.post(
             status: "resolved",
             message,
             tag: tag.descripcion,
+            resolvedNeeds:
+                understanding.resolvedNeeds,
             context:
                 understanding.context,
             needsClarification: false,

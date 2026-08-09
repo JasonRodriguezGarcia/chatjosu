@@ -295,3 +295,61 @@ test(
     );
   }
 );
+
+test(
+  "varios anchors explícitos resuelven sin embedding",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+
+            throw new Error(
+              "No debería ejecutarse."
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "soy alcohólico y tengo depresión",
+        conversationContext: null,
+      });
+
+    assert.equal(
+      result.status,
+      "resolved"
+    );
+
+    assert.equal(
+      result.tag.descripcion,
+      "ALCOHOLISMO"
+    );
+
+    assert.deepEqual(
+      result.resolvedNeeds.map(
+        (need) =>
+          need.descripcion
+      ),
+      [
+        "ALCOHOLISMO",
+        "SALUD MENTAL",
+      ]
+    );
+
+    assert.equal(
+      result.provider,
+      "anchor"
+    );
+
+    assert.equal(
+      semanticCalls,
+      0
+    );
+  }
+);

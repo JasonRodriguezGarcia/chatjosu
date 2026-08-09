@@ -28,8 +28,19 @@ const ANCHORS = [
     tag: "ALCOHOLISMO",
     patterns: [
       /\balcoholismo\b/,
+      /\balcoholic[oa]s?\b/,
       /\bproblema(?:s)? con (?:el )?alcohol\b/,
       /\bdependencia (?:del|al) alcohol\b/,
+      /\badiccion (?:al )?alcohol\b/,
+    ],
+  },
+  {
+    tagId: 31,
+    tag: "SALUD MENTAL",
+    patterns: [
+      /\bdepresion\b/,
+      /\bdepresiv[oa]s?\b/,
+      /\btrastorno depresivo\b/,
     ],
   },
   {
@@ -100,31 +111,46 @@ const INSUFFICIENT_PATTERNS = [
   /^(?:mi|el|la) \w+ esta muy mal$/,
 ];
 
-export function resolveSemanticAnchor(
+export function resolveSemanticAnchors(
   inputMessage
 ) {
   const text = normalizeText(
     inputMessage
   );
 
-  const matches = ANCHORS.filter(
-    (entry) =>
-      entry.patterns.some(
-        (pattern) =>
-          pattern.test(text)
-      )
-  );
-
-  if (matches.length !== 1) {
-    return null;
+  if (!text) {
+    return [];
   }
 
-  const match = matches[0];
+  return ANCHORS
+    .filter(
+      (entry) =>
+        entry.patterns.some(
+          (pattern) =>
+            pattern.test(text)
+        )
+    )
+    .map(
+      (entry) => ({
+        tag_id:
+          entry.tagId,
+        descripcion:
+          entry.tag,
+      })
+    );
+}
 
-  return {
-    tag_id: match.tagId,
-    descripcion: match.tag,
-  };
+export function resolveSemanticAnchor(
+  inputMessage
+) {
+  const matches =
+    resolveSemanticAnchors(
+      inputMessage
+    );
+
+  return matches.length === 1
+    ? matches[0]
+    : null;
 }
 
 export function isClearlyInsufficient(
