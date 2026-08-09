@@ -100,6 +100,7 @@ const HelpChat = () => {
   const bottomRef = useRef(null);
   const requestQueueRef = useRef([]);
   const processingQueueRef = useRef(false);
+  const conversationContextRef = useRef(null);
 
   useEffect(() => {
     const fetchingProvincias = async () => {
@@ -116,7 +117,8 @@ const HelpChat = () => {
         }
 
         const data = await response.json();
-        const datosProvincias = Array.isArray(data) ? data : [];
+
+          const datosProvincias = Array.isArray(data) ? data : [];
 
         setProvincias(datosProvincias);
         setSelectedProvincia(datosProvincias[0]?.label ?? "");
@@ -160,14 +162,23 @@ const HelpChat = () => {
         body: JSON.stringify({
           inputMessage,
           selectedProvincia: provincia,
-        }),
-      });
+            conversationContext: conversationContextRef.current,
+          }),
+        });
 
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
       }
 
       const data = await response.json();
+
+        if (
+          data?.context &&
+          typeof data.context === "object" &&
+          !Array.isArray(data.context)
+        ) {
+          conversationContextRef.current = data.context;
+        }
 
       const resources = Array.isArray(data?.associations)
         ? data.associations
