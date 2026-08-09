@@ -25,6 +25,22 @@ const createMessage = (role, content) => ({
   content,
 });
 
+const BRAND = {
+  background: "#FFF9F3",
+  surface: "#FFFFFF",
+  header: "#FFFDF9",
+  plum: "#765366",
+  plumDark: "#624456",
+  coral: "#D96F62",
+  yellow: "#EAC354",
+  mint: "#9ACDA8",
+  green: "#5F806B",
+  text: "#332D31",
+  textSecondary: "#71676C",
+  border: "#E8DDD7",
+  plumSoft: "#F4EAF0",
+};
+
 const HelpChat = () => {
   const [provincias, setProvincias] = useState([]);
   const [selectedProvincia, setSelectedProvincia] = useState("");
@@ -34,6 +50,7 @@ const HelpChat = () => {
   const [isSending, setIsSending] = useState(false);
   const [requestError, setRequestError] = useState(null);
   const [lastFailedRequest, setLastFailedRequest] = useState(null);
+  const [isEditingProvincia, setIsEditingProvincia] = useState(false);
 
   const bottomRef = useRef(null);
 
@@ -65,7 +82,13 @@ const HelpChat = () => {
   }, []);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    bottomRef.current?.scrollIntoView({
+      behavior: prefersReducedMotion ? "auto" : "smooth",
+    });
   }, [messages, isSending, requestError]);
 
   const handleInput = (event) => {
@@ -166,6 +189,7 @@ const HelpChat = () => {
 
   const handleSetSelectedProvincia = (event) => {
     setSelectedProvincia(event.target.value);
+    setIsEditingProvincia(false);
   };
 
   const handleSuggestion = (suggestion) => {
@@ -189,54 +213,129 @@ const HelpChat = () => {
         height: "100dvh",
         display: "flex",
         flexDirection: "column",
-        bgcolor: "background.default",
+        bgcolor: BRAND.background,
         overflow: "hidden",
       }}
     >
       <Toolbar
         sx={{
           borderBottom: 1,
-          borderColor: "divider",
-          bgcolor: "background.paper",
-          gap: 1.5,
-          px: { xs: 1.5, sm: 2 },
-          minHeight: { xs: 64, sm: 68 },
+          borderColor: BRAND.border,
+          bgcolor: BRAND.header,
+          gap: { xs: 1, sm: 2 },
+          px: { xs: 1.5, sm: 2.5 },
+          py: { xs: 1, sm: 0.75 },
+          minHeight: { xs: 74, sm: 76 },
+          flexWrap: { xs: "wrap", sm: "nowrap" },
         }}
       >
-        <Typography
-          variant="h6"
-          component="div"
+        <Stack
+          spacing={0.15}
           sx={{
             flexGrow: 1,
-            fontWeight: 600,
-            whiteSpace: "nowrap",
+            minWidth: 0,
           }}
         >
-          Copilot ONG
-        </Typography>
-
-        <FormControl size="small" sx={{ minWidth: { xs: 118, sm: 160 } }}>
-          <InputLabel id="provincia-label">Provincia</InputLabel>
-
-          <Select
-            labelId="provincia-label"
-            id="provincia-select"
-            name="provincia"
-            label="Provincia"
-            value={selectedProvincia}
-            onChange={handleSetSelectedProvincia}
+          <Typography
+            variant="h6"
+            component="div"
+            sx={{
+              fontWeight: 700,
+              color: BRAND.plum,
+              lineHeight: 1.15,
+              letterSpacing: "-0.01em",
+            }}
           >
-            {provincias.map((provincia) => (
-              <MenuItem
-                key={provincia.label}
-                id={provincia.label}
-                value={provincia.label}
-              >
-                {provincia.label}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+            Entre Amigas · Te orienta
+          </Typography>
+
+          <Typography
+            variant="caption"
+            sx={{
+              color: BRAND.textSecondary,
+              lineHeight: 1.3,
+            }}
+          >
+            Una iniciativa de Entre Amigas Anda la Cosa
+          </Typography>
+        </Stack>
+
+        {!isEditingProvincia ? (
+          <Stack
+            direction="row"
+            spacing={0.5}
+            alignItems="center"
+            sx={{
+              bgcolor: BRAND.plumSoft,
+              border: 1,
+              borderColor: BRAND.border,
+              borderRadius: 999,
+              pl: 1.5,
+              pr: 0.5,
+              py: 0.25,
+              maxWidth: "100%",
+            }}
+          >
+            <Typography
+              variant="body2"
+              sx={{
+                color: BRAND.text,
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              📍 {selectedProvincia || "Ubicación"}
+            </Typography>
+
+            <Button
+              type="button"
+              size="small"
+              aria-label="Cambiar provincia"
+              disabled={provincias.length === 0}
+              onClick={() => setIsEditingProvincia(true)}
+              sx={{
+                color: BRAND.plum,
+                textTransform: "none",
+                minWidth: "auto",
+                px: 1,
+                borderRadius: 999,
+              }}
+            >
+              Cambiar
+            </Button>
+          </Stack>
+        ) : (
+          <FormControl
+            size="small"
+            sx={{
+              minWidth: { xs: "100%", sm: 170 },
+              bgcolor: BRAND.surface,
+              borderRadius: 2,
+            }}
+          >
+            <InputLabel id="provincia-label">Provincia</InputLabel>
+
+            <Select
+              labelId="provincia-label"
+              id="provincia-select"
+              name="provincia"
+              label="Provincia"
+              value={selectedProvincia}
+              onChange={handleSetSelectedProvincia}
+            >
+              {provincias.map((provincia) => (
+                <MenuItem
+                  key={provincia.label}
+                  id={provincia.label}
+                  value={provincia.label}
+                >
+                  {provincia.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        )}
       </Toolbar>
 
       <Box
@@ -262,8 +361,9 @@ const HelpChat = () => {
             <Stack
               spacing={2}
               sx={{
-                my: "auto",
-                py: 4,
+                mt: { xs: 5, sm: 8 },
+                mb: "auto",
+                py: { xs: 2, sm: 4 },
                 alignItems: "center",
                 textAlign: "center",
               }}
@@ -282,8 +382,8 @@ const HelpChat = () => {
                   color="text.secondary"
                   sx={{ mt: 1, maxWidth: 560 }}
                 >
-                  Cuéntame qué está pasando con tus propias palabras.
-                  Intentaré encontrar recursos que puedan orientarte.
+                  Cuéntanos qué está pasando con tus propias palabras.
+                  Buscaremos asociaciones y recursos que puedan orientarte.
                 </Typography>
               </Box>
 
@@ -301,7 +401,24 @@ const HelpChat = () => {
                     type="button"
                     variant="outlined"
                     onClick={() => handleSuggestion(suggestion)}
-                    sx={{ textTransform: "none" }}
+                    sx={{
+                      textTransform: "none",
+                      color: BRAND.plum,
+                      borderColor: BRAND.border,
+                      bgcolor: BRAND.surface,
+                      borderRadius: 999,
+                      px: 2,
+                      py: 1,
+                      fontWeight: 500,
+                      "&:hover": {
+                        borderColor: BRAND.plum,
+                        bgcolor: BRAND.plumSoft,
+                      },
+                      "&:focus-visible": {
+                        outline: `3px solid ${BRAND.yellow}`,
+                        outlineOffset: 2,
+                      },
+                    }}
                   >
                     {suggestion}
                   </Button>
@@ -323,18 +440,27 @@ const HelpChat = () => {
                   >
                     <Box
                       sx={{
-                        maxWidth: { xs: "88%", sm: "82%" },
+                        width: "fit-content",
+                        maxWidth: { xs: "92%", sm: isUser ? "76%" : "84%" },
                         px: 2,
-                        py: 1.25,
-                        borderRadius: 2.5,
+                        py: 1.35,
+                        borderRadius: isUser
+                          ? "18px 18px 5px 18px"
+                          : "18px 18px 18px 5px",
                         bgcolor: isUser
-                          ? "primary.main"
-                          : "background.paper",
+                          ? BRAND.plum
+                          : BRAND.surface,
                         color: isUser
-                          ? "primary.contrastText"
-                          : "text.primary",
-                        border: isUser ? 0 : 1,
-                        borderColor: "divider",
+                          ? "#FFFFFF"
+                          : BRAND.text,
+                        border: 1,
+                        borderColor: isUser
+                          ? BRAND.plum
+                          : BRAND.border,
+                        boxShadow: isUser
+                          ? "0 3px 12px rgba(118, 83, 102, 0.12)"
+                          : "0 3px 14px rgba(51, 45, 49, 0.05)",
+                        lineHeight: 1.55,
                         overflowWrap: "anywhere",
                         "& p": {
                           m: 0,
@@ -375,11 +501,11 @@ const HelpChat = () => {
                     sx={{
                       px: 2,
                       py: 1.25,
-                      borderRadius: 2.5,
-                      bgcolor: "background.paper",
+                      borderRadius: "18px 18px 18px 5px",
+                      bgcolor: BRAND.surface,
                       border: 1,
-                      borderColor: "divider",
-                      color: "text.secondary",
+                      borderColor: BRAND.border,
+                      color: BRAND.textSecondary,
                     }}
                   >
                     Buscando opciones…
@@ -399,10 +525,10 @@ const HelpChat = () => {
                     sx={{
                       px: 2,
                       py: 1.25,
-                      borderRadius: 2.5,
-                      bgcolor: "background.paper",
+                      borderRadius: "18px 18px 18px 5px",
+                      bgcolor: BRAND.surface,
                       border: 1,
-                      borderColor: "error.light",
+                      borderColor: BRAND.coral,
                       maxWidth: { xs: "88%", sm: "82%" },
                     }}
                   >
@@ -435,10 +561,10 @@ const HelpChat = () => {
       <Box
         sx={{
           borderTop: 1,
-          borderColor: "divider",
-          bgcolor: "background.paper",
-          px: { xs: 1.5, sm: 2 },
-          py: 1.5,
+          borderColor: BRAND.border,
+          bgcolor: BRAND.header,
+          px: { xs: 1, sm: 2 },
+          py: { xs: 1, sm: 1.5 },
         }}
       >
         <Stack
@@ -465,7 +591,23 @@ const HelpChat = () => {
             helperText={
               errorInput ? "El mensaje no puede estar vacío" : ""
             }
+            placeholder="Cuéntanos qué necesitas…"
             onChange={handleInput}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                bgcolor: BRAND.surface,
+                borderRadius: 3,
+                "& fieldset": {
+                  borderColor: BRAND.border,
+                },
+                "&:hover fieldset": {
+                  borderColor: BRAND.plum,
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: BRAND.plum,
+                },
+              },
+            }}
             onKeyDown={(event) => {
               if (event.key === "Enter" && !event.shiftKey) {
                 event.preventDefault();
@@ -480,7 +622,19 @@ const HelpChat = () => {
             disabled={!input.trim() || isSending}
             sx={{
               minHeight: 56,
-              px: { xs: 2, sm: 3 },
+              minWidth: { xs: 76, sm: 96 },
+              px: { xs: 1.5, sm: 2.5 },
+              borderRadius: 3,
+              textTransform: "none",
+              fontWeight: 700,
+              bgcolor: BRAND.plum,
+              "&:hover": {
+                bgcolor: BRAND.plumDark,
+              },
+              "&:focus-visible": {
+                outline: `3px solid ${BRAND.yellow}`,
+                outlineOffset: 2,
+              },
             }}
           >
             {isSending ? "Buscando…" : "Enviar"}

@@ -149,3 +149,29 @@ Location should appear as context, for example:
 The initial screen should offer conversational starting points without resembling a questionnaire.
 
 Future association cards should be introduced as resources that may orient the user rather than as exhaustive search results.
+
+### Accessibility Direction
+
+Accessibility is a product requirement rather than a separate visual mode.
+
+The default interface must provide sufficient contrast, semantic controls, visible focus states, keyboard operation, meaningful labels, and screen-reader-compatible status announcements.
+
+Do not communicate meaning through colour alone.
+
+Respect relevant operating-system and browser accessibility preferences where practical.
+
+A future appearance control may provide:
+
+normal;
+high contrast;
+dark.
+
+The appearance control must complement, not replace, an accessible default interface.
+
+Screen-reader support must not depend on the selected visual theme.
+
+The UI should remain usable with increased browser text size and zoom without requiring horizontal scrolling at normal mobile breakpoints.
+
+Animations and motion should remain restrained and should respect reduced-motion preferences.
+
+A dedicated accessibility/appearance control is intentionally deferred until the core conversation and structured-resource interfaces are stable.
