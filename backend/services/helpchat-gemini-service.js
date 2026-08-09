@@ -55,16 +55,28 @@ export async function classifyHelpchatTag({
   generateContentUrl,
   inputMessage,
   tags,
+  timeoutMs = 12000,
 }) {
   const availableTags = tags.map(tag => ({
     tag_id: tag.tag_id,
     descripcion: tag.descripcion,
   }));
 
-  const response = await fetch(
+  const controller = new AbortController();
+
+  const timeout = setTimeout(
+    () => controller.abort(),
+    timeoutMs
+  );
+
+  let response;
+
+  try {
+    response = await fetch(
     generateContentUrl,
     {
       method: "POST",
+      signal: controller.signal,
       headers: {
         "Content-Type": "application/json",
         "x-goog-api-key": apiKey,
@@ -116,6 +128,22 @@ ${inputMessage}
       }),
     }
   );
+  } catch (error) {
+    if (error?.name === "AbortError") {
+      const timeoutError = new Error(
+        `Gemini superó el timeout de ${timeoutMs} ms.`
+      );
+
+      timeoutError.providerStatus = 504;
+      timeoutError.code = "AI_TIMEOUT";
+
+      throw timeoutError;
+    }
+
+    throw error;
+  } finally {
+    clearTimeout(timeout);
+  }
 
   const data = await response.json();
 

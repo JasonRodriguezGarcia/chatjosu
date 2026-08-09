@@ -30,6 +30,52 @@ if (!SCHEMA_NAME || !/^[A-Za-z0-9_]+$/.test(SCHEMA_NAME)) {
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+function positiveIntegerEnv(name, fallback) {
+    const raw = process.env[name];
+
+    if (raw === undefined || raw === "") {
+        return fallback;
+    }
+
+    const value = Number(raw);
+
+    if (!Number.isSafeInteger(value) || value <= 0) {
+        throw new Error(
+            `${name} must be a positive integer.`
+        );
+    }
+
+    return value;
+}
+
+const HELPCHAT_AI_TIMEOUT_MS =
+    positiveIntegerEnv(
+        "HELPCHAT_AI_TIMEOUT_MS",
+        12000
+    );
+
+const HELPCHAT_STORE_INPUT_MESSAGE =
+    String(
+        process.env.HELPCHAT_STORE_INPUT_MESSAGE ||
+        "false"
+    ).toLowerCase() === "true";
+
+const HELPCHAT_JSON_LIMIT =
+    process.env.HELPCHAT_JSON_LIMIT?.trim() ||
+    "16kb";
+
+const HELPCHAT_RATE_LIMIT_WINDOW_MS =
+    positiveIntegerEnv(
+        "HELPCHAT_RATE_LIMIT_WINDOW_MS",
+        60000
+    );
+
+const HELPCHAT_RATE_LIMIT_MAX =
+    positiveIntegerEnv(
+        "HELPCHAT_RATE_LIMIT_MAX",
+        20
+    );
+
 const allowedOriginsValue = process.env.ALLOWED_ORIGINS?.trim();
 if (!allowedOriginsValue) {
   throw new Error("ALLOWED_ORIGINS is required.");
@@ -136,7 +182,9 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.use(express.json());
+app.use(express.json({
+    limit: HELPCHAT_JSON_LIMIT,
+}));
 
 // API Route Example
 app.get("/api/message", (req, res) => {
@@ -157,7 +205,93 @@ app.get(['/api/provincias', '/api/v1/helpchat/provincias'], async (req, res) => 
   }
 });
 
-app.post('/api/v1/helpchat/iacall', async (req, res) => {
+const helpchatRateLimitBuckets = new Map();
+
+function helpchatRateLimit(req, res, next) {
+    const now = Date.now();
+    const key = req.ip || "unknown";
+
+    let bucket =
+        helpchatRateLimitBuckets.get(key);
+
+    if (
+        !bucket ||
+        now - bucket.windowStartedAt >=
+            HELPCHAT_RATE_LIMIT_WINDOW_MS
+    ) {
+        bucket = {
+            windowStartedAt: now,
+            count: 0,
+        };
+
+        helpchatRateLimitBuckets.set(
+            key,
+            bucket
+        );
+    }
+
+    bucket.count += 1;
+
+    if (
+        bucket.count >
+        HELPCHAT_RATE_LIMIT_MAX
+    ) {
+        const remainingMs =
+            HELPCHAT_RATE_LIMIT_WINDOW_MS -
+            (now - bucket.windowStartedAt);
+
+        res.set(
+            "Retry-After",
+            String(
+                Math.max(
+                    1,
+                    Math.ceil(remainingMs / 1000)
+                )
+            )
+        );
+
+        return res.status(429).json({
+            error:
+                "Demasiadas consultas. Inténtalo de nuevo en unos segundos.",
+            code: "RATE_LIMITED",
+        });
+    }
+
+    return next();
+}
+
+app.get('/api/health', (req, res) => {
+    return res.json({
+        status: "ok",
+        service: "copilot-ong-backend",
+    });
+});
+
+app.get('/api/ready', async (req, res) => {
+    try {
+        await pool.query("SELECT 1");
+
+        return res.json({
+            status: "ready",
+            database: "ok",
+        });
+    } catch (error) {
+        console.error(
+            "Readiness check failed:",
+            error.message
+        );
+
+        return res.status(503).json({
+            status: "not_ready",
+            database: "error",
+        });
+    }
+});
+
+app.post(
+    '/api/v1/helpchat/iacall',
+    helpchatRateLimit,
+    async (req, res) => {
     const startedAt = Date.now();
 
     const inputMessage =
@@ -188,6 +322,7 @@ app.post('/api/v1/helpchat/iacall', async (req, res) => {
             generateContentUrl: GEMINI_GENERATE_CONTENT_URL,
             inputMessage,
             tags,
+            timeoutMs: HELPCHAT_AI_TIMEOUT_MS,
         });
 
         const searchResult = await findAssociationsForHelpchat({
@@ -200,7 +335,9 @@ app.post('/api/v1/helpchat/iacall', async (req, res) => {
 
         const savedTag = await tagSaving(
             tag.descripcion,
-            inputMessage
+            HELPCHAT_STORE_INPUT_MESSAGE
+                ? inputMessage
+                : "[not-stored]"
         );
 
         const associations = searchResult.associations;
@@ -301,9 +438,21 @@ app.post('/api/v1/helpchat/iacall', async (req, res) => {
         console.error("Error procesando la consulta de IA:", err);
 
         if (err?.providerStatus) {
-            return res.status(502).json({
-                error: "El proveedor de IA no pudo clasificar la consulta.",
-                providerStatus: err.providerStatus,
+            const status =
+                err.providerStatus === 504
+                    ? 504
+                    : 502;
+
+            return res.status(status).json({
+                error:
+                    status === 504
+                        ? "El proveedor de IA tardó demasiado en responder."
+                        : "El proveedor de IA no pudo clasificar la consulta.",
+                code:
+                    err.code ||
+                    "AI_PROVIDER_ERROR",
+                providerStatus:
+                    err.providerStatus,
             });
         }
 
