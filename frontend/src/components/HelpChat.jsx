@@ -1,301 +1,494 @@
-import React, { useEffect, useState, useRef } from 'react';
-import ReactMarkdown from "react-markdown";     // Para tunear el resultado de la IA de Gémini
-import useLoading from "../hooks/useLoading"    // Para la pantalla de Cargando
-// MUI
+import React, { useEffect, useRef, useState } from "react";
+import ReactMarkdown from "react-markdown";
 import {
-    Box,
-    Button,
-    FormControl,
-    InputLabel,
-    MenuItem,
-    Select,
-    Stack,
-    TextField,
-    Toolbar, // en lugar de box usar Stack, que simplifica aún más la organización vertical.
-    Typography,
-} from '@mui/material';
+  Box,
+  Button,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Stack,
+  TextField,
+  Toolbar,
+  Typography,
+} from "@mui/material";
+
+const STARTER_SUGGESTIONS = [
+  "Necesito ayuda para un familiar",
+  "Busco orientación social",
+  "Necesito apoyo relacionado con una enfermedad",
+];
+
+const createMessage = (role, content) => ({
+  id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+  role,
+  content,
+});
 
 const HelpChat = () => {
-    const [provincias, setProvincias] = useState([])
-    const [selectedProvincia, setSelectedProvincia] = useState("")
+  const [provincias, setProvincias] = useState([]);
+  const [selectedProvincia, setSelectedProvincia] = useState("");
+  const [input, setInput] = useState("");
+  const [errorInput, setErrorInput] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [isSending, setIsSending] = useState(false);
+  const [requestError, setRequestError] = useState(null);
+  const [lastFailedRequest, setLastFailedRequest] = useState(null);
 
-    const [input, setInput]= useState('')
-    const [errorInput, setErrorInput] = useState(false)
-    const [messages, setMessages] = useState([])
-    const bottomRef = useRef(null);
-    const { setIsLoading, setWaitingMessageTextNumber, WaitingMessage } = useLoading()
+  const bottomRef = useRef(null);
 
-    useEffect(()=> {
-        const fetchingProvincias = async () => {
-            setIsLoading(true)
-            setWaitingMessageTextNumber(1)
-            try {
+  useEffect(() => {
+    const fetchingProvincias = async () => {
+      try {
+        const response = await fetch("/api/v1/helpchat/provincias", {
+          method: "GET",
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+        });
 
-                const response = await fetch(
-                    // `http://localhost:5000/api/provincias`,
-                    "/api/v1/helpchat/provincias",
-                    {
-                        method: 'GET',
-                        headers: {
-                            'Content-type': 'application/json; charset=UTF-8',
-                        }
-                    })
-                    const data = await response.json()
-                    const datosProvincias = data
-                    console.log("Provincias: ", datosProvincias)
-                    setProvincias(datosProvincias)
-                    setSelectedProvincia(datosProvincias[0].label)  // Seleccionamos la primera por defecto
-                }
-            catch (err) {
-                console.log("Error al obtener provincias: ", err.message)
-            }
-
-            setIsLoading(false)
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
         }
-        fetchingProvincias()
-    }, [])
 
-    useEffect(() => {
-        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [messages]);
+        const data = await response.json();
+        const datosProvincias = Array.isArray(data) ? data : [];
 
-    const handleInput = (event) => {
-        setInput(event.target.value)
+        setProvincias(datosProvincias);
+        setSelectedProvincia(datosProvincias[0]?.label ?? "");
+      } catch (err) {
+        console.error("Error al obtener provincias:", err);
+      }
+    };
+
+    fetchingProvincias();
+  }, []);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, isSending, requestError]);
+
+  const handleInput = (event) => {
+    setInput(event.target.value);
+
+    if (errorInput && event.target.value.trim()) {
+      setErrorInput(false);
+    }
+  };
+
+  const requestHelp = async ({ inputMessage, selectedProvincia: provincia }) => {
+    if (isSending) {
+      return;
     }
 
-    const handleSend = (event) => {
-        console.log("imprimo input: ", input)
-        const checkError = input.trim() === ""
-        if (checkError) {
-            setErrorInput(true)
-            setTimeout(() =>  {
-                setInput("")
-                setErrorInput(false)
-            } , 2000)
-            return
-        }
-        setErrorInput(false)
+    setIsSending(true);
+    setRequestError(null);
 
-        const sentMessage = {
-            color: "red",
-            backgroundColor: "#E0E0E0",
-            align: "right",
-            margin: "5px 0 0 50px",
-            padding: "10px",
-            borderRadius: "10px",
-            message: input
-        }
-        setMessages(prev=> [...prev, sentMessage])
-        checkWithIA(input, selectedProvincia)
-        setInput("")
+    try {
+      const response = await fetch("/api/v1/helpchat/iacall", {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
+        body: JSON.stringify({
+          inputMessage,
+          selectedProvincia: provincia,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (typeof data?.message !== "string" || !data.message.trim()) {
+        throw new Error("Respuesta sin mensaje utilizable");
+      }
+
+      setMessages((previous) => [
+        ...previous,
+        createMessage("assistant", data.message.trim()),
+      ]);
+
+      setLastFailedRequest(null);
+    } catch (err) {
+      console.error("Error al llamar a /api/v1/helpchat/iacall:", err);
+
+      setRequestError(
+        "No he podido completar la búsqueda. Puedes intentarlo de nuevo.",
+      );
+
+      setLastFailedRequest({
+        inputMessage,
+        selectedProvincia: provincia,
+      });
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const handleSend = () => {
+    const trimmedInput = input.trim();
+
+    if (!trimmedInput) {
+      setErrorInput(true);
+      return;
     }
 
-    const checkWithIA = async (inputMessage, selectedProvincia) => {
-        setIsLoading(true)
-        setWaitingMessageTextNumber(0)
-        const iaQueryData = {
-            inputMessage,
-            selectedProvincia
-        }
-
-        let text = ""
-        try {
-
-            const response = await fetch(
-                "/api/v1/helpchat/iacall",
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-type': 'application/json; charset=UTF-8',
-                    },
-                    body: JSON.stringify(iaQueryData)
-                }
-            )
-            const data = await response.json()
-            console.log("Respuesta backend: ", data)
-            text = data.message
-        }
-        catch (err) {
-            console.log("Error al llama a /helpchat/iacall: ", err.message)
-        }
-        const textProcessed = text.replace(/3\. \*\*/g, "\n3. **")
-        console.log("Respuesta backend:", text);
-        const repliedMessage = {
-            color: "green",
-            backgroundColor: "#EDEEEE",
-            align: "left",
-            margin: "5px 0 0 0",
-            padding: "10px",
-            borderRadius: "10px",
-            message: `RESPUESTA: ${textProcessed}`
-        }
-        setMessages(prev=> [...prev, repliedMessage])
-        setIsLoading(false)
+    if (isSending) {
+      return;
     }
 
-    const handleSetSelectedProvincia = (e) => {
-        console.log("provincia seleccionada: ", e.target.value)
-        setSelectedProvincia(e.target.value)
+    setErrorInput(false);
+    setRequestError(null);
+
+    setMessages((previous) => [
+      ...previous,
+      createMessage("user", trimmedInput),
+    ]);
+
+    setInput("");
+
+    requestHelp({
+      inputMessage: trimmedInput,
+      selectedProvincia,
+    });
+  };
+
+  const handleRetry = () => {
+    if (!lastFailedRequest || isSending) {
+      return;
     }
 
-    return (
-        <Box
-            component="form"
-            noValidate
-            autoComplete="off"
-            sx={{
-                height: "100dvh",
-                display: "flex",
-                flexDirection: "column",
-                bgcolor: "background.default",
-                overflow: "hidden",
-            }}
+    requestHelp(lastFailedRequest);
+  };
+
+  const handleSetSelectedProvincia = (event) => {
+    setSelectedProvincia(event.target.value);
+  };
+
+  const handleSuggestion = (suggestion) => {
+    setInput(suggestion);
+    setErrorInput(false);
+  };
+
+  const showInitialState =
+    messages.length === 0 && !isSending && !requestError;
+
+  return (
+    <Box
+      component="form"
+      noValidate
+      autoComplete="off"
+      onSubmit={(event) => {
+        event.preventDefault();
+        handleSend();
+      }}
+      sx={{
+        height: "100dvh",
+        display: "flex",
+        flexDirection: "column",
+        bgcolor: "background.default",
+        overflow: "hidden",
+      }}
+    >
+      <Toolbar
+        sx={{
+          borderBottom: 1,
+          borderColor: "divider",
+          bgcolor: "background.paper",
+          gap: 1.5,
+          px: { xs: 1.5, sm: 2 },
+          minHeight: { xs: 64, sm: 68 },
+        }}
+      >
+        <Typography
+          variant="h6"
+          component="div"
+          sx={{
+            flexGrow: 1,
+            fontWeight: 600,
+            whiteSpace: "nowrap",
+          }}
         >
-            <WaitingMessage />
+          Copilot ONG
+        </Typography>
 
-            <Toolbar
-                sx={{
-                    borderBottom: 1,
-                    borderColor: "divider",
-                    bgcolor: "background.paper",
-                    gap: 1.5,
-                    px: { xs: 1.5, sm: 2 },
-                    minHeight: { xs: 64, sm: 68 },
-                }}
+        <FormControl size="small" sx={{ minWidth: { xs: 118, sm: 160 } }}>
+          <InputLabel id="provincia-label">Provincia</InputLabel>
+
+          <Select
+            labelId="provincia-label"
+            id="provincia-select"
+            name="provincia"
+            label="Provincia"
+            value={selectedProvincia}
+            onChange={handleSetSelectedProvincia}
+          >
+            {provincias.map((provincia) => (
+              <MenuItem
+                key={provincia.label}
+                id={provincia.label}
+                value={provincia.label}
+              >
+                {provincia.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Toolbar>
+
+      <Box
+        sx={{
+          flex: 1,
+          minHeight: 0,
+          overflowY: "auto",
+          px: { xs: 1.5, sm: 2 },
+          py: 2,
+        }}
+      >
+        <Box
+          sx={{
+            width: "100%",
+            maxWidth: 800,
+            mx: "auto",
+            minHeight: "100%",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          {showInitialState ? (
+            <Stack
+              spacing={2}
+              sx={{
+                my: "auto",
+                py: 4,
+                alignItems: "center",
+                textAlign: "center",
+              }}
             >
+              <Box>
                 <Typography
-                    variant="h6"
-                    component="div"
-                    sx={{
-                        flexGrow: 1,
-                        fontWeight: 600,
-                        whiteSpace: "nowrap",
-                    }}
+                  variant="h5"
+                  component="h1"
+                  sx={{ fontWeight: 600 }}
                 >
-                    Copilot ONG
+                  ¿En qué podemos ayudarte?
                 </Typography>
 
-                <FormControl size="small" sx={{ minWidth: { xs: 118, sm: 160 } }}>
-                    <InputLabel id="provincia-label">Provincia</InputLabel>
-                    <Select
-                        labelId="provincia-label"
-                        id="provincia-select"
-                        name="provincia"
-                        label="Provincia"
-                        value={selectedProvincia}
-                        onChange={handleSetSelectedProvincia}
+                <Typography
+                  variant="body1"
+                  color="text.secondary"
+                  sx={{ mt: 1, maxWidth: 560 }}
+                >
+                  Cuéntame qué está pasando con tus propias palabras.
+                  Intentaré encontrar recursos que puedan orientarte.
+                </Typography>
+              </Box>
+
+              <Stack
+                direction={{ xs: "column", sm: "row" }}
+                spacing={1}
+                sx={{
+                  width: "100%",
+                  justifyContent: "center",
+                }}
+              >
+                {STARTER_SUGGESTIONS.map((suggestion) => (
+                  <Button
+                    key={suggestion}
+                    type="button"
+                    variant="outlined"
+                    onClick={() => handleSuggestion(suggestion)}
+                    sx={{ textTransform: "none" }}
+                  >
+                    {suggestion}
+                  </Button>
+                ))}
+              </Stack>
+            </Stack>
+          ) : (
+            <Stack spacing={1.5}>
+              {messages.map((message) => {
+                const isUser = message.role === "user";
+
+                return (
+                  <Box
+                    key={message.id}
+                    sx={{
+                      display: "flex",
+                      justifyContent: isUser ? "flex-end" : "flex-start",
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        maxWidth: { xs: "88%", sm: "82%" },
+                        px: 2,
+                        py: 1.25,
+                        borderRadius: 2.5,
+                        bgcolor: isUser
+                          ? "primary.main"
+                          : "background.paper",
+                        color: isUser
+                          ? "primary.contrastText"
+                          : "text.primary",
+                        border: isUser ? 0 : 1,
+                        borderColor: "divider",
+                        overflowWrap: "anywhere",
+                        "& p": {
+                          m: 0,
+                        },
+                        "& p + p": {
+                          mt: 1,
+                        },
+                      }}
                     >
-                        {provincias.map((provincia, index) => (
-                            <MenuItem
-                                key={index}
-                                id={provincia.label}
-                                value={provincia.label}
-                            >
-                                {provincia.label}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-
-            </Toolbar>
-
-            <Box
-                sx={{
-                    flex: 1,
-                    minHeight: 0,
-                    overflowY: "auto",
-                    px: { xs: 1.5, sm: 2 },
-                    py: 2,
-                }}
-            >
-                <Box
-                    sx={{
-                        width: "100%",
-                        maxWidth: 800,
-                        mx: "auto",
-                    }}
-                >
-                    {messages.map((message, index) => (
-                        <div
-                            key={index}
-                            style={{
-                                color: message.color,
-                                backgroundColor: message.backgroundColor,
-                                textAlign: message.align,
-                                margin: message.margin,
-                                padding: message.padding,
-                                borderRadius: message.borderRadius,
-                            }}
-                        >
-                            <ReactMarkdown
-                                components={{
-                                    a: ({ node, ...props }) => (
-                                        <a
-                                            {...props}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                        />
-                                    ),
-                                }}
-                            >
-                                {message.message}
-                            </ReactMarkdown>
-                        </div>
-                    ))}
-                    <div ref={bottomRef} />
-                </Box>
-            </Box>
-
-            <Box
-                sx={{
-                    borderTop: 1,
-                    borderColor: "divider",
-                    bgcolor: "background.paper",
-                    px: { xs: 1.5, sm: 2 },
-                    py: 1.5,
-                }}
-            >
-                <Stack
-                    direction="row"
-                    spacing={1.5}
-                    alignItems="flex-start"
-                    sx={{
-                        width: "100%",
-                        maxWidth: 800,
-                        mx: "auto",
-                    }}
-                >
-                    <TextField
-                        fullWidth
-                        id="mensaje"
-                        name="mensaje"
-                        label="Escribe qué necesitas"
-                        value={input}
-                        required
-                        minRows={1}
-                        maxRows={5}
-                        multiline
-                        error={errorInput}
-                        helperText={errorInput ? "El mensaje no puede estar vacío" : ""}
-                        onChange={handleInput}
-                        onKeyDown={(event) => {
-                            if (event.key === "Enter" && !event.shiftKey) {
-                                event.preventDefault()
-                                handleSend()
-                            }
+                      <ReactMarkdown
+                        components={{
+                          a: (props) => (
+                            <a
+                              {...props}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            />
+                          ),
                         }}
-                    />
+                      >
+                        {message.content}
+                      </ReactMarkdown>
+                    </Box>
+                  </Box>
+                );
+              })}
+
+              {isSending && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "flex-start",
+                  }}
+                >
+                  <Box
+                    role="status"
+                    aria-live="polite"
+                    sx={{
+                      px: 2,
+                      py: 1.25,
+                      borderRadius: 2.5,
+                      bgcolor: "background.paper",
+                      border: 1,
+                      borderColor: "divider",
+                      color: "text.secondary",
+                    }}
+                  >
+                    Buscando opciones…
+                  </Box>
+                </Box>
+              )}
+
+              {requestError && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "flex-start",
+                  }}
+                >
+                  <Stack
+                    spacing={1}
+                    sx={{
+                      px: 2,
+                      py: 1.25,
+                      borderRadius: 2.5,
+                      bgcolor: "background.paper",
+                      border: 1,
+                      borderColor: "error.light",
+                      maxWidth: { xs: "88%", sm: "82%" },
+                    }}
+                  >
+                    <Typography variant="body2">
+                      {requestError}
+                    </Typography>
+
                     <Button
-                        onClick={handleSend}
-                        variant="contained"
-                        sx={{ minHeight: 56, px: { xs: 2, sm: 3 } }}
+                      type="button"
+                      size="small"
+                      onClick={handleRetry}
+                      disabled={isSending}
+                      sx={{
+                        alignSelf: "flex-start",
+                        textTransform: "none",
+                      }}
                     >
-                        Enviar
+                      Reintentar
                     </Button>
-                </Stack>
-            </Box>
+                  </Stack>
+                </Box>
+              )}
+            </Stack>
+          )}
+
+          <div ref={bottomRef} />
         </Box>
-    )
-}
+      </Box>
+
+      <Box
+        sx={{
+          borderTop: 1,
+          borderColor: "divider",
+          bgcolor: "background.paper",
+          px: { xs: 1.5, sm: 2 },
+          py: 1.5,
+        }}
+      >
+        <Stack
+          direction="row"
+          spacing={1.5}
+          alignItems="flex-start"
+          sx={{
+            width: "100%",
+            maxWidth: 800,
+            mx: "auto",
+          }}
+        >
+          <TextField
+            fullWidth
+            id="mensaje"
+            name="mensaje"
+            label="Escribe qué necesitas"
+            value={input}
+            required
+            minRows={1}
+            maxRows={5}
+            multiline
+            error={errorInput}
+            helperText={
+              errorInput ? "El mensaje no puede estar vacío" : ""
+            }
+            onChange={handleInput}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                handleSend();
+              }
+            }}
+          />
+
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={!input.trim() || isSending}
+            sx={{
+              minHeight: 56,
+              px: { xs: 2, sm: 3 },
+            }}
+          >
+            {isSending ? "Buscando…" : "Enviar"}
+          </Button>
+        </Stack>
+      </Box>
+    </Box>
+  );
+};
 
 export default HelpChat;
