@@ -462,29 +462,21 @@ app.get(
                     ?.remoteAddress
             )
         ) {
-            const cloudflareTerritory =
-                helpchatProvinceResolver(
-                    req.get(
-                        "CF-Region"
-                    )
-                );
-
-            if (cloudflareTerritory) {
-                location =
-                    normalizeCloudflareLocation({
-                        country:
-                            req.get(
-                                "CF-IPCountry"
-                            ),
-                        province:
-                            cloudflareTerritory
-                                .label,
-                        municipality:
-                            req.get(
-                                "CF-IPCity"
-                            ),
-                    });
-            }
+            location =
+                normalizeCloudflareLocation({
+                    country:
+                        req.get(
+                            "CF-IPCountry"
+                        ),
+                    province:
+                        req.get(
+                            "CF-Region"
+                        ),
+                    municipality:
+                        req.get(
+                            "CF-IPCity"
+                        ),
+                });
         }
 
         if (

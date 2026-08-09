@@ -164,36 +164,43 @@ test(
                 provinces
             );
 
-        const vizcaya =
-            canonicalizeHelpchatLocation({
-                location: {
+        for (
+            const province of [
+                "Vizcaya",
+                "Bizkaia",
+            ]
+        ) {
+            const vizcaya =
+                canonicalizeHelpchatLocation({
+                    location: {
+                        country: "ES",
+                        province,
+                        municipality:
+                            "Bilbao",
+                        source: "ip",
+                        confidence:
+                            "coarse",
+                    },
+                    provinceResolver:
+                        resolve,
+                });
+
+            assert.deepEqual(
+                vizcaya,
+                {
                     country: "ES",
-                    province: "Vizcaya",
+                    provinceKey:
+                        "VIZCAYA",
+                    province:
+                        "Bizkaia",
                     municipality:
                         "Bilbao",
                     source: "ip",
                     confidence:
                         "coarse",
-                },
-                provinceResolver:
-                    resolve,
-            });
-
-        assert.deepEqual(
-            vizcaya,
-            {
-                country: "ES",
-                provinceKey:
-                    "VIZCAYA",
-                province:
-                    "Bizkaia",
-                municipality:
-                    "Bilbao",
-                source: "ip",
-                confidence:
-                    "coarse",
-            }
-        );
+                }
+            );
+        }
 
         for (
             const province of [
