@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
+import AssociationCard from "./AssociationCard";
 import {
   Box,
   Button,
@@ -19,10 +20,11 @@ const STARTER_SUGGESTIONS = [
   "Necesito apoyo relacionado con una enfermedad",
 ];
 
-const createMessage = (role, content) => ({
+const createMessage = (role, content, extra = {}) => ({
   id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
   role,
   content,
+  ...extra,
 });
 
 const BRAND = {
@@ -39,6 +41,49 @@ const BRAND = {
   textSecondary: "#71676C",
   border: "#E8DDD7",
   plumSoft: "#F4EAF0",
+};
+
+const buildAssistantContent = (data) => {
+  const resources = Array.isArray(data?.associations)
+    ? data.associations
+    : [];
+
+  const count = resources.length;
+  const requestedProvince = data?.requestedProvince || "tu provincia";
+  const resolvedProvince = data?.resolvedProvince || requestedProvince;
+
+  if (count === 0) {
+    return `No he encontrado recursos registrados para ${requestedProvince} con esta búsqueda. Puedes escribir de nuevo contando un poco más sobre el tipo de ayuda que necesitas.`;
+  }
+
+  const resourceText =
+    count === 1 ? "un recurso" : `${count} recursos`;
+
+  if (Number(data?.localCount) > 0) {
+    return `He encontrado ${resourceText} en ${resolvedProvince} que podría${count === 1 ? "" : "n"} orientarte.`;
+  }
+
+  if (data?.fallbackType === "neighbor_province") {
+    return `No he encontrado opciones registradas en ${requestedProvince}, pero sí ${resourceText} en provincias cercanas que podría${count === 1 ? "" : "n"} orientarte.`;
+  }
+
+  if (data?.fallbackType === "national") {
+    return `No he encontrado opciones registradas en ${requestedProvince}, pero sí ${resourceText} de ámbito nacional que podría${count === 1 ? "" : "n"} orientarte.`;
+  }
+
+  return `He encontrado ${resourceText} que podría${count === 1 ? "" : "n"} orientarte.`;
+};
+
+const getResourcesTitle = (context) => {
+  if (context?.fallbackType === "neighbor_province") {
+    return "Recursos cercanos que pueden orientarte";
+  }
+
+  if (context?.fallbackType === "national") {
+    return "Recursos de ámbito nacional";
+  }
+
+  return "Recursos que pueden orientarte";
 };
 
 const HelpChat = () => {
@@ -107,6 +152,8 @@ const HelpChat = () => {
     setIsSending(true);
     setRequestError(null);
 
+    const requestStartedAt = performance.now();
+
     try {
       const response = await fetch("/api/v1/helpchat/iacall", {
         method: "POST",
@@ -125,13 +172,39 @@ const HelpChat = () => {
 
       const data = await response.json();
 
-      if (typeof data?.message !== "string" || !data.message.trim()) {
-        throw new Error("Respuesta sin mensaje utilizable");
+      const resources = Array.isArray(data?.associations)
+        ? data.associations
+        : [];
+
+      const assistantContent = buildAssistantContent(data);
+      const roundTripMs = Math.round(
+        performance.now() - requestStartedAt,
+      );
+
+      if (import.meta.env.DEV) {
+        console.debug("HelpChat timing", {
+          serverDurationMs: Number(data?.durationMs) || null,
+          roundTripMs,
+        });
       }
 
       setMessages((previous) => [
         ...previous,
-        createMessage("assistant", data.message.trim()),
+        createMessage("assistant", assistantContent, {
+          resources,
+          context: {
+            tag: data?.tag || null,
+            requestedProvince: data?.requestedProvince || provincia,
+            resolvedProvince: data?.resolvedProvince || provincia,
+            fallbackUsed: Boolean(data?.fallbackUsed),
+            fallbackType: data?.fallbackType || null,
+            localCount: Number(data?.localCount) || 0,
+            neighborCount: Number(data?.neighborCount) || 0,
+            nationalCount: Number(data?.nationalCount) || 0,
+            serverDurationMs: Number(data?.durationMs) || null,
+            roundTripMs,
+          },
+        }),
       ]);
 
       setLastFailedRequest(null);
@@ -261,50 +334,40 @@ const HelpChat = () => {
         </Stack>
 
         {!isEditingProvincia ? (
-          <Stack
-            direction="row"
-            spacing={0.5}
-            alignItems="center"
+          <Button
+            type="button"
+            size="small"
+            aria-label={`Cambiar provincia. Provincia actual: ${
+              selectedProvincia || "sin seleccionar"
+            }`}
+            disabled={provincias.length === 0}
+            onClick={() => setIsEditingProvincia(true)}
             sx={{
+              maxWidth: "100%",
               bgcolor: BRAND.plumSoft,
+              color: BRAND.text,
               border: 1,
               borderColor: BRAND.border,
               borderRadius: 999,
-              pl: 1.5,
-              pr: 0.5,
-              py: 0.25,
-              maxWidth: "100%",
+              px: 1.5,
+              py: 0.75,
+              textTransform: "none",
+              fontWeight: 500,
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              "&:hover": {
+                bgcolor: BRAND.plumSoft,
+                borderColor: BRAND.plum,
+              },
+              "&:focus-visible": {
+                outline: `3px solid ${BRAND.yellow}`,
+                outlineOffset: 2,
+              },
             }}
           >
-            <Typography
-              variant="body2"
-              sx={{
-                color: BRAND.text,
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-              }}
-            >
-              📍 {selectedProvincia || "Ubicación"}
-            </Typography>
-
-            <Button
-              type="button"
-              size="small"
-              aria-label="Cambiar provincia"
-              disabled={provincias.length === 0}
-              onClick={() => setIsEditingProvincia(true)}
-              sx={{
-                color: BRAND.plum,
-                textTransform: "none",
-                minWidth: "auto",
-                px: 1,
-                borderRadius: 999,
-              }}
-            >
-              Cambiar
-            </Button>
-          </Stack>
+            📍 {selectedProvincia || "Ubicación"}
+          </Button>
         ) : (
           <FormControl
             size="small"
@@ -435,8 +498,10 @@ const HelpChat = () => {
                     key={message.id}
                     sx={{
                       display: "flex",
-                      justifyContent: isUser ? "flex-end" : "flex-start",
-                    }}
+                        flexDirection: "column",
+                        alignItems: isUser ? "flex-end" : "flex-start",
+                        width: "100%",
+                      }}
                   >
                     <Box
                       sx={{
@@ -484,6 +549,38 @@ const HelpChat = () => {
                         {message.content}
                       </ReactMarkdown>
                     </Box>
+
+                    {!isUser &&
+                      Array.isArray(message.resources) &&
+                      message.resources.length > 0 && (
+                        <Stack
+                          spacing={1.25}
+                          sx={{
+                            width: "100%",
+                            maxWidth: { xs: "100%", sm: "84%" },
+                            mt: 1.25,
+                          }}
+                        >
+                          <Typography
+                            component="h2"
+                            variant="subtitle2"
+                            sx={{
+                              color: BRAND.textSecondary,
+                              fontWeight: 700,
+                              px: 0.5,
+                            }}
+                          >
+                            {getResourcesTitle(message.context)}
+                          </Typography>
+
+                          {message.resources.map((association) => (
+                            <AssociationCard
+                              key={association.id}
+                              association={association}
+                            />
+                          ))}
+                        </Stack>
+                      )}
                   </Box>
                 );
               })}

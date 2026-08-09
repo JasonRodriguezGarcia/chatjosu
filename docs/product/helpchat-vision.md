@@ -112,3 +112,32 @@ pre-evaluation workflows;
 deterministic calculations.
 
 These future capabilities must not distort the current conversational orientation product.
+
+### Conversation Performance
+
+Response speed is a core product KPI.
+
+The interaction should feel like a continuous conversation rather than a sequence of blocking request/response turns.
+
+Immediate local feedback after sending should be effectively instantaneous.
+
+The composer should remain usable while the assistant is working.
+
+Performance targets should be measured separately for:
+
+client-perceived round-trip latency;
+backend processing latency;
+AI-provider latency;
+database/resource lookup latency.
+
+Initial product targets:
+
+visible acknowledgement after send: under 100 ms;
+typical useful response: target under 2 seconds;
+p95 useful response: target under 4 seconds.
+
+These are product targets rather than guarantees and should be refined from production measurements.
+
+Avoid global loading screens or interaction patterns that make the user wait before continuing to express their needs.
+
+Streaming or progressive assistant responses should be evaluated once the conversational context contract is stable.
