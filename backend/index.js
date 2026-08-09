@@ -1,20 +1,31 @@
 import express from "express";
-import path from "path";
 import cors from 'cors';
-import { fileURLToPath } from "url";
-import { loadExcelContentData } from "./services/excel-service.js";
+import {
+  findAssociationsForHelpchat,
+} from "./services/helpchat-association-service.js";
+import {
+  classifyHelpchatTag,
+} from "./services/helpchat-gemini-service.js";
 // import { tags } from "./data/tags.js";
 import dotenv from 'dotenv';
 dotenv.config();
 import pool from './db-pg.js';
 
 const SCHEMA_NAME = process.env.SCHEMA_NAME;
+const GEMINI_MODEL = process.env.GEMINI_MODEL;
+
+if (!GEMINI_MODEL || !/^[A-Za-z0-9._-]+$/.test(GEMINI_MODEL)) {
+  throw new Error(
+    "GEMINI_MODEL must contain only letters, numbers, dots, underscores, and hyphens."
+  );
+}
+
+const GEMINI_GENERATE_CONTENT_URL =
+  `https://generativelanguage.googleapis.com/v1beta/models/` +
+  `${encodeURIComponent(GEMINI_MODEL)}:generateContent`;
 if (!SCHEMA_NAME || !/^[A-Za-z0-9_]+$/.test(SCHEMA_NAME)) {
   throw new Error("SCHEMA_NAME must contain only letters, numbers, and underscores.");
 }
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -45,7 +56,18 @@ app.locals.GEMINI_API_KEY = GEMINI_API_KEY;
 //
 async function datos() {
     try {
-        const result = await pool.query(`SELECT tag_id, descripcion FROM ${SCHEMA_NAME}.tags ORDER BY descripcion;`)
+        const result = await pool.query(`
+            SELECT DISTINCT
+                t.tag_id,
+                t.descripcion
+            FROM ${SCHEMA_NAME}.tags AS t
+            JOIN ${SCHEMA_NAME}.association_tags AS at
+              ON at.tag_id = t.tag_id
+            JOIN ${SCHEMA_NAME}.associations AS a
+              ON a.association_id = at.association_id
+             AND a.active = TRUE
+            ORDER BY t.descripcion;
+        `)
         
         console.log("Datos tags: result.rows")
         return result.rows
@@ -53,36 +75,58 @@ async function datos() {
     } catch (err) {
         console.error('Error recuperando datos iniciales:', err.message);
         throw err;
-        return { error: true }
     }
 }
 
-async function tagSaving(tagText) {
-    console.log("tagText: ", tagText)
-    tagText = tagText.replace("TAG: ", "").trim();
-    console.log("tagtext: *",tagText, "*")
-    const tag = tags.find((t, index) => {
-            return t.descripcion === tagText
-        })
-    console.log("Tag encontrado: ", tag)
+async function tagSaving(tagText, inputMessage, userId = null) {
+    if (!tagText) {
+        console.warn("No se recibió un tag válido; no se guardará histórico.");
+        return null;
+    }
 
-    // Saving tag in historic database
-    const response = await pool.query(`
+    const normalizedTagText = tagText.trim().toLocaleUpperCase("es-ES");
+
+    const tag = tags.find((candidate) =>
+        candidate.descripcion
+            .trim()
+            .toLocaleUpperCase("es-ES") === normalizedTagText
+    );
+
+    if (!tag) {
+        console.warn("Tag desconocido; no se guardará histórico:", tagText);
+        return null;
+    }
+
+    const response = await pool.query(
+        `
         INSERT INTO ${SCHEMA_NAME}.tags_historico
             (fecha, input_message, tag_id, user_id)
-        VALUES (current_timestamp, 'TEST2-${tag.tag_id}', $1, 222)
+        VALUES
+            (current_timestamp, $1, $2, $3)
         RETURNING tags_historico_id;
-        `, [tag.tag_id]);
-    // const data = await response.json();
-    console.log("Tags historico creado: ", response.rows[0].tags_historico_id);
+        `,
+        [inputMessage, tag.tag_id, userId]
+    );
 
-    return
+    const historyId = response.rows[0].tags_historico_id;
+
+    console.log("Tag guardado:", {
+        historyId,
+        tagId: tag.tag_id,
+        descripcion: tag.descripcion,
+    });
+
+    return {
+        historyId,
+        tagId: tag.tag_id,
+        descripcion: tag.descripcion,
+    };
 }
 
 
 const datosIniciales = await datos()
 const tags = !datosIniciales ? [] : datosIniciales
-console.log("datos tags: ", tags)
+console.log(`Tags operativos cargados: ${tags.length}`)
 
 // Middleware
 
@@ -90,14 +134,6 @@ console.log("datos tags: ", tags)
 const corsOptions = {
   origin: ALLOWED_ORIGINS,
 };
-
-// Llama a la conversión del fichero excel de contexto y a la vez lo traduce a un objeto compatible Json
-const excelContentData = await loadExcelContentData();
-// app.locals es un objeto global asociado a la aplicación Express.
-// Permite que cualquier ruta o middleware acceda a esos datos SIN VOLVER A LEER el Excel o ejecutar la funcion.
-// Funcionaría también en res.app.locals.excelData para usarlo
-app.locals.excelContentData = excelContentData;
-// console.log ("ExcelData: ", excelContentData)
 
 app.use(cors(corsOptions));
 app.use(express.json());
@@ -122,67 +158,161 @@ app.get(['/api/provincias', '/api/v1/helpchat/provincias'], async (req, res) => 
 });
 
 app.post('/api/v1/helpchat/iacall', async (req, res) => {
+    const startedAt = Date.now();
 
-        const { inputMessage, selectedProvincia } = req.body;
+    const inputMessage =
+        typeof req.body?.inputMessage === "string"
+            ? req.body.inputMessage.trim()
+            : "";
 
-        console.log("HA PASADO POR AQUI");
-        let replyMessage = "";
-        try {
-            const response = await fetch( 
-                // "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent",
-                // "https://generativelanguage.googleapis.com/v1/models/gemini-3-flash-preview:generateContent", 
-                    // "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=" + GEMINI_API_KEY,
-            // "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent",
-            "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent",
-                { 
-                    method: "POST",
-                    headers: { 
-                        "Content-Type": "application/json",
-                        "x-goog-api-key": app.locals.GEMINI_API_KEY 
-                    },
-                    body: JSON.stringify({
-                        contents: [ 
-                            { 
-                                role: "user", 
-                                parts: [ 
-                                    { 
-                                        text: `Eres un asistente que recomienda asociaciones de pacientes u ONG. Pregunto ${inputMessage}
-                                            y los resultados que aparezcan serán para la provincia ${selectedProvincia} que en el caso de no
-                                            tener resultados para esa provincia se dirá que no hay resultados pero se indicarán los resultados
-                                            de las provincias más cercanas y devuelve el tag mas adecuado de los siguiente disponibles
-                                            ${JSON.stringify(tags)} pero indicando el texto "#TAG: "+el tag oportuno+"#"
-                                            CONTEXTO: ${JSON.stringify(app.locals.excelContentData)} 
-                                            INSTRUCCIÓN: Dime asociaciones u OGNs que me puedan ayudar.`
-                                    }
-                                ]
-                            } 
-                        ] 
-                    })
+    const selectedProvincia =
+        typeof req.body?.selectedProvincia === "string"
+            ? req.body.selectedProvincia.trim()
+            : "";
+
+    if (!inputMessage) {
+        return res.status(400).json({
+            error: "El mensaje no puede estar vacío.",
+        });
+    }
+
+    if (!selectedProvincia) {
+        return res.status(400).json({
+            error: "Debe seleccionarse una provincia.",
+        });
+    }
+
+    try {
+        const tag = await classifyHelpchatTag({
+            apiKey: app.locals.GEMINI_API_KEY,
+            generateContentUrl: GEMINI_GENERATE_CONTENT_URL,
+            inputMessage,
+            tags,
+        });
+
+        const searchResult = await findAssociationsForHelpchat({
+            pool,
+            schemaName: SCHEMA_NAME,
+            tagId: tag.tag_id,
+            selectedProvince: selectedProvincia,
+            limit: 5,
+        });
+
+        const savedTag = await tagSaving(
+            tag.descripcion,
+            inputMessage
+        );
+
+        const associations = searchResult.associations;
+
+        let message;
+
+        if (associations.length === 0) {
+            message =
+                `He identificado tu consulta como **${tag.descripcion}**, ` +
+                `pero no he encontrado asociaciones en el catálogo disponible ` +
+                `para **${selectedProvincia}** ni recursos nacionales registrados ` +
+                `con esta categoría.`;
+        } else {
+            let localText;
+
+            if (searchResult.localCount > 0) {
+                localText =
+                    `He encontrado ${searchResult.localCount} opción` +
+                    `${searchResult.localCount === 1 ? "" : "es"} ` +
+                    `relacionada${searchResult.localCount === 1 ? "" : "s"} ` +
+                    `con **${tag.descripcion}** en **${searchResult.resolvedProvince}**.`;
+            } else if (searchResult.fallbackType === "neighbor_province") {
+                localText =
+                    `No he encontrado opciones registradas en **${selectedProvincia}**, ` +
+                    `pero sí recursos relacionados con **${tag.descripcion}** ` +
+                    `en provincias limítrofes disponibles en el catálogo.`;
+            } else if (searchResult.fallbackType === "national") {
+                localText =
+                    `No he encontrado opciones registradas en **${selectedProvincia}**, ` +
+                    `pero sí recursos de ámbito nacional relacionados con ` +
+                    `**${tag.descripcion}**.`;
+            } else {
+                localText =
+                    `He encontrado recursos relacionados con **${tag.descripcion}**.`;
+            }
+
+            const lines = associations.map((association, index) => {
+                const details = [];
+
+                if (association.municipality) {
+                    details.push(association.municipality);
                 }
-            );
-            const data = await response.json();
-            console.log("Respuesta Gemini: ", data);
-            replyMessage = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
-            const tagText = replyMessage.match(/#([^#]+)#/);
-            const extraido = tagText ? tagText[1] : null;
-            console.log("TAG devuelto: ", extraido);
+                if (association.phone) {
+                    details.push(`Tel.: ${association.phone}`);
+                }
 
-            const textoSinTag = replyMessage.replace(/#[^#]+#/, "");
+                if (association.email) {
+                    details.push(`Email: ${association.email}`);
+                }
 
-            // Guardando TAG en la base de datos
+                if (association.website) {
+                    details.push(`Web: ${association.website}`);
+                }
 
-            await tagSaving(extraido);
-            
-            // res.json ({ message: textoSinTag, tag: tagExtraido });
-            res.json ({ message: replyMessage });
+                return (
+                    `${index + 1}. **${association.name}**` +
+                    (details.length > 0
+                        ? ` — ${details.join(" · ")}`
+                        : "")
+                );
+            });
+
+            message =
+                `${localText}\n\n${lines.join("\n")}`;
         }
-        catch (err) {
-            console.log("Error al llamar a la IA: ", err.message);
-            res.status(500).json({ error: 'Error al llamar a la IA' });
 
+        const durationMs = Date.now() - startedAt;
+
+        console.log("Helpchat procesado:", {
+            tag: tag.descripcion,
+            requestedProvince: selectedProvincia,
+            resolvedProvince: searchResult.resolvedProvince,
+            localCount: searchResult.localCount,
+            neighborCount: searchResult.neighborCount,
+            nationalCount: searchResult.nationalCount,
+            fallbackType: searchResult.fallbackType,
+            durationMs,
+        });
+
+        return res.json({
+            message,
+            tag: tag.descripcion,
+            requestedProvince: selectedProvincia,
+            resolvedProvince: searchResult.resolvedProvince,
+            fallbackUsed: searchResult.fallbackUsed,
+            fallbackType: searchResult.fallbackType,
+            localCount: searchResult.localCount,
+            neighborCount: searchResult.neighborCount,
+            nationalCount: searchResult.nationalCount,
+            associations,
+            provider: "gemini",
+            model: GEMINI_MODEL,
+            historyId: savedTag?.historyId || null,
+            durationMs,
+        });
+    } catch (err) {
+        console.error("Error procesando la consulta de IA:", err);
+
+        if (err?.providerStatus) {
+            return res.status(502).json({
+                error: "El proveedor de IA no pudo clasificar la consulta.",
+                providerStatus: err.providerStatus,
+            });
         }
-})
+
+        return res.status(500).json({
+            error: "Error interno al procesar la consulta.",
+        });
+    }
+});
+
 // **OPCIONAL**
 // Serve React Frontend 
 //app.use(express.static(path.join(__dirname, "../build")));
