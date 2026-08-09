@@ -8,7 +8,10 @@ import {
   createSpeechRecognition,
   isSpeechRecognitionSupported,
 } from "../helpchat/speechRecognition";
-import { normalizeDetectedLocation } from "../helpchat/location";
+import {
+  findDetectedProvince,
+  normalizeDetectedLocation,
+} from "../helpchat/location";
 import {
   Box,
   Button,
@@ -183,14 +186,9 @@ const HelpChat = () => {
             return;
           }
 
-          const matchedProvince = datosProvincias.find(
-            (provincia) =>
-              typeof provincia?.label === "string" &&
-              provincia.label.localeCompare(
-                detectedLocation.province,
-                "es",
-                { sensitivity: "base" },
-              ) === 0,
+          const matchedProvince = findDetectedProvince(
+            datosProvincias,
+            detectedLocation,
           );
 
           if (matchedProvince) {

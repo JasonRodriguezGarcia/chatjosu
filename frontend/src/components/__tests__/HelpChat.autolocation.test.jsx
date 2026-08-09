@@ -39,6 +39,48 @@ describe("HelpChat silent IP location", () => {
     ).toBeInTheDocument();
   });
 
+  it("matches a detected province by provinceKey before its public label", async () => {
+    globalThis.fetch = vi.fn((url) => {
+      if (String(url).includes("/provincias")) {
+        return Promise.resolve(
+          jsonResponse([
+            {
+              provinceKey: "BURGOS",
+              label: "Burgos",
+            },
+            {
+              provinceKey: "VIZCAYA",
+              label: "Bizkaia",
+            },
+          ]),
+        );
+      }
+
+      if (isLocationRequest(url)) {
+        return Promise.resolve(
+          jsonResponse({
+            country: "ES",
+            provinceKey: "VIZCAYA",
+            province: "Vizcaya",
+            municipality: "Bilbao",
+            source: "ip",
+            confidence: "coarse",
+          }),
+        );
+      }
+
+      throw new Error(`Unexpected request: ${url}`);
+    });
+
+    render(<HelpChat />);
+
+    expect(
+      await screen.findByRole("combobox", {
+        name: /Provincia actual.*Bizkaia/i,
+      }),
+    ).toBeInTheDocument();
+  });
+
   it("keeps the fallback when silent location is unavailable", async () => {
     globalThis.fetch = vi.fn((url) => {
       if (String(url).includes("/provincias")) {
