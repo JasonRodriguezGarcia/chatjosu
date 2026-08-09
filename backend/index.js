@@ -26,6 +26,11 @@ import {
   createProvinceMatcher,
 } from "./helpchat/conversation-context-enricher-v1.js";
 import {
+  canonicalizeHelpchatLocation,
+  createProvinceResolver,
+  projectProvinceCatalog,
+} from "./helpchat/territory-contract-v1.js";
+import {
   persistResolvedActiveNeed,
   persistResolvedActiveNeeds,
   preferContextResolution,
@@ -304,6 +309,16 @@ const helpchatProvinceMatcher =
         helpchatProvinceRows
     );
 
+const helpchatProvinceResolver =
+    createProvinceResolver(
+        helpchatProvinceRows
+    );
+
+const helpchatProvinceCatalog =
+    projectProvinceCatalog(
+        helpchatProvinceRows
+    );
+
 console.log(
     `Territorios Helpchat cargados: ${helpchatProvinceRows.length}`
 );
@@ -404,17 +419,17 @@ app.get("/api/message", (req, res) => {
 
 // '/api/provincias' es viejo anterior a chat4
 // '/api/v1/helpchat/provincias' es nuevo
-app.get(['/api/provincias', '/api/v1/helpchat/provincias'], async (req, res) => {
-  try {
-    const response = await fetch('https://datos.gob.es/apidata/nti/territory/Province?_pageSize=100&_sort=label');
-    const data = await response.json();
-    // console.log(data.result.items)
-    res.json(data.result.items);
-  } catch (err) {
-    console.log("Error al obtener provincias: ", err.message);
-    res.status(500).json({ error: 'Error al obtener provincias' });
-  }
-});
+app.get(
+    [
+        "/api/provincias",
+        "/api/v1/helpchat/provincias",
+    ],
+    (req, res) => {
+        return res.json(
+            helpchatProvinceCatalog
+        );
+    }
+);
 
 const helpchatLocationResolver =
     createHelpchatLocationResolver();
@@ -447,26 +462,29 @@ app.get(
                     ?.remoteAddress
             )
         ) {
-            const cloudflareProvince =
-                helpchatProvinceMatcher(
+            const cloudflareTerritory =
+                helpchatProvinceResolver(
                     req.get(
                         "CF-Region"
                     )
                 );
 
-            location =
-                normalizeCloudflareLocation({
-                    country:
-                        req.get(
-                            "CF-IPCountry"
-                        ),
-                    province:
-                        cloudflareProvince,
-                    municipality:
-                        req.get(
-                            "CF-IPCity"
-                        ),
-                });
+            if (cloudflareTerritory) {
+                location =
+                    normalizeCloudflareLocation({
+                        country:
+                            req.get(
+                                "CF-IPCountry"
+                            ),
+                        province:
+                            cloudflareTerritory
+                                .label,
+                        municipality:
+                            req.get(
+                                "CF-IPCity"
+                            ),
+                    });
+            }
         }
 
         if (
@@ -479,6 +497,13 @@ app.get(
                         ip,
                     });
         }
+
+        location =
+            canonicalizeHelpchatLocation({
+                location,
+                provinceResolver:
+                    helpchatProvinceResolver,
+            });
 
         return res.json(
             location
