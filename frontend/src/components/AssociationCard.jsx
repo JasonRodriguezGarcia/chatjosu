@@ -1,4 +1,5 @@
 import { Box, Button, Stack, Typography } from "@mui/material";
+import { buildAssociationMapUrl } from "../helpchat/mapLocation";
 
 const unwrapLink = (value) => {
   if (!value) {
@@ -55,6 +56,7 @@ const AssociationCard = ({ association }) => {
   const email = unwrapLink(association?.email);
   const phone = association?.phone?.trim() || null;
   const scope = formatScope(association?.scope);
+  const mapUrl = buildAssociationMapUrl(association);
 
   const location = [
     association?.municipality,
@@ -223,6 +225,28 @@ const AssociationCard = ({ association }) => {
               }}
             >
               Sitio web
+            </Button>
+          )}
+
+          {mapUrl && (
+            <Button
+              component="a"
+              href={mapUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              variant="outlined"
+              size="small"
+              aria-label={`Ver ${
+                association?.name || "recurso"
+              } en el mapa`}
+              sx={{
+                textTransform: "none",
+                borderRadius: 999,
+                color: "#765366",
+                borderColor: "#E8DDD7",
+              }}
+            >
+              Ver en mapa
             </Button>
           )}
         </Stack>

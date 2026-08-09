@@ -80,5 +80,28 @@ describe("AssociationCard", () => {
     expect(
       screen.queryByRole("link", { name: "Sitio web" }),
     ).not.toBeInTheDocument();
+
+    expect(
+      screen.getByRole("link", {
+        name: "Ver Recurso sin contacto en el mapa",
+      }),
+    ).toBeInTheDocument();
   });
+  it("does not render a map action without territorial information", () => {
+    render(
+      <AssociationCard
+        association={{
+          id: "remote",
+          name: "Recurso remoto",
+        }}
+      />,
+    );
+
+    expect(
+      screen.queryByRole("link", {
+        name: "Ver Recurso remoto en el mapa",
+      }),
+    ).not.toBeInTheDocument();
+  });
+
 });
