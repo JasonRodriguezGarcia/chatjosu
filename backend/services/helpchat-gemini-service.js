@@ -57,10 +57,12 @@ export async function classifyHelpchatTag({
   tags,
   timeoutMs = 12000,
 }) {
-  const availableTags = tags.map(tag => ({
-    tag_id: tag.tag_id,
-    descripcion: tag.descripcion,
-  }));
+  const availableTags = tags
+    .map(
+      tag =>
+        `${tag.tag_id}|${tag.descripcion}`
+    )
+    .join("\n");
 
   const controller = new AbortController();
 
@@ -107,8 +109,9 @@ Devuelve solamente JSON válido:
 {"tag":"NOMBRE EXACTO DEL TAG"}
 
 === TAGS DISPONIBLES ===
+Formato: tag_id|nombre_exacto
 
-${JSON.stringify(availableTags)}
+${availableTags}
 
 === CONSULTA_USUARIO ===
 
@@ -122,7 +125,7 @@ ${inputMessage}
         ],
         generationConfig: {
           temperature: 0,
-          maxOutputTokens: 512,
+          maxOutputTokens: 64,
           responseMimeType: "application/json",
         },
       }),
@@ -154,6 +157,22 @@ ${inputMessage}
 
     const error = new Error(providerMessage);
     error.providerStatus = response.status;
+
+    if (response.status === 429) {
+      error.code =
+        "AI_PROVIDER_RATE_LIMITED";
+
+      const retryAfter =
+        response.headers.get("retry-after");
+
+      if (retryAfter) {
+        error.retryAfter = retryAfter;
+      }
+    } else {
+      error.code =
+        "AI_PROVIDER_ERROR";
+    }
+
     throw error;
   }
 

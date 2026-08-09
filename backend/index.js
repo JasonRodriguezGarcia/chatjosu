@@ -317,6 +317,9 @@ app.post(
     }
 
     try {
+        const classificationStartedAt =
+            performance.now();
+
         const tag = await classifyHelpchatTag({
             apiKey: app.locals.GEMINI_API_KEY,
             generateContentUrl: GEMINI_GENERATE_CONTENT_URL,
@@ -324,6 +327,13 @@ app.post(
             tags,
             timeoutMs: HELPCHAT_AI_TIMEOUT_MS,
         });
+
+        const classificationMs =
+            performance.now() -
+            classificationStartedAt;
+
+        const searchStartedAt =
+            performance.now();
 
         const searchResult = await findAssociationsForHelpchat({
             pool,
@@ -333,12 +343,23 @@ app.post(
             limit: 5,
         });
 
+        const searchMs =
+            performance.now() -
+            searchStartedAt;
+
+        const historyStartedAt =
+            performance.now();
+
         const savedTag = await tagSaving(
             tag.descripcion,
             HELPCHAT_STORE_INPUT_MESSAGE
                 ? inputMessage
                 : "[not-stored]"
         );
+
+        const historyMs =
+            performance.now() -
+            historyStartedAt;
 
         const associations = searchResult.associations;
 
@@ -407,6 +428,16 @@ app.post(
 
         const durationMs = Date.now() - startedAt;
 
+        const timings = {
+            classificationMs:
+                Number(classificationMs.toFixed(1)),
+            searchMs:
+                Number(searchMs.toFixed(1)),
+            historyMs:
+                Number(historyMs.toFixed(1)),
+            totalMs: durationMs,
+        };
+
         console.log("Helpchat procesado:", {
             tag: tag.descripcion,
             requestedProvince: selectedProvincia,
@@ -415,7 +446,7 @@ app.post(
             neighborCount: searchResult.neighborCount,
             nationalCount: searchResult.nationalCount,
             fallbackType: searchResult.fallbackType,
-            durationMs,
+            timings,
         });
 
         return res.json({
@@ -433,21 +464,37 @@ app.post(
             model: GEMINI_MODEL,
             historyId: savedTag?.historyId || null,
             durationMs,
+            timings,
         });
     } catch (err) {
         console.error("Error procesando la consulta de IA:", err);
 
         if (err?.providerStatus) {
-            const status =
-                err.providerStatus === 504
-                    ? 504
-                    : 502;
+            let status = 502;
+            let message =
+                "El proveedor de IA no pudo clasificar la consulta.";
+
+            if (err.providerStatus === 504) {
+                status = 504;
+                message =
+                    "El proveedor de IA tardó demasiado en responder.";
+            } else if (
+                err.providerStatus === 429
+            ) {
+                status = 503;
+                message =
+                    "El servicio de IA está temporalmente saturado.";
+            }
+
+            if (err.retryAfter) {
+                res.set(
+                    "Retry-After",
+                    String(err.retryAfter)
+                );
+            }
 
             return res.status(status).json({
-                error:
-                    status === 504
-                        ? "El proveedor de IA tardó demasiado en responder."
-                        : "El proveedor de IA no pudo clasificar la consulta.",
+                error: message,
                 code:
                     err.code ||
                     "AI_PROVIDER_ERROR",

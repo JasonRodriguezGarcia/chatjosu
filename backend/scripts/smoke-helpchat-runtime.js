@@ -75,13 +75,31 @@ async function tagId(description) {
 }
 
 async function search(tag, province) {
-  return findAssociationsForHelpchat({
-    pool,
-    schemaName: schema,
-    tagId: await tagId(tag),
-    selectedProvince: province,
-    limit: 5,
-  });
+  const result =
+    await findAssociationsForHelpchat({
+      pool,
+      schemaName: schema,
+      tagId: await tagId(tag),
+      selectedProvince: province,
+      limit: 5,
+    });
+
+  const validScopes = new Set([
+    "local",
+    "neighbor_province",
+    "national",
+  ]);
+
+  for (const association of result.associations) {
+    assert(
+      validScopes.has(
+        association.resultScope
+      ),
+      `resultScope inválido para asociación ${association.id}`
+    );
+  }
+
+  return result;
 }
 
 async function main() {

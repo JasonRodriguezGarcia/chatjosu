@@ -445,32 +445,42 @@ export async function findAssociationsForHelpchat({
     ].join("|");
   }
 
-  for (const association of [
-    ...local,
-    ...neighbors,
-    ...national,
-  ]) {
-    if (seenIds.has(association.id)) {
-      continue;
+  const scopedGroups = [
+    [local, "local"],
+    [neighbors, "neighbor_province"],
+    [national, "national"],
+  ];
+
+  for (const [
+    group,
+    resultScope,
+  ] of scopedGroups) {
+    for (const association of group) {
+      if (seenIds.has(association.id)) {
+        continue;
+      }
+
+      const contactKey =
+        associationContactKey(association);
+
+      if (
+        contactKey &&
+        seenContactKeys.has(contactKey)
+      ) {
+        continue;
+      }
+
+      seenIds.add(association.id);
+
+      if (contactKey) {
+        seenContactKeys.add(contactKey);
+      }
+
+      associations.push({
+        ...association,
+        resultScope,
+      });
     }
-
-    const contactKey =
-      associationContactKey(association);
-
-    if (
-      contactKey &&
-      seenContactKeys.has(contactKey)
-    ) {
-      continue;
-    }
-
-    seenIds.add(association.id);
-
-    if (contactKey) {
-      seenContactKeys.add(contactKey);
-    }
-
-    associations.push(association);
   }
 
   let fallbackType = null;
