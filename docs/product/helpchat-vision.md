@@ -141,3 +141,23 @@ These are product targets rather than guarantees and should be refined from prod
 Avoid global loading screens or interaction patterns that make the user wait before continuing to express their needs.
 
 Streaming or progressive assistant responses should be evaluated once the conversational context contract is stable.
+
+### Conversational Continuity
+
+Conversational continuity must be semantic, not merely visual.
+
+A follow-up message may depend on facts established in previous turns, including the person being helped, relationship, active needs, relevant territory, constraints, and previously shown resources.
+
+Do not resend the complete raw conversation history by default.
+
+Maintain a compact structured conversation context containing only information required to interpret subsequent turns.
+
+Context interpretation and need classification should preferably happen in the same AI-provider request. Do not introduce a second sequential AI call solely to summarize or update conversation context unless measurements demonstrate that it is necessary.
+
+The frontend should allow the user to continue sending messages while a previous message is being processed.
+
+Pending messages should be processed in causal order so that each message can use the context produced by earlier completed messages.
+
+Do not issue context-dependent user messages concurrently when doing so could cause them to be interpreted against stale conversation context.
+
+The target interaction is continuous expression by the user with ordered asynchronous processing underneath.

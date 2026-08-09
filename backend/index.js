@@ -1,6 +1,7 @@
 import express from "express";
 import cors from 'cors';
 import { pathToFileURL } from "node:url";
+import { isIP } from "node:net";
 import {
   findAssociationsForHelpchat,
 } from "./services/helpchat-association-service.js";
@@ -30,6 +31,10 @@ if (!SCHEMA_NAME || !/^[A-Za-z0-9_]+$/.test(SCHEMA_NAME)) {
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+const BACKEND_HOST =
+    process.env.BACKEND_HOST?.trim() ||
+    "127.0.0.1";
 
 function positiveIntegerEnv(name, fallback) {
     const raw = process.env[name];
@@ -76,6 +81,13 @@ const HELPCHAT_RATE_LIMIT_MAX =
         "HELPCHAT_RATE_LIMIT_MAX",
         20
     );
+
+const HELPCHAT_TRUST_CLOUDFLARE =
+    String(
+        process.env
+            .HELPCHAT_TRUST_CLOUDFLARE ||
+        "false"
+    ).toLowerCase() === "true";
 
 const allowedOriginsValue = process.env.ALLOWED_ORIGINS?.trim();
 if (!allowedOriginsValue) {
@@ -212,9 +224,50 @@ app.get(['/api/provincias', '/api/v1/helpchat/provincias'], async (req, res) => 
 
 const helpchatRateLimitBuckets = new Map();
 
+function isLoopbackAddress(value) {
+    const address =
+        String(value || "").trim();
+
+    return (
+        address === "127.0.0.1" ||
+        address === "::1" ||
+        address === "::ffff:127.0.0.1"
+    );
+}
+
+function helpchatClientKey(req) {
+    const remoteAddress =
+        req.socket?.remoteAddress ||
+        "";
+
+    if (
+        HELPCHAT_TRUST_CLOUDFLARE &&
+        isLoopbackAddress(remoteAddress)
+    ) {
+        const connectingIp =
+            String(
+                req.get(
+                    "CF-Connecting-IP"
+                ) || ""
+            ).trim();
+
+        if (isIP(connectingIp)) {
+            return `cf:${connectingIp}`;
+        }
+    }
+
+    return (
+        `direct:` +
+        (
+            remoteAddress ||
+            "unknown"
+        )
+    );
+}
+
 function helpchatRateLimit(req, res, next) {
     const now = Date.now();
-    const key = req.ip || "unknown";
+    const key = helpchatClientKey(req);
 
     let bucket =
         helpchatRateLimitBuckets.get(key);
@@ -534,9 +587,14 @@ const isMainModule =
 
 // Start Server
 if (isMainModule) {
-    app.listen(PORT, () => {
-        console.log(
-            `Server running on http://localhost:${PORT}`
-        );
-    });
+    app.listen(
+        PORT,
+        BACKEND_HOST,
+        () => {
+            console.log(
+                `Server running on ` +
+                `http://${BACKEND_HOST}:${PORT}`
+            );
+        }
+    );
 }

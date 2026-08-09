@@ -169,7 +169,9 @@ const AssociationCard = ({ association }) => {
           direction="row"
           spacing={1}
           useFlexGap
-          flexWrap="wrap"
+          sx={{
+            flexWrap: "wrap",
+          }}
         >
           {phone && (
             <Button

@@ -98,6 +98,8 @@ const HelpChat = () => {
   const [isEditingProvincia, setIsEditingProvincia] = useState(false);
 
   const bottomRef = useRef(null);
+  const requestQueueRef = useRef([]);
+  const processingQueueRef = useRef(false);
 
   useEffect(() => {
     const fetchingProvincias = async () => {
@@ -145,11 +147,6 @@ const HelpChat = () => {
   };
 
   const requestHelp = async ({ inputMessage, selectedProvincia: provincia }) => {
-    if (isSending) {
-      return;
-    }
-
-    setIsSending(true);
     setRequestError(null);
 
     const requestStartedAt = performance.now();
@@ -208,6 +205,7 @@ const HelpChat = () => {
       ]);
 
       setLastFailedRequest(null);
+      return true;
     } catch (err) {
       console.error("Error al llamar a /api/v1/helpchat/iacall:", err);
 
@@ -219,7 +217,30 @@ const HelpChat = () => {
         inputMessage,
         selectedProvincia: provincia,
       });
+
+      return false;
+    }
+  };
+
+  const processRequestQueue = async () => {
+    if (processingQueueRef.current) {
+      return;
+    }
+
+    processingQueueRef.current = true;
+    setIsSending(true);
+
+    try {
+      while (requestQueueRef.current.length > 0) {
+        const nextRequest = requestQueueRef.current.shift();
+        const succeeded = await requestHelp(nextRequest);
+
+        if (!succeeded) {
+          break;
+        }
+      }
     } finally {
+      processingQueueRef.current = false;
       setIsSending(false);
     }
   };
@@ -229,10 +250,6 @@ const HelpChat = () => {
 
     if (!trimmedInput) {
       setErrorInput(true);
-      return;
-    }
-
-    if (isSending) {
       return;
     }
 
@@ -246,18 +263,28 @@ const HelpChat = () => {
 
     setInput("");
 
-    requestHelp({
+    requestQueueRef.current.push({
       inputMessage: trimmedInput,
       selectedProvincia,
     });
+
+    if (!lastFailedRequest) {
+      void processRequestQueue();
+    }
   };
 
   const handleRetry = () => {
-    if (!lastFailedRequest || isSending) {
+    if (!lastFailedRequest || processingQueueRef.current) {
       return;
     }
 
-    requestHelp(lastFailedRequest);
+    const retryRequest = lastFailedRequest;
+
+    setLastFailedRequest(null);
+    setRequestError(null);
+
+    requestQueueRef.current.unshift(retryRequest);
+    void processRequestQueue();
   };
 
   const handleSetSelectedProvincia = (event) => {
@@ -667,9 +694,10 @@ const HelpChat = () => {
         <Stack
           direction="row"
           spacing={1.5}
-          alignItems="flex-start"
+
           sx={{
-            width: "100%",
+            alignItems: "flex-start",
+              width: "100%",
             maxWidth: 800,
             mx: "auto",
           }}
@@ -716,7 +744,7 @@ const HelpChat = () => {
           <Button
             type="submit"
             variant="contained"
-            disabled={!input.trim() || isSending}
+            disabled={!input.trim()}
             sx={{
               minHeight: 56,
               minWidth: { xs: 76, sm: 96 },
@@ -734,7 +762,7 @@ const HelpChat = () => {
               },
             }}
           >
-            {isSending ? "Buscando…" : "Enviar"}
+            Enviar
           </Button>
         </Stack>
       </Box>
