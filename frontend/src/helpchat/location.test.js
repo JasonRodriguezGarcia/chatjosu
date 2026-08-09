@@ -18,6 +18,17 @@ describe("normalizeDetectedLocation", () => {
     });
   });
 
+  it("rejects an unavailable silent location response", () => {
+    expect(
+      normalizeDetectedLocation({
+        province: null,
+        source: "unavailable",
+        confidence: "none",
+      }),
+    ).toBeNull();
+  });
+
+
   it("rejects locations without a usable province", () => {
     expect(normalizeDetectedLocation(null)).toBeNull();
     expect(normalizeDetectedLocation({})).toBeNull();

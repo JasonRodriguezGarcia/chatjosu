@@ -7,6 +7,31 @@ const cleanText = (value) => {
   return text || null;
 };
 
+const cleanAddress = (value) => {
+  const address = cleanText(value);
+
+  if (!address) {
+    return null;
+  }
+
+  const normalized = address.toLocaleLowerCase("es");
+
+  const placeholderPatterns = [
+    "consultar",
+    "ver web",
+    "en web",
+    "sede en",
+    "sedes y horarios",
+    "contactar",
+  ];
+
+  if (placeholderPatterns.some((pattern) => normalized.includes(pattern))) {
+    return null;
+  }
+
+  return address;
+};
+
 const cleanCoordinate = (value) => {
   if (value === null || value === undefined || value === "") {
     return null;
@@ -25,13 +50,23 @@ export const buildAssociationMapUrl = (association) => {
   const latitude = cleanCoordinate(association.latitude);
   const longitude = cleanCoordinate(association.longitude);
 
+  const validLatitude =
+    latitude !== null &&
+    latitude >= -90 &&
+    latitude <= 90;
+
+  const validLongitude =
+    longitude !== null &&
+    longitude >= -180 &&
+    longitude <= 180;
+
   let query = null;
 
-  if (latitude !== null && longitude !== null) {
+  if (validLatitude && validLongitude) {
     query = `${latitude},${longitude}`;
   } else {
     const locationParts = [
-      cleanText(association.address),
+      cleanAddress(association.address),
       cleanText(association.postal_code),
       cleanText(association.municipality),
       cleanText(association.province),

@@ -39,6 +39,37 @@ describe("HelpChat silent IP location", () => {
     ).toBeInTheDocument();
   });
 
+  it("keeps the fallback when silent location is unavailable", async () => {
+    globalThis.fetch = vi.fn((url) => {
+      if (String(url).includes("/provincias")) {
+        return Promise.resolve(provincesResponse());
+      }
+
+      if (isLocationRequest(url)) {
+        return Promise.resolve(
+          jsonResponse({
+            country: null,
+            province: null,
+            municipality: null,
+            source: "unavailable",
+            confidence: "none",
+          }),
+        );
+      }
+
+      throw new Error(`Unexpected request: ${url}`);
+    });
+
+    render(<HelpChat />);
+
+    expect(
+      await screen.findByRole("combobox", {
+        name: /Provincia actual.*Burgos/i,
+      }),
+    ).toBeInTheDocument();
+  });
+
+
   it("keeps the normal fallback when location detection fails", async () => {
     globalThis.fetch = vi.fn((url) => {
       if (String(url).includes("/provincias")) {
