@@ -184,11 +184,24 @@ const HelpChat = () => {
           }
         }
 
-      const resources = Array.isArray(data?.associations)
-        ? data.associations
-        : [];
+      const needsClarification =
+        data?.needsClarification === true;
 
-      const assistantContent = buildAssistantContent(data);
+      const clarificationQuestion =
+        typeof data?.clarificationQuestion === "string"
+          ? data.clarificationQuestion.trim()
+          : "";
+
+      const resources = needsClarification
+        ? []
+        : Array.isArray(data?.associations)
+          ? data.associations
+          : [];
+
+      const assistantContent =
+        needsClarification && clarificationQuestion
+          ? clarificationQuestion
+          : buildAssistantContent(data);
       const roundTripMs = Math.round(
         performance.now() - requestStartedAt,
       );
