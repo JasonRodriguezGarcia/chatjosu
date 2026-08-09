@@ -1,11 +1,18 @@
 import React, { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
+import MicIcon from "@mui/icons-material/Mic";
+import StopIcon from "@mui/icons-material/Stop";
 import AssociationCard from "./AssociationCard";
 import { normalizeConversationContext } from "../helpchat/conversationContext";
+import {
+  createSpeechRecognition,
+  isSpeechRecognitionSupported,
+} from "../helpchat/speechRecognition";
 import { normalizeDetectedLocation } from "../helpchat/location";
 import {
   Box,
   Button,
+  IconButton,
   FormControl,
   MenuItem,
   Select,
@@ -20,6 +27,23 @@ const STARTER_SUGGESTIONS = [
   "Busco orientación social",
   "Necesito apoyo relacionado con una enfermedad",
 ];
+
+const composeSpeechInput = (base, finalTranscript, interimTranscript) => {
+  const transcript = [finalTranscript, interimTranscript]
+    .map((value) => String(value || "").trim())
+    .filter(Boolean)
+    .join(" ");
+
+  if (!transcript) {
+    return base;
+  }
+
+  if (!base) {
+    return transcript;
+  }
+
+  return `${base}${/\s$/.test(base) ? "" : " "}${transcript}`;
+};
 
 const createMessage = (role, content, extra = {}) => ({
   id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
@@ -96,12 +120,18 @@ const HelpChat = () => {
   const [isSending, setIsSending] = useState(false);
   const [requestError, setRequestError] = useState(null);
   const [lastFailedRequest, setLastFailedRequest] = useState(null);
+  const [isListening, setIsListening] = useState(false);
+  const [speechError, setSpeechError] = useState(null);
 
   const bottomRef = useRef(null);
   const requestQueueRef = useRef([]);
   const processingQueueRef = useRef(false);
   const conversationContextRef = useRef(null);
   const manualProvinciaRef = useRef(false);
+  const speechRecognitionRef = useRef(null);
+  const speechBaseInputRef = useRef("");
+  const speechFinalTranscriptRef = useRef("");
+  const speechRecognitionSupported = isSpeechRecognitionSupported(globalThis);
 
   useEffect(() => {
     const fetchingProvincias = async () => {
@@ -168,6 +198,13 @@ const HelpChat = () => {
     };
 
     fetchingProvincias();
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      speechRecognitionRef.current?.abort();
+      speechRecognitionRef.current = null;
+    };
   }, []);
 
   useEffect(() => {
@@ -359,6 +396,78 @@ const HelpChat = () => {
   const handleSetSelectedProvincia = (event) => {
     manualProvinciaRef.current = true;
     setSelectedProvincia(event.target.value);
+  };
+
+  const handleToggleSpeech = () => {
+    if (isListening) {
+      speechRecognitionRef.current?.stop();
+      return;
+    }
+
+    setSpeechError(null);
+    speechBaseInputRef.current = input;
+    speechFinalTranscriptRef.current = "";
+
+    const adapter = createSpeechRecognition({
+      target: globalThis,
+      language: "es-ES",
+      onStart: () => {
+        setIsListening(true);
+      },
+      onResult: ({ interimTranscript, finalTranscript }) => {
+        if (finalTranscript) {
+          speechFinalTranscriptRef.current = [
+            speechFinalTranscriptRef.current,
+            finalTranscript,
+          ]
+            .map((value) => value.trim())
+            .filter(Boolean)
+            .join(" ");
+        }
+
+        setInput(
+          composeSpeechInput(
+            speechBaseInputRef.current,
+            speechFinalTranscriptRef.current,
+            interimTranscript,
+          ),
+        );
+        setErrorInput(false);
+      },
+      onError: (error) => {
+        setIsListening(false);
+
+        if (error === "not-allowed" || error === "service-not-allowed") {
+          setSpeechError(
+            "No he podido acceder al micrófono. Puedes seguir escribiendo normalmente.",
+          );
+        } else {
+          setSpeechError(
+            "No he podido completar el dictado. Puedes seguir escribiendo normalmente.",
+          );
+        }
+      },
+      onEnd: () => {
+        setIsListening(false);
+        speechRecognitionRef.current = null;
+      },
+    });
+
+    if (!adapter) {
+      return;
+    }
+
+    speechRecognitionRef.current = adapter;
+
+    try {
+      adapter.start();
+    } catch {
+      speechRecognitionRef.current = null;
+      setIsListening(false);
+      setSpeechError(
+        "No he podido iniciar el dictado. Puedes seguir escribiendo normalmente.",
+      );
+    }
   };
 
   const handleSuggestion = (suggestion) => {
@@ -775,8 +884,16 @@ const HelpChat = () => {
             multiline
             error={errorInput}
             helperText={
-              errorInput ? "El mensaje no puede estar vacío" : ""
+              errorInput
+                ? "El mensaje no puede estar vacío"
+                : speechError || (isListening ? "Escuchando…" : "")
             }
+            slotProps={{
+              formHelperText: {
+                role: "status",
+                "aria-live": "polite",
+              },
+            }}
             placeholder="Cuéntanos qué necesitas…"
             onChange={handleInput}
             sx={{
@@ -801,6 +918,34 @@ const HelpChat = () => {
               }
             }}
           />
+
+          {speechRecognitionSupported && (
+            <IconButton
+              type="button"
+              onClick={handleToggleSpeech}
+              aria-label={isListening ? "Detener dictado" : "Dictar mensaje"}
+              aria-pressed={isListening}
+              sx={{
+                mt: 0.25,
+                width: 52,
+                height: 52,
+                flexShrink: 0,
+                color: isListening ? BRAND.coral : BRAND.plum,
+                border: 1,
+                borderColor: isListening ? BRAND.coral : BRAND.border,
+                bgcolor: BRAND.surface,
+                "&:hover": {
+                  bgcolor: BRAND.plumSoft,
+                },
+                "&:focus-visible": {
+                  outline: `3px solid ${BRAND.yellow}`,
+                  outlineOffset: 2,
+                },
+              }}
+            >
+              {isListening ? <StopIcon /> : <MicIcon />}
+            </IconButton>
+          )}
 
           <Button
             type="submit"
