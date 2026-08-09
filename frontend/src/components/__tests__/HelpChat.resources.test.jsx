@@ -258,4 +258,135 @@ describe("HelpChat structured resources", () => {
     ).toBeInTheDocument();
   });
 
+
+  it("renders the national resources title from presentation context", async () => {
+    globalThis.fetch = vi.fn((url) => {
+      if (String(url).includes("/provincias")) {
+        return Promise.resolve(
+          jsonResponse([{ label: "Burgos" }]),
+        );
+      }
+
+      if (isLocationRequest(url)) {
+        return Promise.resolve(
+          locationResponse({ province: "Burgos" }),
+        );
+      }
+
+      return Promise.resolve(
+        jsonResponse({
+          status: "resolved",
+          tag: "SALUD MENTAL",
+          requestedProvince: "Burgos",
+          resolvedProvince: "Burgos",
+          fallbackUsed: true,
+          fallbackType: "national",
+          localCount: 0,
+          neighborCount: 0,
+          nationalCount: 1,
+          durationMs: 120,
+          associations: [
+            {
+              id: 9001,
+              name: "Recurso estatal de orientación",
+              scope: "NACIONAL",
+            },
+          ],
+        }),
+      );
+    });
+
+    render(<HelpChat />);
+
+    await screen.findByRole("combobox", {
+      name: /Provincia actual.*Burgos/i,
+    });
+
+    fireEvent.change(
+      screen.getByRole("textbox", {
+        name: /Escribe qué necesitas/i,
+      }),
+      {
+        target: {
+          value: "necesito apoyo",
+        },
+      },
+    );
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Enviar" }),
+    );
+
+    expect(
+      await screen.findByText("Recursos de ámbito nacional"),
+    ).toBeInTheDocument();
+  });
+
+  it("renders the nearby resources title from presentation context", async () => {
+    globalThis.fetch = vi.fn((url) => {
+      if (String(url).includes("/provincias")) {
+        return Promise.resolve(
+          jsonResponse([{ label: "Burgos" }]),
+        );
+      }
+
+      if (isLocationRequest(url)) {
+        return Promise.resolve(
+          locationResponse({ province: "Burgos" }),
+        );
+      }
+
+      return Promise.resolve(
+        jsonResponse({
+          status: "resolved",
+          tag: "SALUD MENTAL",
+          requestedProvince: "Burgos",
+          resolvedProvince: "Palencia",
+          fallbackUsed: true,
+          fallbackType: "neighbor_province",
+          localCount: 0,
+          neighborCount: 1,
+          nationalCount: 0,
+          durationMs: 120,
+          associations: [
+            {
+              id: 9002,
+              name: "Recurso cercano de orientación",
+              municipality: "Palencia",
+            },
+          ],
+        }),
+      );
+    });
+
+    render(<HelpChat />);
+
+    await screen.findByRole("combobox", {
+      name: /Provincia actual.*Burgos/i,
+    });
+
+    fireEvent.change(
+      screen.getByRole("textbox", {
+        name: /Escribe qué necesitas/i,
+      }),
+      {
+        target: {
+          value: "necesito apoyo",
+        },
+      },
+    );
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Enviar" }),
+    );
+
+    expect(
+      await screen.findByText(
+        "Recursos cercanos que pueden orientarte",
+      ),
+    ).toBeInTheDocument();
+  });
+
+
+
 });

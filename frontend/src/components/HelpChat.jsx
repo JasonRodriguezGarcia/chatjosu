@@ -309,8 +309,7 @@ const HelpChat = () => {
         ...previous,
         createMessage("assistant", assistantContent, {
           resources,
-          context: {
-            tag: data?.tag || null,
+          presentationContext: {
             requestedProvince: data?.requestedProvince || provincia,
             resolvedProvince: data?.resolvedProvince || provincia,
             fallbackUsed: Boolean(data?.fallbackUsed),
@@ -318,6 +317,9 @@ const HelpChat = () => {
             localCount: Number(data?.localCount) || 0,
             neighborCount: Number(data?.neighborCount) || 0,
             nationalCount: Number(data?.nationalCount) || 0,
+          },
+          operationalMetadata: {
+            tag: data?.tag || null,
             serverDurationMs: Number(data?.durationMs) || null,
             roundTripMs,
           },
@@ -781,7 +783,7 @@ const HelpChat = () => {
                               px: 0.5,
                             }}
                           >
-                            {getResourcesTitle(message.context)}
+                            {getResourcesTitle(message.presentationContext)}
                           </Typography>
 
                           {message.resources.map((association) => (
