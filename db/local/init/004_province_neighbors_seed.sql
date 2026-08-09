@@ -1,23 +1,18 @@
--- Fallback territorial inicial de HelpChat.
+-- Deprecated territorial seed.
 --
--- Solo se incluyen relaciones verificadas que además existen
--- actualmente en el catálogo normalizado de provincias.
+-- La versión inicial contenía únicamente:
+--   Álava <-> Burgos
+--   Álava <-> Navarra
 --
--- distance_km permanece NULL deliberadamente: estas relaciones
--- significan provincia limítrofe, no distancia calculada.
+-- No se insertan filas aquí deliberadamente.
+--
+-- Motivo:
+-- 005_spain_territorial_catalog.sql crea el catálogo territorial
+-- oficial completo antes de que
+-- 006_province_neighbors_seed.sql cargue la topología derivada
+-- de CNIG/IGN.
+--
+-- Mantener este fichero como no-op conserva el orden histórico
+-- de las migraciones y permite bootstraps limpios.
 
-INSERT INTO copilot_ong.province_neighbors (
-    province_key,
-    neighbor_key,
-    distance_km,
-    source
-)
-VALUES
-    ('ALAVA', 'BURGOS', NULL, 'manual_border_v1'),
-    ('BURGOS', 'ALAVA', NULL, 'manual_border_v1'),
-    ('ALAVA', 'NAVARRA', NULL, 'manual_border_v1'),
-    ('NAVARRA', 'ALAVA', NULL, 'manual_border_v1')
-ON CONFLICT (province_key, neighbor_key)
-DO UPDATE SET
-    distance_km = EXCLUDED.distance_km,
-    source = EXCLUDED.source;
+SELECT 1;

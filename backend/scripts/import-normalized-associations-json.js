@@ -167,7 +167,10 @@ async function main() {
   const tags = (Array.isArray(payload.tags) ? payload.tags : [])
     .filter(row => row.tag_id && row.tag_canonico);
   const provinces = (Array.isArray(payload.provinces) ? payload.provinces : [])
-    .filter(row => row.provincia_key);
+    .filter(row =>
+      row.provincia_key &&
+      String(row.provincia_key).trim().toUpperCase() !== 'NACIONAL'
+    );
 
   const problems = [];
 
