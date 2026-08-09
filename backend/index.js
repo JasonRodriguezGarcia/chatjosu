@@ -1,5 +1,6 @@
 import express from "express";
 import cors from 'cors';
+import { pathToFileURL } from "node:url";
 import {
   findAssociationsForHelpchat,
 } from "./services/helpchat-association-service.js";
@@ -96,6 +97,8 @@ if (!GEMINI_API_KEY) {
 }
 
 app.locals.GEMINI_API_KEY = GEMINI_API_KEY;
+app.locals.classifyHelpchatTag =
+    classifyHelpchatTag;
 
 //
 // functions
@@ -173,6 +176,8 @@ async function tagSaving(tagText, inputMessage, userId = null) {
 const datosIniciales = await datos()
 const tags = !datosIniciales ? [] : datosIniciales
 console.log(`Tags operativos cargados: ${tags.length}`)
+
+app.locals.tagSaving = tagSaving;
 
 // Middleware
 
@@ -320,7 +325,8 @@ app.post(
         const classificationStartedAt =
             performance.now();
 
-        const tag = await classifyHelpchatTag({
+        const tag =
+            await app.locals.classifyHelpchatTag({
             apiKey: app.locals.GEMINI_API_KEY,
             generateContentUrl: GEMINI_GENERATE_CONTENT_URL,
             inputMessage,
@@ -350,7 +356,8 @@ app.post(
         const historyStartedAt =
             performance.now();
 
-        const savedTag = await tagSaving(
+        const savedTag =
+            await app.locals.tagSaving(
             tag.descripcion,
             HELPCHAT_STORE_INPUT_MESSAGE
                 ? inputMessage
@@ -518,7 +525,18 @@ app.post(
 //});
 // **END OPCIONAL**
 
+export { app, pool };
+
+const isMainModule =
+    Boolean(process.argv[1]) &&
+    import.meta.url ===
+        pathToFileURL(process.argv[1]).href;
+
 // Start Server
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+if (isMainModule) {
+    app.listen(PORT, () => {
+        console.log(
+            `Server running on http://localhost:${PORT}`
+        );
+    });
+}
