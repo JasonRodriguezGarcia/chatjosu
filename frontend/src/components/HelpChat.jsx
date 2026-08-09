@@ -84,8 +84,17 @@ const buildAssistantContent = (data) => {
     const recognizedNeed =
       typeof data?.tag === "string" ? data.tag.trim() : "";
 
+    const publicNeedLabel =
+      typeof data?.needLabel === "string"
+        ? data.needLabel.trim()
+        : "";
+
     if (recognizedNeed) {
-      return `He entendido que buscas orientación relacionada con ${recognizedNeed}, pero todavía no tengo recursos registrados para ${requestedProvince} ni alternativas disponibles en el catálogo actual. Puedes contarme si hay algo más que también te esté afectando y seguiré buscando contigo.`;
+      if (publicNeedLabel) {
+        return `He entendido que buscas orientación relacionada con ${publicNeedLabel}, pero todavía no tengo recursos registrados para ${requestedProvince} ni alternativas disponibles en el catálogo actual. Puedes contarme si hay algo más que también te esté afectando y seguiré buscando contigo.`;
+      }
+
+      return `He entendido una de las necesidades que mencionas, pero todavía no tengo recursos registrados para ${requestedProvince} ni alternativas disponibles en el catálogo actual. Puedes contarme si hay algo más que también te esté afectando y seguiré buscando contigo.`;
     }
 
     return `No he encontrado recursos registrados para ${requestedProvince} con la información disponible. Si quieres, puedes contarme algún detalle más para intentar otra vía de orientación.`;
