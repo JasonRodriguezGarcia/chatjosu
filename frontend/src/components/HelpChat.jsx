@@ -78,7 +78,14 @@ const buildAssistantContent = (data) => {
   const resolvedProvince = data?.resolvedProvince || requestedProvince;
 
   if (count === 0) {
-    return `No he encontrado recursos registrados para ${requestedProvince} con esta búsqueda. Puedes escribir de nuevo contando un poco más sobre el tipo de ayuda que necesitas.`;
+    const recognizedNeed =
+      typeof data?.tag === "string" ? data.tag.trim() : "";
+
+    if (recognizedNeed) {
+      return `He entendido que buscas orientación relacionada con ${recognizedNeed}, pero todavía no tengo recursos registrados para ${requestedProvince} ni alternativas disponibles en el catálogo actual. Puedes contarme si hay algo más que también te esté afectando y seguiré buscando contigo.`;
+    }
+
+    return `No he encontrado recursos registrados para ${requestedProvince} con la información disponible. Si quieres, puedes contarme algún detalle más para intentar otra vía de orientación.`;
   }
 
   const resourceText =
