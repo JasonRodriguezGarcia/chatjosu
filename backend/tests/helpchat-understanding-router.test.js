@@ -353,3 +353,67 @@ test(
     );
   }
 );
+
+test(
+  "regresión exacta multi-need conserva alcohol trabajo y sueño sin semántica",
+  async () => {
+    const inputMessage =
+      "no sé qué hacer con mi vida he perdido el trabajo.\n" +
+      "tengo problemas de alcohol y no puedo dormir por las noches";
+
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+
+            throw new Error(
+              "SEMANTIC_SHOULD_NOT_RUN"
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage,
+        conversationContext: null,
+      });
+
+    assert.equal(
+      result.status,
+      "resolved"
+    );
+
+    assert.equal(
+      result.tag?.descripcion,
+      "ALCOHOLISMO"
+    );
+
+    assert.deepEqual(
+      new Set(
+        result.resolvedNeeds?.map(
+          (need) =>
+            need.descripcion
+        )
+      ),
+      new Set([
+        "ALCOHOLISMO",
+        "SALUD MENTAL",
+        "INSERCIÓN LABORAL",
+      ])
+    );
+
+    assert.equal(
+      result.provider,
+      "anchor"
+    );
+
+    assert.equal(
+      semanticCalls,
+      0
+    );
+  }
+);

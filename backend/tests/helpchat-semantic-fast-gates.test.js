@@ -4,6 +4,7 @@ import assert from "node:assert/strict";
 import {
   resolveSemanticAnchor,
   isClearlyInsufficient,
+  resolveSemanticAnchors,
 } from "../helpchat/semantic-fast-gates.js";
 
 test(
@@ -141,6 +142,32 @@ test(
           tag.descripcion
       ),
       ["SALUD MENTAL"]
+    );
+  }
+);
+
+test(
+  "regresión exacta conserva alcohol trabajo y sueño",
+  () => {
+    const inputMessage =
+      "no sé qué hacer con mi vida he perdido el trabajo.\n" +
+      "tengo problemas de alcohol y no puedo dormir por las noches";
+
+    const needs =
+      resolveSemanticAnchors(
+        inputMessage
+      );
+
+    assert.deepEqual(
+      needs.map(
+        (need) =>
+          need.descripcion
+      ),
+      [
+        "ALCOHOLISMO",
+        "SALUD MENTAL",
+        "INSERCIÓN LABORAL",
+      ]
     );
   }
 );
