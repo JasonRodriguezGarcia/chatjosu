@@ -1,0 +1,10 @@
+node_modules
+dist
+build
+.git
+.vscode
+frontend/node_modules
+backend/node_modules
+*.min.js
+coverage
+public
