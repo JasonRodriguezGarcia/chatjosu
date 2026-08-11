@@ -62,6 +62,40 @@ const AssociationCard = ({ association }) => {
   const scope = formatScope(association?.scope);
   const mapUrl = buildAssociationMapUrl(association);
 
+  const primaryAction =
+    phone
+      ? "phone"
+      : website
+        ? "website"
+        : email
+          ? "email"
+          : mapUrl
+            ? "map"
+            : null;
+
+  const actionStyle = (action) =>
+    primaryAction === action
+      ? {
+          bgcolor: "#765366",
+          color: "#FFFFFF",
+          borderColor: "#765366",
+          boxShadow: "none",
+          "&:hover": {
+            bgcolor: "#624456",
+            borderColor: "#624456",
+            boxShadow: "none",
+          },
+        }
+      : {
+          color: "#765366",
+          borderColor: "#E8DDD7",
+          bgcolor: "transparent",
+          "&:hover": {
+            borderColor: "#765366",
+            bgcolor: "#F4EAF0",
+          },
+        };
+
   const location = [
     association?.municipality,
     association?.province,
@@ -200,21 +234,17 @@ const AssociationCard = ({ association }) => {
             <Button
               component="a"
               href={`tel:${phone.replace(/\s+/g, "")}`}
-              variant="contained"
+              variant={
+                primaryAction === "phone"
+                  ? "contained"
+                  : "outlined"
+              }
               size="small"
               startIcon={<LocalPhoneOutlinedIcon />}
               aria-label={`Llamar a ${
                 association?.name || "recurso"
               }`}
-              sx={{
-                bgcolor: "#765366",
-                color: "#FFFFFF",
-                boxShadow: "none",
-                "&:hover": {
-                  bgcolor: "#624456",
-                  boxShadow: "none",
-                },
-              }}
+              sx={actionStyle("phone")}
             >
               Llamar
             </Button>
@@ -224,16 +254,17 @@ const AssociationCard = ({ association }) => {
             <Button
               component="a"
               href={`mailto:${email}`}
-              variant="outlined"
+              variant={
+                primaryAction === "email"
+                  ? "contained"
+                  : "outlined"
+              }
               size="small"
               startIcon={<EmailOutlinedIcon />}
               aria-label={`Enviar un email a ${
                 association?.name || "recurso"
               }`}
-              sx={{
-                color: "#765366",
-                borderColor: "#E8DDD7",
-              }}
+              sx={actionStyle("email")}
             >
               Email
             </Button>
@@ -245,16 +276,17 @@ const AssociationCard = ({ association }) => {
               href={website}
               target="_blank"
               rel="noopener noreferrer"
-              variant="outlined"
+              variant={
+                primaryAction === "website"
+                  ? "contained"
+                  : "outlined"
+              }
               size="small"
               startIcon={<LanguageOutlinedIcon />}
               aria-label={`Abrir el sitio web de ${
                 association?.name || "recurso"
               }`}
-              sx={{
-                color: "#765366",
-                borderColor: "#E8DDD7",
-              }}
+              sx={actionStyle("website")}
             >
               Sitio web
             </Button>
@@ -266,16 +298,17 @@ const AssociationCard = ({ association }) => {
               href={mapUrl}
               target="_blank"
               rel="noopener noreferrer"
-              variant="outlined"
+              variant={
+                primaryAction === "map"
+                  ? "contained"
+                  : "outlined"
+              }
               size="small"
               startIcon={<PlaceOutlinedIcon />}
               aria-label={`Ver ${
                 association?.name || "recurso"
               } en el mapa`}
-              sx={{
-                color: "#765366",
-                borderColor: "#E8DDD7",
-              }}
+              sx={actionStyle("map")}
             >
               Ver en mapa
             </Button>

@@ -116,4 +116,95 @@ describe("AssociationCard", () => {
     ).not.toBeInTheDocument();
   });
 
+
+  it("uses phone as the primary action when available", () => {
+    render(
+      <AssociationCard
+        association={{
+          id: "priority-phone",
+          name: "Recurso con teléfono",
+          province: "Burgos",
+          phone: "947 00 00 00",
+          email: "hola@example.org",
+          website: "https://example.org",
+        }}
+      />,
+    );
+
+    const phone = screen.getByRole("link", {
+      name: "Llamar a Recurso con teléfono",
+    });
+    const website = screen.getByRole("link", {
+      name: "Abrir el sitio web de Recurso con teléfono",
+    });
+
+    expect(phone).toHaveClass("MuiButton-contained");
+    expect(website).toHaveClass("MuiButton-outlined");
+  });
+
+  it("uses website as the primary action when phone is unavailable", () => {
+    render(
+      <AssociationCard
+        association={{
+          id: "priority-web",
+          name: "Recurso web",
+          province: "Burgos",
+          email: "hola@example.org",
+          website: "https://example.org",
+        }}
+      />,
+    );
+
+    const website = screen.getByRole("link", {
+      name: "Abrir el sitio web de Recurso web",
+    });
+    const email = screen.getByRole("link", {
+      name: "Enviar un email a Recurso web",
+    });
+
+    expect(website).toHaveClass("MuiButton-contained");
+    expect(email).toHaveClass("MuiButton-outlined");
+  });
+
+  it("uses email as the primary action when phone and website are unavailable", () => {
+    render(
+      <AssociationCard
+        association={{
+          id: "priority-email",
+          name: "Recurso por email",
+          province: "Burgos",
+          email: "hola@example.org",
+        }}
+      />,
+    );
+
+    const email = screen.getByRole("link", {
+      name: "Enviar un email a Recurso por email",
+    });
+    const map = screen.getByRole("link", {
+      name: "Ver Recurso por email en el mapa",
+    });
+
+    expect(email).toHaveClass("MuiButton-contained");
+    expect(map).toHaveClass("MuiButton-outlined");
+  });
+
+  it("uses map as the primary action when it is the only available action", () => {
+    render(
+      <AssociationCard
+        association={{
+          id: "priority-map",
+          name: "Recurso territorial",
+          province: "Burgos",
+        }}
+      />,
+    );
+
+    const map = screen.getByRole("link", {
+      name: "Ver Recurso territorial en el mapa",
+    });
+
+    expect(map).toHaveClass("MuiButton-contained");
+  });
+
 });
