@@ -38,23 +38,29 @@ describe("AssociationCard", () => {
     ).toBeInTheDocument();
 
     expect(
-      screen.getByText("Teléfono: 947 33 03 33"),
+      screen.getByText("947 33 03 33"),
     ).toBeInTheDocument();
 
     expect(
-      screen.getByText("Email: info@example.org"),
+      screen.getByText("info@example.org"),
     ).toBeInTheDocument();
 
     expect(
-      screen.getByRole("link", { name: "Llamar" }),
+      screen.getByRole("link", {
+        name: "Llamar a Servicios sociales y de dependencia",
+      }),
     ).toHaveAttribute("href", "tel:947330333");
 
     expect(
-      screen.getByRole("link", { name: "Email" }),
+      screen.getByRole("link", {
+        name: "Enviar un email a Servicios sociales y de dependencia",
+      }),
     ).toHaveAttribute("href", "mailto:info@example.org");
 
     expect(
-      screen.getByRole("link", { name: "Sitio web" }),
+      screen.getByRole("link", {
+        name: "Abrir el sitio web de Servicios sociales y de dependencia",
+      }),
     ).toHaveAttribute("href", "https://www.fedispa.es/");
   });
 
@@ -70,15 +76,21 @@ describe("AssociationCard", () => {
     );
 
     expect(
-      screen.queryByRole("link", { name: "Llamar" }),
+      screen.queryByRole("link", {
+        name: /Llamar a /i,
+      }),
     ).not.toBeInTheDocument();
 
     expect(
-      screen.queryByRole("link", { name: "Email" }),
+      screen.queryByRole("link", {
+        name: /Enviar un email a /i,
+      }),
     ).not.toBeInTheDocument();
 
     expect(
-      screen.queryByRole("link", { name: "Sitio web" }),
+      screen.queryByRole("link", {
+        name: /Abrir el sitio web de /i,
+      }),
     ).not.toBeInTheDocument();
 
     expect(

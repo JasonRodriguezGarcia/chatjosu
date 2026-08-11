@@ -1,3 +1,7 @@
+import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
+import LanguageOutlinedIcon from "@mui/icons-material/LanguageOutlined";
+import LocalPhoneOutlinedIcon from "@mui/icons-material/LocalPhoneOutlined";
+import PlaceOutlinedIcon from "@mui/icons-material/PlaceOutlined";
 import { Box, Button, Stack, Typography } from "@mui/material";
 import { buildAssociationMapUrl } from "../helpchat/mapLocation";
 
@@ -146,22 +150,32 @@ const AssociationCard = ({ association }) => {
         )}
 
         {(phone || email) && (
-          <Stack spacing={0.35}>
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            spacing={{ xs: 0.35, sm: 1.5 }}
+            useFlexGap
+            sx={{ flexWrap: "wrap" }}
+          >
             {phone && (
-              <Typography variant="body2" sx={{ color: "#332D31" }}>
-                Teléfono: {phone}
+              <Typography
+                component="span"
+                variant="body2"
+                sx={{ color: "#71676C" }}
+              >
+                {phone}
               </Typography>
             )}
 
             {email && (
               <Typography
+                component="span"
                 variant="body2"
                 sx={{
-                  color: "#332D31",
+                  color: "#71676C",
                   overflowWrap: "anywhere",
                 }}
               >
-                Email: {email}
+                {email}
               </Typography>
             )}
           </Stack>
@@ -173,19 +187,33 @@ const AssociationCard = ({ association }) => {
           useFlexGap
           sx={{
             flexWrap: "wrap",
+            pt: 0.25,
+            "& .MuiButton-root": {
+              minHeight: 36,
+              px: 1.5,
+              textTransform: "none",
+              borderRadius: 999,
+            },
           }}
         >
           {phone && (
             <Button
               component="a"
               href={`tel:${phone.replace(/\s+/g, "")}`}
-              variant="outlined"
+              variant="contained"
               size="small"
+              startIcon={<LocalPhoneOutlinedIcon />}
+              aria-label={`Llamar a ${
+                association?.name || "recurso"
+              }`}
               sx={{
-                textTransform: "none",
-                borderRadius: 999,
-                color: "#765366",
-                borderColor: "#E8DDD7",
+                bgcolor: "#765366",
+                color: "#FFFFFF",
+                boxShadow: "none",
+                "&:hover": {
+                  bgcolor: "#624456",
+                  boxShadow: "none",
+                },
               }}
             >
               Llamar
@@ -198,9 +226,11 @@ const AssociationCard = ({ association }) => {
               href={`mailto:${email}`}
               variant="outlined"
               size="small"
+              startIcon={<EmailOutlinedIcon />}
+              aria-label={`Enviar un email a ${
+                association?.name || "recurso"
+              }`}
               sx={{
-                textTransform: "none",
-                borderRadius: 999,
                 color: "#765366",
                 borderColor: "#E8DDD7",
               }}
@@ -217,9 +247,11 @@ const AssociationCard = ({ association }) => {
               rel="noopener noreferrer"
               variant="outlined"
               size="small"
+              startIcon={<LanguageOutlinedIcon />}
+              aria-label={`Abrir el sitio web de ${
+                association?.name || "recurso"
+              }`}
               sx={{
-                textTransform: "none",
-                borderRadius: 999,
                 color: "#765366",
                 borderColor: "#E8DDD7",
               }}
@@ -236,12 +268,11 @@ const AssociationCard = ({ association }) => {
               rel="noopener noreferrer"
               variant="outlined"
               size="small"
+              startIcon={<PlaceOutlinedIcon />}
               aria-label={`Ver ${
                 association?.name || "recurso"
               } en el mapa`}
               sx={{
-                textTransform: "none",
-                borderRadius: 999,
                 color: "#765366",
                 borderColor: "#E8DDD7",
               }}
