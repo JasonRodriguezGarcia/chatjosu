@@ -46,6 +46,9 @@ createHelpchatLocationResolver,
 helpchatClientIp,
 normalizeCloudflareLocation,
 } from "./services/helpchat-location-service.js";
+import {
+createIpLocationLookup,
+} from "./services/helpchat-ip-location-provider-v1.js";
 // import { tags } from "./data/tags.js";
 import dotenv from 'dotenv';
 dotenv.config();
@@ -432,7 +435,10 @@ app.get(
 );
 
 const helpchatLocationResolver =
-    createHelpchatLocationResolver();
+    createHelpchatLocationResolver({
+        lookupIp:
+            createIpLocationLookup(),
+    });
 
 app.locals.resolveHelpchatLocation =
     helpchatLocationResolver;
