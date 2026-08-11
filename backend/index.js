@@ -42,6 +42,9 @@ import {
   resolveMultipleNeeds,
 } from "./helpchat/multi-need-v1.js";
 import {
+  resolveHelpchatLocationRequirement,
+} from "./helpchat/location-requirement-v1.js";
+import {
 createHelpchatLocationResolver,
 helpchatClientIp,
 normalizeCloudflareLocation,
@@ -667,12 +670,6 @@ app.post(
         });
     }
 
-    if (!selectedProvincia) {
-        return res.status(400).json({
-            error: "Debe seleccionarse una provincia.",
-        });
-    }
-
     try {
         const classificationStartedAt =
             performance.now();
@@ -811,6 +808,8 @@ app.post(
                 needsClarification: true,
                 clarificationQuestion:
                     understanding.clarificationQuestion,
+                needsLocation: false,
+                locationReason: null,
                 requestedProvince:
                     selectedProvincia,
                 effectiveProvince,
@@ -889,6 +888,77 @@ app.post(
                 tags:
                     resolvedNeeds,
             });
+
+        const locationRequirement =
+            resolveHelpchatLocationRequirement({
+                effectiveProvince,
+                understanding,
+            });
+
+        if (
+            locationRequirement
+                .needsLocation
+        ) {
+            const durationMs =
+                Date.now() -
+                startedAt;
+
+            const timings = {
+                classificationMs:
+                    Number(
+                        classificationMs
+                            .toFixed(1)
+                    ),
+                searchMs: 0,
+                historyMs: 0,
+                totalMs:
+                    durationMs,
+            };
+
+            return res.json({
+                status:
+                    "needs_location",
+                message: null,
+                tag:
+                    tag.descripcion,
+                resolvedNeeds:
+                    understanding
+                        .resolvedNeeds,
+                context:
+                    understanding.context,
+                needsClarification:
+                    false,
+                clarificationQuestion:
+                    null,
+                needsLocation:
+                    true,
+                locationReason:
+                    locationRequirement
+                        .locationReason,
+                requestedProvince:
+                    selectedProvincia ||
+                    null,
+                effectiveProvince:
+                    null,
+                resolvedProvince:
+                    null,
+                fallbackUsed:
+                    false,
+                fallbackType:
+                    null,
+                localCount: 0,
+                neighborCount: 0,
+                nationalCount: 0,
+                associations: [],
+                provider:
+                    understanding.provider,
+                model:
+                    understanding.model,
+                historyId: null,
+                durationMs,
+                timings,
+            });
+        }
 
         const searchStartedAt =
             performance.now();
@@ -1071,6 +1141,8 @@ app.post(
                 understanding.context,
             needsClarification: false,
             clarificationQuestion: null,
+            needsLocation: false,
+            locationReason: null,
             requestedProvince: selectedProvincia,
             effectiveProvince,
             resolvedProvince: searchResult.resolvedProvince,
