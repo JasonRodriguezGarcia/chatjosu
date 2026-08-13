@@ -62,6 +62,7 @@ function resolvedResult({
   model,
   durationMs,
   diagnostics = null,
+  clarificationTransition = null,
 }) {
   return {
     status: "resolved",
@@ -77,6 +78,7 @@ function resolvedResult({
     durationMs,
 
     diagnostics,
+    clarificationTransition,
   };
 }
 
@@ -87,6 +89,7 @@ function clarificationResult({
   model,
   durationMs,
   diagnostics = null,
+  clarificationTransition = null,
 }) {
   const clarification =
     buildClarification({
@@ -113,6 +116,7 @@ function clarificationResult({
     durationMs,
 
     diagnostics,
+    clarificationTransition,
   };
 }
 
@@ -215,6 +219,14 @@ export function createHelpchatUnderstandingRouter({
               model:
                 "clarification-graph-v1",
               durationMs,
+              clarificationTransition: {
+                sourceNode:
+                  graphNode,
+                action:
+                  structuredClone(
+                    action,
+                  ),
+              },
             }),
             resolvedNeeds,
           };
@@ -235,6 +247,14 @@ export function createHelpchatUnderstandingRouter({
           model:
             "clarification-graph-v1",
           durationMs,
+          clarificationTransition: {
+            sourceNode:
+              graphNode,
+            action:
+              structuredClone(
+                action,
+              ),
+          },
         });
       }
 
@@ -251,6 +271,14 @@ export function createHelpchatUnderstandingRouter({
           model:
             "clarification-graph-v1",
           durationMs,
+          clarificationTransition: {
+            sourceNode:
+              graphNode,
+            action:
+              structuredClone(
+                action,
+              ),
+          },
         });
       }
     }

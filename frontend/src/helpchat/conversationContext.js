@@ -79,6 +79,49 @@ const normalizeConversationPersonV2 = (value) => {
   };
 };
 
+const normalizePendingClarificationV2 = (
+  value,
+  validPersonIds,
+) => {
+  if (
+    !value ||
+    typeof value !== "object" ||
+    Array.isArray(value)
+  ) {
+    return null;
+  }
+
+  const node =
+    cleanString(value.node, 80);
+
+  if (!node) {
+    return null;
+  }
+
+  const requestedPersonId =
+    cleanString(
+      value.personId,
+      64,
+    );
+
+  const personId =
+    requestedPersonId &&
+    validPersonIds.has(
+      requestedPersonId,
+    )
+      ? requestedPersonId
+      : null;
+
+  return {
+    node,
+    personId,
+    mode:
+      value.mode === "free_text"
+        ? "free_text"
+        : "choice",
+  };
+};
+
 const normalizeConversationContextV2 = (value) => {
   const people = [];
   const seenIds = new Set();
@@ -144,6 +187,11 @@ const normalizeConversationContextV2 = (value) => {
     people,
     currentFocus,
     currentGoal: cleanString(value.currentGoal),
+    pendingClarification:
+      normalizePendingClarificationV2(
+        value.pendingClarification,
+        seenIds,
+      ),
     territory: {
       province: cleanString(value.territory?.province),
       municipality: cleanString(value.territory?.municipality),

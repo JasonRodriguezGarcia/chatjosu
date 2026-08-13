@@ -149,3 +149,74 @@ describe("normalizeConversationContext V2", () => {
     ).toBeNull();
   });
 });
+
+it(
+  "preserves V2 pending clarification state",
+  () => {
+    const result =
+      normalizeConversationContext({
+        version: 2,
+        people: [
+          {
+            id: "self",
+            relationship: "self",
+          },
+          {
+            id: "person_1",
+            relationship: "hermano",
+          },
+        ],
+        currentFocus: "person_1",
+        pendingClarification: {
+          node:
+            "mental_behavior_detail",
+          personId:
+            "person_1",
+          mode:
+            "free_text",
+        },
+      });
+
+    expect(
+      result.pendingClarification,
+    ).toEqual({
+      node:
+        "mental_behavior_detail",
+      personId:
+        "person_1",
+      mode:
+        "free_text",
+    });
+  },
+);
+
+it(
+  "drops a stale pending clarification person reference",
+  () => {
+    const result =
+      normalizeConversationContext({
+        version: 2,
+        people: [
+          {
+            id: "self",
+            relationship: "self",
+          },
+        ],
+        pendingClarification: {
+          node:
+            "mental_health_detail",
+          personId:
+            "person_404",
+        },
+      });
+
+    expect(
+      result.pendingClarification,
+    ).toEqual({
+      node:
+        "mental_health_detail",
+      personId: null,
+      mode: "choice",
+    });
+  },
+);

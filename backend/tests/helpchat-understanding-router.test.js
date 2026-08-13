@@ -1003,3 +1003,77 @@ test(
     );
   },
 );
+
+test(
+  "clarification graph exposes its canonical transition metadata",
+  async () => {
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            throw new Error(
+              "semantic classifier no debería ejecutarse",
+            );
+          },
+        },
+      });
+
+    const next =
+      await router.understand({
+        inputMessage:
+          "Necesito orientación sobre salud emocional",
+        conversationContext: null,
+        controlledReply: {
+          type:
+            "clarification_choice",
+          node:
+            "need_type",
+          choice:
+            "emotional_health",
+        },
+      });
+
+    assert.deepEqual(
+      next.clarificationTransition,
+      {
+        sourceNode:
+          "need_type",
+        action: {
+          type: "goto",
+          node:
+            "mental_health_detail",
+        },
+      },
+    );
+
+    const resolved =
+      await router.understand({
+        inputMessage:
+          "Lo que más preocupa es el sueño",
+        conversationContext: null,
+        controlledReply: {
+          type:
+            "clarification_choice",
+          node:
+            "mental_health_detail",
+          choice:
+            "sleep",
+        },
+      });
+
+    assert.equal(
+      resolved
+        .clarificationTransition
+        .sourceNode,
+      "mental_health_detail",
+    );
+
+    assert.equal(
+      resolved
+        .clarificationTransition
+        .action
+        .type,
+      "resolve_need",
+    );
+  },
+);
