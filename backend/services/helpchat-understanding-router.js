@@ -15,6 +15,10 @@ import {
   resolveControlledReplyV1,
 } from "../helpchat/controlled-replies-v1.js";
 
+import {
+  resolveClarificationChoiceV1,
+} from "../helpchat/clarification-graph-v1.js";
+
 const COGNITIVE_TAGS = new Set([
   "ALZHEIMER",
   "ENFERMEDAD NEUROLÓGICA PARCKINSON ALZHEIMER",
@@ -133,6 +137,123 @@ export function createHelpchatUnderstandingRouter({
       normalizeConversationContextV1(
         conversationContext
       );
+
+    const graphNode =
+      controlledReply?.type ===
+        "clarification_choice" &&
+      typeof controlledReply?.node ===
+        "string"
+        ? controlledReply.node.trim()
+        : null;
+
+    const graphChoice =
+      controlledReply?.type ===
+        "clarification_choice" &&
+      typeof controlledReply?.choice ===
+        "string"
+        ? controlledReply.choice.trim()
+        : null;
+
+    const graphTransition =
+      graphNode &&
+      graphChoice
+        ? resolveClarificationChoiceV1({
+            nodeId:
+              graphNode,
+            choiceId:
+              graphChoice,
+          })
+        : null;
+
+    if (
+      graphTransition?.status ===
+        "resolved"
+    ) {
+      const action =
+        graphTransition.action;
+
+      const durationMs =
+        Math.round(
+          (
+            performance.now() -
+            startedAt
+          ) * 10
+        ) / 10;
+
+      if (
+        action?.type ===
+          "resolve_need"
+      ) {
+        const resolvedNeeds =
+          Array.isArray(
+            action.resolvedNeeds,
+          )
+            ? action.resolvedNeeds.map(
+                (need) => ({
+                  ...need,
+                  source:
+                    "clarification_graph",
+                }),
+              )
+            : [];
+
+        const primary =
+          resolvedNeeds[0];
+
+        if (primary) {
+          return {
+            ...resolvedResult({
+              tag: {
+                tag_id:
+                  primary.tag_id,
+                descripcion:
+                  primary.descripcion,
+              },
+              context,
+              provider:
+                "clarification_graph",
+              model:
+                "clarification-graph-v1",
+              durationMs,
+            }),
+            resolvedNeeds,
+          };
+        }
+      }
+
+      if (
+        action?.type === "goto" &&
+        typeof action.node ===
+          "string"
+      ) {
+        return clarificationResult({
+          context,
+          missingDimension:
+            action.node,
+          provider:
+            "clarification_graph",
+          model:
+            "clarification-graph-v1",
+          durationMs,
+        });
+      }
+
+      if (
+        action?.type ===
+          "free_text"
+      ) {
+        return clarificationResult({
+          context,
+          missingDimension:
+            "free_text",
+          provider:
+            "clarification_graph",
+          model:
+            "clarification-graph-v1",
+          durationMs,
+        });
+      }
+    }
 
     const controlledValue =
       controlledReply?.type ===

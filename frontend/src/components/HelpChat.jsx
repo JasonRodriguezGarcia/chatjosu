@@ -328,20 +328,53 @@ const HelpChat = () => {
                   typeof reply.message === "string",
               )
               .slice(0, 6)
-              .map((reply) => ({
-                id: reply.id,
-                label: reply.label,
-                message: reply.message,
-                controlledReply:
-                  reply.controlledReply &&
-                  reply.controlledReply.type === "need_domain" &&
-                  typeof reply.controlledReply.value === "string"
-                    ? {
-                        type: "need_domain",
-                        value: reply.controlledReply.value,
-                      }
-                    : null,
-              }))
+              .map((reply) => {
+                const rawControlledReply =
+                  reply.controlledReply;
+
+                let controlledReply =
+                  null;
+
+                if (
+                  rawControlledReply?.type ===
+                    "need_domain" &&
+                  typeof rawControlledReply.value ===
+                    "string"
+                ) {
+                  controlledReply = {
+                    type:
+                      "need_domain",
+                    value:
+                      rawControlledReply.value,
+                  };
+                } else if (
+                  rawControlledReply?.type ===
+                    "clarification_choice" &&
+                  typeof rawControlledReply.node ===
+                    "string" &&
+                  typeof rawControlledReply.choice ===
+                    "string"
+                ) {
+                  controlledReply = {
+                    type:
+                      "clarification_choice",
+                    node:
+                      rawControlledReply.node,
+                    choice:
+                      rawControlledReply.choice,
+                  };
+                }
+
+                return {
+                  id:
+                    reply.id,
+                  label:
+                    reply.label,
+                  message:
+                    reply.message,
+                  controlledReply,
+                };
+              })
           : [];
 
       const assistantContent =

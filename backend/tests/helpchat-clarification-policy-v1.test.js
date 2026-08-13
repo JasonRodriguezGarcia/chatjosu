@@ -189,24 +189,44 @@ test(
       ),
       [
         {
-          type: "need_domain",
-          value: "employment",
+          type:
+            "clarification_choice",
+          node:
+            "need_type",
+          choice:
+            "employment",
         },
         {
-          type: "need_domain",
-          value: "health",
+          type:
+            "clarification_choice",
+          node:
+            "need_type",
+          choice:
+            "health",
         },
         {
-          type: "need_domain",
-          value: "emotional_health",
+          type:
+            "clarification_choice",
+          node:
+            "need_type",
+          choice:
+            "emotional_health",
         },
         {
-          type: "need_domain",
-          value: "addiction",
+          type:
+            "clarification_choice",
+          node:
+            "need_type",
+          choice:
+            "addiction",
         },
         {
-          type: "need_domain",
-          value: "other",
+          type:
+            "clarification_choice",
+          node:
+            "need_type",
+          choice:
+            "other",
         },
       ],
     );
@@ -238,14 +258,43 @@ test(
     assert.deepEqual(
       result.quickReplies.map(
         (reply) =>
-          reply.controlledReply?.value,
+          reply.controlledReply,
       ),
       [
-        "mental_mood_anxiety",
-        "mental_sleep",
-        "mental_behavior_changes",
-        "mental_other",
+        {
+          type:
+            "clarification_choice",
+          node:
+            "mental_health_detail",
+          choice:
+            "mood_anxiety",
+        },
+        {
+          type:
+            "clarification_choice",
+          node:
+            "mental_health_detail",
+          choice:
+            "sleep",
+        },
+        {
+          type:
+            "clarification_choice",
+          node:
+            "mental_health_detail",
+          choice:
+            "behavior_changes",
+        },
+        {
+          type:
+            "clarification_choice",
+          node:
+            "mental_health_detail",
+          choice:
+            "mental_other",
+        },
       ],
     );
   },
 );
+

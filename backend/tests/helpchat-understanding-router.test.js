@@ -751,3 +751,255 @@ test(
     );
   },
 );
+
+test(
+  "clarification graph avanza de need_type a salud emocional sin embedding",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+            throw new Error(
+              "semantic classifier no debería ejecutarse",
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Necesito orientación sobre salud emocional",
+        conversationContext: null,
+        controlledReply: {
+          type:
+            "clarification_choice",
+          node:
+            "need_type",
+          choice:
+            "emotional_health",
+        },
+      });
+
+    assert.equal(
+      result.status,
+      "needs_clarification",
+    );
+
+    assert.equal(
+      result.missingDimension,
+      "mental_health_detail",
+    );
+
+    assert.equal(
+      result.provider,
+      "clarification_graph",
+    );
+
+    assert.deepEqual(
+      result.quickReplies.map(
+        (reply) =>
+          reply.label,
+      ),
+      [
+        "Ánimo o ansiedad",
+        "Sueño",
+        "Cambios de conducta",
+        "Otra situación",
+      ],
+    );
+
+    assert.equal(
+      semanticCalls,
+      0,
+    );
+  },
+);
+
+test(
+  "clarification graph resuelve sueño dentro de salud emocional sin embedding",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+            throw new Error(
+              "semantic classifier no debería ejecutarse",
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Lo que más preocupa es el sueño",
+        conversationContext: null,
+        controlledReply: {
+          type:
+            "clarification_choice",
+          node:
+            "mental_health_detail",
+          choice:
+            "sleep",
+        },
+      });
+
+    assert.equal(
+      result.status,
+      "resolved",
+    );
+
+    assert.equal(
+      result.tag.descripcion,
+      "SALUD MENTAL",
+    );
+
+    assert.equal(
+      result.provider,
+      "clarification_graph",
+    );
+
+    assert.deepEqual(
+      result.resolvedNeeds,
+      [
+        {
+          tag_id: 31,
+          descripcion:
+            "SALUD MENTAL",
+          source:
+            "clarification_graph",
+        },
+      ],
+    );
+
+    assert.equal(
+      semanticCalls,
+      0,
+    );
+  },
+);
+
+test(
+  "clarification graph lleva cambios de conducta a una pregunta más específica",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+            throw new Error(
+              "semantic classifier no debería ejecutarse",
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Lo que más preocupa son los cambios de conducta",
+        conversationContext: null,
+        controlledReply: {
+          type:
+            "clarification_choice",
+          node:
+            "mental_health_detail",
+          choice:
+            "behavior_changes",
+        },
+      });
+
+    assert.equal(
+      result.status,
+      "needs_clarification",
+    );
+
+    assert.equal(
+      result.missingDimension,
+      "mental_behavior_detail",
+    );
+
+    assert.match(
+      result.clarificationQuestion,
+      /cambios de conducta/i,
+    );
+
+    assert.equal(
+      semanticCalls,
+      0,
+    );
+  },
+);
+
+test(
+  "una choice no puede reutilizarse en otro nodo para forzar resolución",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify({
+            conversationContext,
+          }) {
+            semanticCalls += 1;
+
+            return {
+              status:
+                "needs_clarification",
+              tag: null,
+              context:
+                conversationContext,
+              provider:
+                "embedding",
+              model:
+                "fake-embedding",
+              diagnostics: {
+                top1: null,
+                top2: null,
+              },
+            };
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Sueño",
+        conversationContext: null,
+        controlledReply: {
+          type:
+            "clarification_choice",
+          node:
+            "need_type",
+          choice:
+            "sleep",
+        },
+      });
+
+    assert.equal(
+      semanticCalls,
+      1,
+    );
+
+    assert.equal(
+      result.status,
+      "needs_clarification",
+    );
+
+    assert.notEqual(
+      result.provider,
+      "clarification_graph",
+    );
+  },
+);

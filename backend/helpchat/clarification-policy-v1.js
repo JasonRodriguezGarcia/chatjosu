@@ -1,64 +1,12 @@
+import {
+  buildClarificationQuickRepliesV1,
+  getClarificationNodeV1,
+  listClarificationNodesV1,
+} from "./clarification-graph-v1.js";
+
 const MAX_QUESTION_LENGTH = 220;
 
-const QUESTIONS = {
-  need_type: {
-    question:
-      "¿Sobre qué situación necesitas orientación principalmente?",
-
-    quickReplies: [
-      {
-        id: "employment",
-        label: "Empleo",
-        message:
-          "Necesito orientación sobre empleo",
-        controlledReply: {
-          type: "need_domain",
-          value: "employment",
-        },
-      },
-      {
-        id: "health",
-        label: "Salud o enfermedad",
-        message:
-          "Necesito orientación sobre salud o una enfermedad",
-        controlledReply: {
-          type: "need_domain",
-          value: "health",
-        },
-      },
-      {
-        id: "emotional_health",
-        label: "Salud emocional",
-        message:
-          "Necesito orientación sobre salud emocional",
-        controlledReply: {
-          type: "need_domain",
-          value: "emotional_health",
-        },
-      },
-      {
-        id: "addiction",
-        label: "Alcohol u otras adicciones",
-        message:
-          "Necesito orientación sobre alcohol u otras adicciones",
-        controlledReply: {
-          type: "need_domain",
-          value: "addiction",
-        },
-      },
-      {
-        id: "other",
-        label: "Otra situación",
-        message:
-          "Quiero contarte otra situación",
-        controlledReply: {
-          type: "need_domain",
-          value: "other",
-        },
-      },
-    ],
-  },
-
+const LEGACY_QUESTIONS = {
   symptom_domain: {
     question:
       "¿Te refieres sobre todo a problemas de memoria o desorientación, a cambios emocionales o de conducta, o a otra situación?",
@@ -98,74 +46,6 @@ const QUESTIONS = {
     question:
       "¿Cuál de estas necesidades quieres que atendamos primero?",
   },
-
-  health_detail: {
-    question:
-      "¿Qué enfermedad, problema de salud o situación concreta estáis viviendo?",
-  },
-
-  mental_health_detail: {
-    question:
-      "¿Qué es lo que más te preocupa: el ánimo o la ansiedad, el sueño, cambios de conducta, u otra situación?",
-
-    quickReplies: [
-      {
-        id: "mood_anxiety",
-        label: "Ánimo o ansiedad",
-        message:
-          "Lo que más preocupa es el ánimo o la ansiedad",
-        controlledReply: {
-          type: "need_domain",
-          value: "mental_mood_anxiety",
-        },
-      },
-      {
-        id: "sleep",
-        label: "Sueño",
-        message:
-          "Lo que más preocupa es el sueño",
-        controlledReply: {
-          type: "need_domain",
-          value: "mental_sleep",
-        },
-      },
-      {
-        id: "behavior_changes",
-        label: "Cambios de conducta",
-        message:
-          "Lo que más preocupa son los cambios de conducta",
-        controlledReply: {
-          type: "need_domain",
-          value: "mental_behavior_changes",
-        },
-      },
-      {
-        id: "mental_other",
-        label: "Otra situación",
-        message:
-          "Quiero contarte otra situación relacionada con la salud emocional",
-        controlledReply: {
-          type: "need_domain",
-          value: "mental_other",
-        },
-      },
-    ],
-  },
-
-  mental_behavior_detail: {
-    question:
-      "¿Qué cambios de conducta has notado y desde cuándo están ocurriendo?",
-  },
-
-  addiction_detail: {
-    question:
-      "¿El problema está relacionado con alcohol, con otra sustancia o con otra conducta?",
-  },
-
-  free_text: {
-    question:
-      "Cuéntame con tus propias palabras qué está pasando.",
-  },
 };
 
 function cleanQuestion(value) {
@@ -183,62 +63,102 @@ function cleanQuestion(value) {
 
   return cleaned.slice(
     0,
-    MAX_QUESTION_LENGTH
+    MAX_QUESTION_LENGTH,
   );
+}
+
+function cloneQuickReplies(
+  value,
+) {
+  return Array.isArray(value)
+    ? value.map(
+        (reply) => ({
+          id:
+            reply.id,
+          label:
+            reply.label,
+          message:
+            reply.message,
+          ...(reply.controlledReply
+            ? {
+                controlledReply:
+                  structuredClone(
+                    reply.controlledReply,
+                  ),
+              }
+            : {}),
+        }),
+      )
+    : [];
 }
 
 export function buildClarification({
   missingDimension = "need_type",
   suggestedQuestion = null,
 } = {}) {
-  const policy =
-    QUESTIONS[missingDimension] ||
-    QUESTIONS.need_type;
+  const graphNode =
+    getClarificationNodeV1(
+      missingDimension,
+    );
 
-  /*
-   * Por ahora priorizamos la redacción canónica.
-   * Más adelante una sugerencia de LLM podrá
-   * aceptarse tras validación.
-   */
-  const question =
-    cleanQuestion(policy.question);
+  if (graphNode) {
+    return {
+      needsClarification: true,
+      clarificationQuestion:
+        cleanQuestion(
+          graphNode.question,
+        ),
+      missingDimension:
+        graphNode.id,
+      quickReplies:
+        buildClarificationQuickRepliesV1(
+          graphNode.id,
+        ),
+    };
+  }
 
-  const quickReplies =
-    Array.isArray(
-      policy.quickReplies
-    )
-      ? policy.quickReplies.map(
-          (reply) => ({
-            id:
-              reply.id,
-            label:
-              reply.label,
-            message:
-              reply.message,
-            ...(reply.controlledReply
-              ? {
-                  controlledReply: {
-                    ...reply.controlledReply,
-                  },
-                }
-              : {}),
-          })
-        )
-      : [];
+  const legacy =
+    LEGACY_QUESTIONS[
+      missingDimension
+    ];
+
+  if (legacy) {
+    return {
+      needsClarification: true,
+      clarificationQuestion:
+        cleanQuestion(
+          legacy.question,
+        ),
+      missingDimension,
+      quickReplies:
+        cloneQuickReplies(
+          legacy.quickReplies,
+        ),
+    };
+  }
+
+  const fallback =
+    getClarificationNodeV1(
+      "need_type",
+    );
 
   return {
     needsClarification: true,
-    clarificationQuestion: question,
+    clarificationQuestion:
+      cleanQuestion(
+        fallback.question,
+      ),
     missingDimension:
-      QUESTIONS[missingDimension]
-        ? missingDimension
-        : "need_type",
-    quickReplies,
+      "need_type",
+    quickReplies:
+      buildClarificationQuickRepliesV1(
+        "need_type",
+      ),
   };
 }
 
 export function validateClarificationQuestion(
-  value
+  value,
 ) {
   const question =
     cleanQuestion(value);
@@ -261,12 +181,17 @@ export function validateClarificationQuestion(
   }
 
   const questionMarks =
-    (question.match(/\?/g) || []).length;
+    (
+      question.match(
+        /\?/g,
+      ) || []
+    ).length;
 
   if (questionMarks > 1) {
     return {
       valid: false,
-      reason: "multiple_questions",
+      reason:
+        "multiple_questions",
     };
   }
 
@@ -277,6 +202,9 @@ export function validateClarificationQuestion(
 }
 
 export const CLARIFICATION_DIMENSIONS =
-  Object.freeze(
-    Object.keys(QUESTIONS)
-  );
+  Object.freeze([
+    ...listClarificationNodesV1(),
+    ...Object.keys(
+      LEGACY_QUESTIONS,
+    ),
+  ]);

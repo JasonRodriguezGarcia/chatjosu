@@ -711,8 +711,10 @@ it(
                         "Necesito orientación sobre salud emocional",
                       controlledReply: {
                         type:
-                          "need_domain",
-                        value:
+                          "clarification_choice",
+                        node:
+                          "need_type",
+                        choice:
                           "emotional_health",
                       },
                     },
@@ -766,9 +768,11 @@ it(
                         "Lo que más preocupa es el sueño",
                       controlledReply: {
                         type:
-                          "need_domain",
-                        value:
-                          "mental_sleep",
+                          "clarification_choice",
+                        node:
+                          "mental_health_detail",
+                        choice:
+                          "sleep",
                       },
                     },
                     {
@@ -909,9 +913,11 @@ it(
         "Gipuzkoa",
       controlledReply: {
         type:
-          "need_domain",
-        value:
-          "mental_sleep",
+          "clarification_choice",
+        node:
+          "mental_health_detail",
+        choice:
+          "sleep",
       },
     });
 
