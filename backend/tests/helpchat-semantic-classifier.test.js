@@ -242,3 +242,149 @@ test(
     );
   }
 );
+
+test(
+  "devuelve shortlist semántico ordenado y acotado",
+  async () => {
+    const embeddingService = {
+      model: "test-embedding",
+
+      async embed(input) {
+        if (Array.isArray(input)) {
+          return {
+            vectors:
+              input.map(
+                (_, index) => [
+                  index === 0
+                    ? 1
+                    : 0.9 -
+                      index * 0.01,
+
+                  index === 0
+                    ? 0
+                    : 0.1 +
+                      index * 0.01,
+                ]
+              ),
+          };
+        }
+
+        return {
+          vectors: [
+            [1, 0],
+          ],
+        };
+      },
+    };
+
+    const classifier =
+      createHelpchatSemanticClassifier({
+        embeddingService,
+        minimumScore: 0,
+        minimumMargin: 0,
+
+        prototypes: [
+          {
+            tagId: 1,
+            tag: "UNO",
+            text: "uno",
+          },
+          {
+            tagId: 2,
+            tag: "DOS",
+            text: "dos",
+          },
+          {
+            tagId: 3,
+            tag: "TRES",
+            text: "tres",
+          },
+          {
+            tagId: 4,
+            tag: "CUATRO",
+            text: "cuatro",
+          },
+          {
+            tagId: 5,
+            tag: "CINCO",
+            text: "cinco",
+          },
+          {
+            tagId: 6,
+            tag: "SEIS",
+            text: "seis",
+          },
+        ],
+      });
+
+    const result =
+      await classifier.classify({
+        inputMessage:
+          "mensaje de prueba",
+
+        conversationContext: {
+          version: 1,
+
+          subject: {
+            relationship: null,
+          },
+
+          activeNeeds: [],
+          currentGoal: null,
+          facts: [],
+          constraints: [],
+
+          territory: {
+            province: null,
+            municipality: null,
+          },
+
+          resourcesShown: [],
+        },
+      });
+
+    assert.equal(
+      result.diagnostics
+        .candidates.length,
+      5
+    );
+
+    assert.deepEqual(
+      result.diagnostics
+        .candidates[0],
+      result.diagnostics.top1
+    );
+
+    assert.deepEqual(
+      result.diagnostics
+        .candidates[1],
+      result.diagnostics.top2
+    );
+
+    assert.equal(
+      result.diagnostics
+        .candidates.some(
+          (candidate) =>
+            candidate.tag ===
+            "SEIS"
+        ),
+      false
+    );
+
+    for (
+      const candidate
+      of result.diagnostics
+        .candidates
+    ) {
+      assert.deepEqual(
+        Object.keys(candidate)
+          .sort(),
+        [
+          "score",
+          "tag",
+          "tagId",
+        ]
+      );
+    }
+  }
+);

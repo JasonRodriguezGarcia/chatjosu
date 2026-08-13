@@ -197,6 +197,20 @@ export function createHelpchatSemanticClassifier({
       diagnostics: {
         top1,
         top2,
+        candidates:
+          candidates
+            .slice(0, 5)
+            .map(
+              ({
+                tagId,
+                tag,
+                score,
+              }) => ({
+                tagId,
+                tag,
+                score,
+              }),
+            ),
         margin,
         minimumScore,
         minimumMargin,
