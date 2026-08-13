@@ -43,3 +43,110 @@ describe("normalizeConversationContext", () => {
     expect(result.prompt).toBeUndefined();
   });
 });
+
+describe("normalizeConversationContext V2", () => {
+  it("keeps bounded relational context without provider metadata", () => {
+    const result = normalizeConversationContext({
+      version: 2,
+      people: [
+        {
+          id: "person_1",
+          relationship: " hermano ",
+          needs: ["ALCOHOLISMO", "ALCOHOLISMO", "EMPLEO"],
+          facts: ["vive solo", "vive solo"],
+          constraints: [],
+        },
+        {
+          id: "person_2",
+          relationship: " cuñado ",
+          needs: ["VIVIENDA"],
+        },
+      ],
+      currentFocus: "person_2",
+      currentGoal: " encontrar apoyo ",
+      territory: {
+        province: " Burgos ",
+        municipality: null,
+      },
+      resourcesShown: ["213", "213"],
+      provider: "must disappear",
+      prompt: "must disappear",
+    });
+
+    expect(result).toEqual({
+      version: 2,
+      people: [
+        {
+          id: "self",
+          relationship: "self",
+          needs: [],
+          facts: [],
+          constraints: [],
+        },
+        {
+          id: "person_1",
+          relationship: "hermano",
+          needs: ["ALCOHOLISMO", "EMPLEO"],
+          facts: ["vive solo"],
+          constraints: [],
+        },
+        {
+          id: "person_2",
+          relationship: "cuñado",
+          needs: ["VIVIENDA"],
+          facts: [],
+          constraints: [],
+        },
+      ],
+      currentFocus: "person_2",
+      currentGoal: "encontrar apoyo",
+      territory: {
+        province: "Burgos",
+        municipality: null,
+      },
+      resourcesShown: ["213"],
+    });
+
+    expect(result.provider).toBeUndefined();
+    expect(result.prompt).toBeUndefined();
+  });
+
+  it("keeps one self and rejects an invalid focus", () => {
+    const result = normalizeConversationContext({
+      version: 2,
+      people: [
+        {
+          id: "self",
+          relationship: "anything",
+          facts: ["está cansada"],
+        },
+        {
+          id: "person_1",
+          relationship: "self",
+          needs: ["SHOULD_DISAPPEAR"],
+        },
+      ],
+      currentFocus: "person_404",
+    });
+
+    expect(result.people).toEqual([
+      {
+        id: "self",
+        relationship: "self",
+        needs: [],
+        facts: ["está cansada"],
+        constraints: [],
+      },
+    ]);
+
+    expect(result.currentFocus).toBeNull();
+  });
+
+  it("rejects unsupported context versions", () => {
+    expect(
+      normalizeConversationContext({
+        version: 3,
+      }),
+    ).toBeNull();
+  });
+});
