@@ -1077,3 +1077,39 @@ test(
     );
   },
 );
+
+test(
+  "a graph-backed clarification exposes pending clarification state",
+  async () => {
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            throw new Error(
+              "embedding no debería ejecutarse para este starter",
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Necesito ayuda para un familiar",
+        conversationContext: null,
+      });
+
+    assert.equal(
+      result.status,
+      "needs_clarification",
+    );
+
+    assert.deepEqual(
+      result.clarificationState,
+      {
+        node: "need_type",
+        mode: "choice",
+      },
+    );
+  },
+);

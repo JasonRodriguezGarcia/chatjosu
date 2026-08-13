@@ -145,3 +145,30 @@ export function mergeLegacyGlobalsIntoRuntimeContextV2({
       legacy.resourcesShown,
   });
 }
+
+export function applyClarificationStateV2({
+  relationalContext,
+  personId = null,
+  clarificationState = null,
+} = {}) {
+  if (
+    !clarificationState ||
+    typeof clarificationState !== "object" ||
+    typeof clarificationState.node !== "string"
+  ) {
+    return relationalContext;
+  }
+
+  return setPendingClarificationV2(
+    relationalContext,
+    {
+      node:
+        clarificationState.node,
+      personId,
+      mode:
+        clarificationState.mode === "free_text"
+          ? "free_text"
+          : "choice",
+    },
+  );
+}

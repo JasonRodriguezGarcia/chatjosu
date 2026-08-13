@@ -44,6 +44,14 @@ import {
 import {
   resolveHelpchatLocationRequirement,
 } from "./helpchat/location-requirement-v1.js";
+
+import {
+  applyClarificationStateV2,
+  applyClarificationTransitionV2,
+  finalizeHelpchatRuntimeContextV2,
+  mergeLegacyGlobalsIntoRuntimeContextV2,
+  prepareHelpchatRuntimeContextV2,
+} from "./helpchat/conversation-runtime-v2.js";
 import {
 createHelpchatLocationResolver,
 helpchatClientIp,
@@ -674,10 +682,17 @@ app.post(
         const classificationStartedAt =
             performance.now();
 
+        const runtimeContext =
+            prepareHelpchatRuntimeContextV2({
+                conversationContext:
+                    req.body?.conversationContext,
+                inputMessage,
+            });
+
         const contextUpdate =
             updateConversationContextV1({
                 conversationContext:
-                    req.body?.conversationContext,
+                    runtimeContext.legacyContext,
                 inputMessage,
                 selectedProvince:
                     selectedProvincia,
@@ -687,6 +702,14 @@ app.post(
 
         const conversationContext =
             contextUpdate.context;
+
+        let relationalContext =
+            mergeLegacyGlobalsIntoRuntimeContextV2({
+                relationalContext:
+                    runtimeContext.relationalContext,
+                legacyContext:
+                    conversationContext,
+            });
 
         const effectiveProvince =
             conversationContext
@@ -768,6 +791,43 @@ app.post(
             classificationStartedAt;
 
         if (
+            understanding
+                .clarificationTransition
+        ) {
+            relationalContext =
+                applyClarificationTransitionV2({
+                    relationalContext,
+                    personId:
+                        runtimeContext.personId,
+                    sourceNode:
+                        understanding
+                            .clarificationTransition
+                            .sourceNode,
+                    action:
+                        understanding
+                            .clarificationTransition
+                            .action,
+                });
+        }
+
+        if (
+            !understanding
+                .clarificationTransition &&
+            understanding
+                .clarificationState
+        ) {
+            relationalContext =
+                applyClarificationStateV2({
+                    relationalContext,
+                    personId:
+                        runtimeContext.personId,
+                    clarificationState:
+                        understanding
+                            .clarificationState,
+                });
+        }
+
+        if (
             understanding.status ===
                 "needs_clarification" ||
             understanding.needsClarification === true
@@ -806,7 +866,7 @@ app.post(
                     understanding.clarificationQuestion,
                 tag: null,
                 context:
-                    understanding.context,
+                    relationalContext,
                 needsClarification: true,
                 clarificationQuestion:
                     understanding.clarificationQuestion,
@@ -897,6 +957,19 @@ app.post(
                     resolvedNeeds,
             });
 
+        const finalizedRuntime =
+            finalizeHelpchatRuntimeContextV2({
+                relationalContext,
+                personId:
+                    runtimeContext.personId,
+                subjectStatus:
+                    runtimeContext.status,
+                resolvedNeeds,
+            });
+
+        relationalContext =
+            finalizedRuntime.context;
+
         const locationRequirement =
             resolveHelpchatLocationRequirement({
                 effectiveProvince,
@@ -933,7 +1006,7 @@ app.post(
                     understanding
                         .resolvedNeeds,
                 context:
-                    understanding.context,
+                    relationalContext,
                 needsClarification:
                     false,
                 clarificationQuestion:
@@ -1146,7 +1219,7 @@ app.post(
             resolvedNeeds:
                 understanding.resolvedNeeds,
             context:
-                understanding.context,
+                relationalContext,
             needsClarification: false,
             clarificationQuestion: null,
             needsLocation: false,

@@ -5,6 +5,7 @@ import {
 } from "vitest";
 
 import {
+  applyClarificationStateV2,
   applyClarificationTransitionV2,
   finalizeHelpchatRuntimeContextV2,
   mergeLegacyGlobalsIntoRuntimeContextV2,
@@ -908,5 +909,42 @@ describe(
         ).toBe("self");
       },
     );
+  },
+);
+
+it(
+  "stores a graph clarification produced without a previous choice",
+  () => {
+    const result =
+      applyClarificationStateV2({
+        relationalContext: {
+          version: 2,
+          people: [
+            {
+              id: "self",
+              relationship: "self",
+            },
+            {
+              id: "person_1",
+              relationship: "hermano",
+            },
+          ],
+          currentFocus: "person_1",
+          pendingClarification: null,
+        },
+        personId: "person_1",
+        clarificationState: {
+          node: "need_type",
+          mode: "choice",
+        },
+      });
+
+    expect(
+      result.pendingClarification,
+    ).toEqual({
+      node: "need_type",
+      personId: "person_1",
+      mode: "choice",
+    });
   },
 );

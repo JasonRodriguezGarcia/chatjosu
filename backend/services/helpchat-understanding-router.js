@@ -16,6 +16,7 @@ import {
 } from "../helpchat/controlled-replies-v1.js";
 
 import {
+  getClarificationNodeV1,
   resolveClarificationChoiceV1,
 } from "../helpchat/clarification-graph-v1.js";
 
@@ -96,6 +97,11 @@ function clarificationResult({
       missingDimension,
     });
 
+  const clarificationNode =
+    getClarificationNodeV1(
+      clarification.missingDimension,
+    );
+
   return {
     status: "needs_clarification",
     tag: null,
@@ -110,6 +116,16 @@ function clarificationResult({
 
     quickReplies:
       clarification.quickReplies,
+
+    clarificationState:
+      clarificationNode
+        ? {
+            node:
+              clarificationNode.id,
+            mode:
+              "choice",
+          }
+        : null,
 
     provider,
     model,
