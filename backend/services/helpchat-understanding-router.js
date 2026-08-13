@@ -127,7 +127,12 @@ function clarificationResult({
             node:
               clarificationNode.id,
             mode:
-              "choice",
+              Array.isArray(
+                clarificationNode.choices,
+              ) &&
+              clarificationNode.choices.length > 0
+                ? "choice"
+                : "free_text",
           }
         : null,
 

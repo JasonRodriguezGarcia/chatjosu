@@ -1,4 +1,8 @@
 import {
+  getClarificationNodeV1,
+} from "./clarification-graph-v1.js";
+
+import {
   prepareConversationMemoryV2,
   persistPreparedResolvedNeedsV2,
   buildLegacyConversationContextV1,
@@ -82,12 +86,25 @@ export function applyClarificationTransitionV2({
     action.type === "goto" &&
     typeof action.node === "string"
   ) {
+    const targetNode =
+      getClarificationNodeV1(
+        action.node,
+      );
+
+    const mode =
+      Array.isArray(
+        targetNode?.choices,
+      ) &&
+      targetNode.choices.length > 0
+        ? "choice"
+        : "free_text";
+
     return setPendingClarificationV2(
       relationalContext,
       {
         node: action.node,
         personId,
-        mode: "choice",
+        mode,
       },
     );
   }

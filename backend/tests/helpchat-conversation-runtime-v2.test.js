@@ -948,3 +948,61 @@ it(
     });
   },
 );
+
+it(
+  "stores choice mode only when the goto target has choices",
+  () => {
+    const base = {
+      version: 2,
+      people: [
+        {
+          id: "self",
+          relationship: "self",
+        },
+        {
+          id: "person_1",
+          relationship: "hermano",
+        },
+      ],
+      currentFocus: "person_1",
+    };
+
+    const choiceResult =
+      applyClarificationTransitionV2({
+        relationalContext: base,
+        personId: "person_1",
+        sourceNode: "need_type",
+        action: {
+          type: "goto",
+          node: "mental_health_detail",
+        },
+      });
+
+    expect(
+      choiceResult.pendingClarification,
+    ).toEqual({
+      node: "mental_health_detail",
+      personId: "person_1",
+      mode: "choice",
+    });
+
+    const freeTextResult =
+      applyClarificationTransitionV2({
+        relationalContext: base,
+        personId: "person_1",
+        sourceNode: "mental_health_detail",
+        action: {
+          type: "goto",
+          node: "mental_behavior_detail",
+        },
+      });
+
+    expect(
+      freeTextResult.pendingClarification,
+    ).toEqual({
+      node: "mental_behavior_detail",
+      personId: "person_1",
+      mode: "free_text",
+    });
+  },
+);

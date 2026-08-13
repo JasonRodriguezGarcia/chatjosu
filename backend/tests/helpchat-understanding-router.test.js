@@ -1295,3 +1295,48 @@ test(
     );
   },
 );
+
+test(
+  "choice-less graph nodes expose free-text pending mode",
+  async () => {
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            throw new Error(
+              "embedding no debería ejecutarse",
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Lo que más preocupa son los cambios de conducta",
+        conversationContext: null,
+        controlledReply: {
+          type: "clarification_choice",
+          node:
+            "mental_health_detail",
+          choice:
+            "behavior_changes",
+        },
+      });
+
+    assert.equal(
+      result.status,
+      "needs_clarification",
+    );
+
+    assert.deepEqual(
+      result.clarificationState,
+      {
+        node:
+          "mental_behavior_detail",
+        mode:
+          "free_text",
+      },
+    );
+  },
+);
