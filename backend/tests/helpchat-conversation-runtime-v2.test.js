@@ -5,6 +5,7 @@ import {
 } from "vitest";
 
 import {
+  applyClarificationTransitionV2,
   finalizeHelpchatRuntimeContextV2,
   prepareHelpchatRuntimeContextV2,
 } from "../helpchat/conversation-runtime-v2.js";
@@ -633,6 +634,123 @@ describe(
               "person_1",
           ).needs,
         ).toEqual([]);
+      },
+    );
+  },
+);
+
+describe(
+  "clarification runtime transitions",
+  () => {
+    it(
+      "stores goto as pending choice for the resolved person",
+      () => {
+        const result =
+          applyClarificationTransitionV2({
+            relationalContext: {
+              version: 2,
+              people: [
+                {
+                  id: "self",
+                  relationship: "self",
+                },
+                {
+                  id: "person_1",
+                  relationship: "hermano",
+                },
+              ],
+              currentFocus: "person_1",
+              pendingClarification: null,
+            },
+            personId: "person_1",
+            sourceNode: "need_type",
+            action: {
+              type: "goto",
+              node: "mental_health_detail",
+            },
+          });
+
+        expect(
+          result.pendingClarification,
+        ).toEqual({
+          node: "mental_health_detail",
+          personId: "person_1",
+          mode: "choice",
+        });
+      },
+    );
+
+    it(
+      "free text preserves the originating graph node",
+      () => {
+        const result =
+          applyClarificationTransitionV2({
+            relationalContext: {
+              version: 2,
+              people: [
+                {
+                  id: "self",
+                  relationship: "self",
+                },
+                {
+                  id: "person_1",
+                  relationship: "hermano",
+                },
+              ],
+              currentFocus: "person_1",
+              pendingClarification: {
+                node: "mental_health_detail",
+                personId: "person_1",
+                mode: "choice",
+              },
+            },
+            personId: "person_1",
+            sourceNode: "mental_health_detail",
+            action: {
+              type: "free_text",
+            },
+          });
+
+        expect(
+          result.pendingClarification,
+        ).toEqual({
+          node: "mental_health_detail",
+          personId: "person_1",
+          mode: "free_text",
+        });
+      },
+    );
+
+    it(
+      "resolution clears pending clarification",
+      () => {
+        const result =
+          applyClarificationTransitionV2({
+            relationalContext: {
+              version: 2,
+              people: [
+                {
+                  id: "self",
+                  relationship: "self",
+                },
+              ],
+              currentFocus: "self",
+              pendingClarification: {
+                node: "mental_health_detail",
+                personId: "self",
+                mode: "choice",
+              },
+            },
+            personId: "self",
+            sourceNode: "mental_health_detail",
+            action: {
+              type: "resolve_need",
+            },
+          });
+
+        expect(
+          result.pendingClarification,
+        ).toBeNull();
       },
     );
   },
