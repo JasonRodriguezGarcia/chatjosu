@@ -207,4 +207,47 @@ describe("AssociationCard", () => {
     expect(map).toHaveClass("MuiButton-contained");
   });
 
+
+  it("explains how a described resource can orient the user", () => {
+    render(
+      <AssociationCard
+        association={{
+          id: "described-resource",
+          name: "Recurso con descripción",
+          description:
+            "Ofrece orientación y acompañamiento a familias.",
+        }}
+      />,
+    );
+
+    expect(
+      screen.getByRole("heading", {
+        name: "Cómo puede orientarte",
+      }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByText(
+        "Ofrece orientación y acompañamiento a familias.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("does not show the explanation heading without a description", () => {
+    render(
+      <AssociationCard
+        association={{
+          id: "resource-without-description",
+          name: "Recurso sin descripción",
+        }}
+      />,
+    );
+
+    expect(
+      screen.queryByRole("heading", {
+        name: "Cómo puede orientarte",
+      }),
+    ).not.toBeInTheDocument();
+  });
+
 });

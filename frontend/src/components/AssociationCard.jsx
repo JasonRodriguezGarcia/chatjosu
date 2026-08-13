@@ -161,15 +161,30 @@ const AssociationCard = ({ association }) => {
         </Box>
 
         {association?.description && (
-          <Typography
-            variant="body2"
-            sx={{
-              color: "#332D31",
-              lineHeight: 1.55,
-            }}
-          >
-            {association.description}
-          </Typography>
+          <Box>
+            <Typography
+              variant="caption"
+              component="h4"
+              sx={{
+                mb: 0.35,
+                color: "#765366",
+                fontWeight: 700,
+                lineHeight: 1.4,
+              }}
+            >
+              Cómo puede orientarte
+            </Typography>
+
+            <Typography
+              variant="body2"
+              sx={{
+                color: "#332D31",
+                lineHeight: 1.6,
+              }}
+            >
+              {association.description}
+            </Typography>
+          </Box>
         )}
 
         {(association?.address || association?.postal_code) && (
