@@ -20,6 +20,9 @@ import {
   createHelpchatSemanticClassifier,
 } from "./services/helpchat-semantic-classifier.js";
 import {
+  createHelpchatOllamaReadiness,
+} from "./services/helpchat-ollama-readiness.js";
+import {
   createHelpchatUnderstandingRouter,
 } from "./services/helpchat-understanding-router.js";
 import {
@@ -149,6 +152,21 @@ const HELPCHAT_EMBEDDING_WARMUP_TIMEOUT_MS =
     positiveIntegerEnv(
         "HELPCHAT_EMBEDDING_WARMUP_TIMEOUT_MS",
         15000
+    );
+
+
+const HELPCHAT_LOCAL_LLM_MODEL =
+    process.env.HELPCHAT_LOCAL_LLM_MODEL?.trim() ||
+    "qwen3:8b";
+
+const HELPCHAT_LOCAL_LLM_KEEP_ALIVE =
+    process.env.HELPCHAT_LOCAL_LLM_KEEP_ALIVE?.trim() ||
+    "30m";
+
+const HELPCHAT_LOCAL_LLM_WARMUP_TIMEOUT_MS =
+    positiveIntegerEnv(
+        "HELPCHAT_LOCAL_LLM_WARMUP_TIMEOUT_MS",
+        60000
     );
 
 const HELPCHAT_SEMANTIC_MIN_SCORE =
@@ -374,7 +392,10 @@ app.locals.understandHelpchat =
     helpchatUnderstandingRouter.understand;
 
 let helpchatSemanticReady = false;
+let helpchatSemanticState =
+    "warming";
 let helpchatSemanticWarmupError = null;
+let helpchatSemanticWarmupMs = null;
 
 async function warmHelpchatSemanticRouter() {
     const startedAt =
@@ -387,7 +408,16 @@ async function warmHelpchatSemanticRouter() {
         });
 
         helpchatSemanticReady = true;
+        helpchatSemanticState =
+            "ready";
         helpchatSemanticWarmupError = null;
+        helpchatSemanticWarmupMs =
+            Number(
+                (
+                    performance.now() -
+                    startedAt
+                ).toFixed(1)
+            );
 
         console.log(
             "Helpchat semantic router warm:",
@@ -395,18 +425,22 @@ async function warmHelpchatSemanticRouter() {
                 model:
                     HELPCHAT_EMBEDDING_MODEL,
                 durationMs:
-                    Number(
-                        (
-                            performance.now() -
-                            startedAt
-                        ).toFixed(1)
-                    ),
+                    helpchatSemanticWarmupMs,
             }
         );
 
         return true;
     } catch (error) {
         helpchatSemanticReady = false;
+        helpchatSemanticState =
+            "degraded";
+        helpchatSemanticWarmupMs =
+            Number(
+                (
+                    performance.now() -
+                    startedAt
+                ).toFixed(1)
+            );
         helpchatSemanticWarmupError =
             error?.code ||
             error?.message ||
@@ -423,6 +457,292 @@ async function warmHelpchatSemanticRouter() {
 
 app.locals.warmHelpchatSemanticRouter =
     warmHelpchatSemanticRouter;
+
+const helpchatOllamaReadiness =
+    createHelpchatOllamaReadiness({
+        baseUrl:
+            HELPCHAT_EMBEDDING_BASE_URL,
+    });
+
+let helpchatLocalLlmState = {
+    model:
+        HELPCHAT_LOCAL_LLM_MODEL,
+    state:
+        "pending",
+    installed:
+        null,
+    loaded:
+        null,
+    warmupMs:
+        null,
+    error:
+        null,
+};
+
+async function warmHelpchatLocalLlm() {
+    const startedAt =
+        performance.now();
+
+    helpchatLocalLlmState = {
+        ...helpchatLocalLlmState,
+        state:
+            "checking",
+        error:
+            null,
+    };
+
+    const inspection =
+        await helpchatOllamaReadiness.inspectModel(
+            HELPCHAT_LOCAL_LLM_MODEL
+        );
+
+    if (
+        inspection.state ===
+        "ready"
+    ) {
+        helpchatLocalLlmState = {
+            model:
+                HELPCHAT_LOCAL_LLM_MODEL,
+            state:
+                "ready",
+            installed:
+                true,
+            loaded:
+                true,
+            warmupMs:
+                Number(
+                    (
+                        performance.now() -
+                        startedAt
+                    ).toFixed(1)
+                ),
+            error:
+                null,
+        };
+
+        console.log(
+            "Helpchat local LLM already warm:",
+            helpchatLocalLlmState
+        );
+
+        return true;
+    }
+
+    if (
+        inspection.state ===
+        "missing"
+    ) {
+        helpchatLocalLlmState = {
+            model:
+                HELPCHAT_LOCAL_LLM_MODEL,
+            state:
+                "missing",
+            installed:
+                false,
+            loaded:
+                false,
+            warmupMs:
+                Number(
+                    (
+                        performance.now() -
+                        startedAt
+                    ).toFixed(1)
+                ),
+            error:
+                "MODEL_NOT_INSTALLED",
+        };
+
+        console.warn(
+            "Helpchat local LLM model missing:",
+            HELPCHAT_LOCAL_LLM_MODEL
+        );
+
+        return false;
+    }
+
+    if (
+        inspection.state !==
+        "cold"
+    ) {
+        helpchatLocalLlmState = {
+            model:
+                HELPCHAT_LOCAL_LLM_MODEL,
+            state:
+                "degraded",
+            installed:
+                inspection.installed,
+            loaded:
+                inspection.loaded,
+            warmupMs:
+                Number(
+                    (
+                        performance.now() -
+                        startedAt
+                    ).toFixed(1)
+                ),
+            error:
+                inspection.error ||
+                "OLLAMA_UNAVAILABLE",
+        };
+
+        console.warn(
+            "Helpchat local LLM unavailable:",
+            helpchatLocalLlmState.error
+        );
+
+        return false;
+    }
+
+    helpchatLocalLlmState = {
+        model:
+            HELPCHAT_LOCAL_LLM_MODEL,
+        state:
+            "warming",
+        installed:
+            true,
+        loaded:
+            false,
+        warmupMs:
+            null,
+        error:
+            null,
+    };
+
+    // Loading the large local LLM may temporarily
+    // evict the embedding model from VRAM.
+    helpchatSemanticReady = false;
+    helpchatSemanticState =
+        "warming";
+    helpchatSemanticWarmupError =
+        null;
+
+    const preload =
+        await helpchatOllamaReadiness.preloadGenerate({
+            model:
+                HELPCHAT_LOCAL_LLM_MODEL,
+            keepAlive:
+                HELPCHAT_LOCAL_LLM_KEEP_ALIVE,
+            timeoutMs:
+                HELPCHAT_LOCAL_LLM_WARMUP_TIMEOUT_MS,
+        });
+
+    if (!preload.ok) {
+        helpchatLocalLlmState = {
+            ...helpchatLocalLlmState,
+            state:
+                "degraded",
+            warmupMs:
+                Number(
+                    (
+                        performance.now() -
+                        startedAt
+                    ).toFixed(1)
+                ),
+            error:
+                preload.error ||
+                "LOCAL_LLM_PRELOAD_FAILED",
+        };
+
+        console.warn(
+            "Helpchat local LLM warmup failed:",
+            helpchatLocalLlmState.error
+        );
+
+        return false;
+    }
+
+    try {
+        helpchatSemanticState =
+            "warming";
+
+        await helpchatEmbeddingService.preload({
+            timeoutMs:
+                HELPCHAT_EMBEDDING_WARMUP_TIMEOUT_MS,
+        });
+
+        helpchatSemanticReady = true;
+        helpchatSemanticState =
+            "ready";
+        helpchatSemanticWarmupError =
+            null;
+    } catch (error) {
+        helpchatSemanticReady = false;
+        helpchatSemanticState =
+            "degraded";
+        helpchatSemanticWarmupError =
+            error?.code ||
+            error?.message ||
+            "EMBEDDING_REWARM_FAILED";
+
+        console.warn(
+            "Helpchat embedding rewarm after local LLM failed:",
+            helpchatSemanticWarmupError
+        );
+    }
+
+    const after =
+        await helpchatOllamaReadiness.inspectModel(
+            HELPCHAT_LOCAL_LLM_MODEL
+        );
+
+    const loaded =
+        after.state ===
+        "ready";
+
+    const runtimeReady =
+        loaded &&
+        helpchatSemanticState ===
+            "ready";
+
+    helpchatLocalLlmState = {
+        model:
+            HELPCHAT_LOCAL_LLM_MODEL,
+        state:
+            runtimeReady
+                ? "ready"
+                : "degraded",
+        installed:
+            after.installed,
+        loaded:
+            after.loaded,
+        warmupMs:
+            Number(
+                (
+                    performance.now() -
+                    startedAt
+                ).toFixed(1)
+            ),
+        error:
+            runtimeReady
+                ? null
+                : (
+                    helpchatSemanticState !==
+                        "ready"
+                        ? "EMBEDDING_NOT_READY_AFTER_PRELOAD"
+                        : (
+                            after.error ||
+                            "MODEL_NOT_RESIDENT_AFTER_PRELOAD"
+                        )
+                ),
+    };
+
+    if (runtimeReady) {
+        console.log(
+            "Helpchat local LLM warm:",
+            helpchatLocalLlmState
+        );
+    } else {
+        console.warn(
+            "Helpchat local LLM preload did not make model resident:",
+            helpchatLocalLlmState
+        );
+    }
+
+    return runtimeReady;
+}
+
+app.locals.warmHelpchatLocalLlm =
+    warmHelpchatLocalLlm;
 
 // Middleware
 
@@ -641,17 +961,18 @@ app.get('/api/ready', async (req, res) => {
             status: "ready",
             database: "ok",
             semanticRouter:
-                helpchatSemanticReady
-                    ? "ready"
-                    : "degraded",
+                helpchatSemanticState,
             semanticFallback:
-                helpchatSemanticReady
-                    ? null
-                    : "gemini",
+                helpchatSemanticState ===
+                    "degraded"
+                    ? "gemini"
+                    : null,
             semanticWarmupError:
-                helpchatSemanticReady
-                    ? null
-                    : helpchatSemanticWarmupError,
+                helpchatSemanticWarmupError,
+            semanticWarmupMs:
+                helpchatSemanticWarmupMs,
+            localLlm:
+                helpchatLocalLlmState,
         });
     } catch (error) {
         console.error(
@@ -1359,7 +1680,12 @@ if (isMainModule) {
                 `http://${BACKEND_HOST}:${PORT}`
             );
 
-            void warmHelpchatSemanticRouter();
+            void (
+                async () => {
+                    await warmHelpchatSemanticRouter();
+                    await warmHelpchatLocalLlm();
+                }
+            )();
         }
     );
 }

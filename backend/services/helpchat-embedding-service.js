@@ -118,8 +118,22 @@ export function createHelpchatEmbeddingService({
     }
   }
 
+  async function preload({
+    timeoutMs:
+      preloadTimeoutMs = timeoutMs,
+  } = {}) {
+    return embed(
+      "helpchat embedding warmup",
+      {
+        timeoutMs:
+          preloadTimeoutMs,
+      },
+    );
+  }
+
   return {
     model,
     embed,
+    preload,
   };
 }
