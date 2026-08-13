@@ -808,6 +808,12 @@ app.post(
                 needsClarification: true,
                 clarificationQuestion:
                     understanding.clarificationQuestion,
+                quickReplies:
+                    Array.isArray(
+                        understanding.quickReplies
+                    )
+                        ? understanding.quickReplies
+                        : [],
                 needsLocation: false,
                 locationReason: null,
                 requestedProvince:

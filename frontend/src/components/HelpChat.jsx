@@ -308,6 +308,20 @@ const HelpChat = () => {
           ? data.associations
           : [];
 
+      const quickReplies =
+        needsClarification &&
+        Array.isArray(data?.quickReplies)
+          ? data.quickReplies
+              .filter(
+                (reply) =>
+                  reply &&
+                  typeof reply.id === "string" &&
+                  typeof reply.label === "string" &&
+                  typeof reply.message === "string",
+              )
+              .slice(0, 6)
+          : [];
+
       const assistantContent =
         needsClarification && clarificationQuestion
           ? clarificationQuestion
@@ -327,6 +341,7 @@ const HelpChat = () => {
         ...previous,
         createMessage("assistant", assistantContent, {
           resources,
+          quickReplies,
           presentationContext: {
             requestedProvince: data?.requestedProvince || provincia,
             resolvedProvince: data?.resolvedProvince || provincia,
@@ -800,6 +815,52 @@ const HelpChat = () => {
                         {message.content}
                       </ReactMarkdown>
                     </Box>
+
+                    {!isUser &&
+                      Array.isArray(message.quickReplies) &&
+                      message.quickReplies.length > 0 && (
+                        <Stack
+                          direction="row"
+                          spacing={1}
+                          useFlexGap
+                          sx={{
+                            flexWrap: "wrap",
+                            width: "100%",
+                            maxWidth: { xs: "100%", sm: "84%" },
+                            mt: 1,
+                          }}
+                        >
+                          {message.quickReplies.map((reply) => (
+                            <Button
+                              key={reply.id}
+                              type="button"
+                              size="small"
+                              variant="outlined"
+                              onClick={() =>
+                                submitMessage(reply.message)
+                              }
+                              disabled={isSending}
+                              sx={{
+                                textTransform: "none",
+                                borderRadius: 999,
+                                color: BRAND.plum,
+                                borderColor: BRAND.border,
+                                bgcolor: BRAND.surface,
+                                "&:hover": {
+                                  borderColor: BRAND.plum,
+                                  bgcolor: BRAND.plumSoft,
+                                },
+                                "&:focus-visible": {
+                                  outline: `3px solid ${BRAND.yellow}`,
+                                  outlineOffset: 2,
+                                },
+                              }}
+                            >
+                              {reply.label}
+                            </Button>
+                          ))}
+                        </Stack>
+                      )}
 
                     {!isUser &&
                       Array.isArray(message.resources) &&
