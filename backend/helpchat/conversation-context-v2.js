@@ -3,6 +3,10 @@ import {
   normalizeConversationContextV1,
 } from "./conversation-context-v1.js";
 
+import {
+  getClarificationNodeV1,
+} from "./clarification-graph-v1.js";
+
 const MAX_PEOPLE = 12;
 const MAX_ITEMS = 12;
 const MAX_ITEM_LENGTH = 180;
@@ -86,6 +90,56 @@ function cleanPersonId(value) {
   return cleaned;
 }
 
+function normalizePendingClarification(
+  value,
+  validPersonIds,
+) {
+  if (
+    !value ||
+    typeof value !== "object" ||
+    Array.isArray(value)
+  ) {
+    return null;
+  }
+
+  const node =
+    cleanString(
+      value.node,
+      80,
+    );
+
+  if (
+    !node ||
+    !getClarificationNodeV1(node)
+  ) {
+    return null;
+  }
+
+  const requestedPersonId =
+    cleanPersonId(
+      value.personId,
+    );
+
+  const personId =
+    requestedPersonId &&
+    validPersonIds.has(
+      requestedPersonId,
+    )
+      ? requestedPersonId
+      : null;
+
+  const mode =
+    value.mode === "free_text"
+      ? "free_text"
+      : "choice";
+
+  return {
+    node,
+    personId,
+    mode,
+  };
+}
+
 function emptySelf() {
   return {
     id: "self",
@@ -155,6 +209,7 @@ export function createEmptyConversationContextV2() {
     ],
     currentFocus: null,
     currentGoal: null,
+    pendingClarification: null,
     territory: {
       province: null,
       municipality: null,
@@ -245,6 +300,11 @@ export function normalizeConversationContextV2(
     currentGoal: cleanString(
       value.currentGoal,
     ),
+    pendingClarification:
+      normalizePendingClarification(
+        value.pendingClarification,
+        seenIds,
+      ),
     territory: {
       province: cleanString(
         value.territory?.province,
@@ -324,6 +384,8 @@ export function migrateConversationContextV1ToV2(
         : null,
     currentGoal:
       legacy.currentGoal,
+    pendingClarification:
+      null,
     territory:
       legacy.territory,
     resourcesShown:

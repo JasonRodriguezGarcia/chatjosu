@@ -33,6 +33,8 @@ describe(
           ],
           currentFocus: null,
           currentGoal: null,
+          pendingClarification:
+            null,
           territory: {
             province: null,
             municipality: null,
@@ -116,6 +118,8 @@ describe(
           currentFocus:
             "person_2",
           currentGoal: null,
+          pendingClarification:
+            null,
           territory: {
             province: null,
             municipality: null,
@@ -494,6 +498,97 @@ describe(
         ).toEqual([
           "está agotada",
         ]);
+      },
+    );
+  },
+);
+
+describe(
+  "pending clarification normalization",
+  () => {
+    it(
+      "preserves a valid graph clarification",
+      () => {
+        const result =
+          normalizeConversationContextV2({
+            version: 2,
+            people: [
+              {
+                id: "person_1",
+                relationship:
+                  "hermano",
+              },
+            ],
+            currentFocus:
+              "person_1",
+            pendingClarification: {
+              node:
+                "mental_behavior_detail",
+              personId:
+                "person_1",
+              mode:
+                "free_text",
+            },
+          });
+
+        expect(
+          result.pendingClarification,
+        ).toEqual({
+          node:
+            "mental_behavior_detail",
+          personId:
+            "person_1",
+          mode:
+            "free_text",
+        });
+      },
+    );
+
+    it(
+      "drops an unknown clarification node",
+      () => {
+        const result =
+          normalizeConversationContextV2({
+            version: 2,
+            people: [],
+            pendingClarification: {
+              node:
+                "made_up",
+              mode:
+                "choice",
+            },
+          });
+
+        expect(
+          result.pendingClarification,
+        ).toBeNull();
+      },
+    );
+
+    it(
+      "nulls a pending person that is no longer present",
+      () => {
+        const result =
+          normalizeConversationContextV2({
+            version: 2,
+            people: [],
+            pendingClarification: {
+              node:
+                "mental_health_detail",
+              personId:
+                "person_404",
+            },
+          });
+
+        expect(
+          result.pendingClarification,
+        ).toEqual({
+          node:
+            "mental_health_detail",
+          personId: null,
+          mode:
+            "choice",
+        });
       },
     );
   },
