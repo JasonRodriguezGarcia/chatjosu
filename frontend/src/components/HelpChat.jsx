@@ -785,8 +785,11 @@ const HelpChat = () => {
             </Stack>
           ) : (
             <Stack spacing={1.5}>
-              {messages.map((message) => {
+              {messages.map((message, index) => {
                 const isUser = message.role === "user";
+
+                const isLatestMessage =
+                  index === messages.length - 1;
 
                 return (
                   <Box
@@ -874,7 +877,10 @@ const HelpChat = () => {
                                   },
                                 )
                               }
-                              disabled={isSending}
+                              disabled={
+                                isSending ||
+                                !isLatestMessage
+                              }
                               sx={{
                                 textTransform: "none",
                                 borderRadius: 999,

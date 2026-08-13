@@ -207,6 +207,24 @@ describe(
           ),
         ).toBeInTheDocument();
 
+        await waitFor(() => {
+          expect(
+            employment,
+          ).toBeDisabled();
+        });
+
+        expect(
+          iacallCount,
+        ).toBe(2);
+
+        fireEvent.click(
+          employment,
+        );
+
+        expect(
+          iacallCount,
+        ).toBe(2);
+
         expect(
           screen.queryByText(
             "housing",
