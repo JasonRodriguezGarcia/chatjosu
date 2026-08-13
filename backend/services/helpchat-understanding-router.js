@@ -20,6 +20,10 @@ import {
   resolveClarificationChoiceV1,
 } from "../helpchat/clarification-graph-v1.js";
 
+import {
+  resolveClarificationTextV1,
+} from "../helpchat/clarification-text-resolver-v1.js";
+
 const COGNITIVE_TAGS = new Set([
   "ALZHEIMER",
   "ENFERMEDAD NEUROLÓGICA PARCKINSON ALZHEIMER",
@@ -149,6 +153,7 @@ export function createHelpchatUnderstandingRouter({
     inputMessage,
     conversationContext,
     controlledReply = null,
+    pendingClarification = null,
   }) {
     const startedAt =
       performance.now();
@@ -158,7 +163,7 @@ export function createHelpchatUnderstandingRouter({
         conversationContext
       );
 
-    const graphNode =
+    let graphNode =
       controlledReply?.type ===
         "clarification_choice" &&
       typeof controlledReply?.node ===
@@ -166,13 +171,49 @@ export function createHelpchatUnderstandingRouter({
         ? controlledReply.node.trim()
         : null;
 
-    const graphChoice =
+    let graphChoice =
       controlledReply?.type ===
         "clarification_choice" &&
       typeof controlledReply?.choice ===
         "string"
         ? controlledReply.choice.trim()
         : null;
+
+    let graphInputProvider =
+      graphNode &&
+      graphChoice
+        ? "clarification_graph"
+        : null;
+
+    if (
+      !graphNode &&
+      !graphChoice &&
+      typeof pendingClarification?.node ===
+        "string" &&
+      pendingClarification.mode ===
+        "choice"
+    ) {
+      const textResolution =
+        resolveClarificationTextV1({
+          nodeId:
+            pendingClarification.node,
+          inputMessage,
+        });
+
+      if (
+        textResolution.status ===
+          "resolved"
+      ) {
+        graphNode =
+          textResolution.nodeId;
+
+        graphChoice =
+          textResolution.choiceId;
+
+        graphInputProvider =
+          "clarification_text";
+      }
+    }
 
     const graphTransition =
       graphNode &&
@@ -231,9 +272,13 @@ export function createHelpchatUnderstandingRouter({
               },
               context,
               provider:
+                graphInputProvider ||
                 "clarification_graph",
               model:
-                "clarification-graph-v1",
+                graphInputProvider ===
+                  "clarification_text"
+                  ? "clarification-text-rules-v1"
+                  : "clarification-graph-v1",
               durationMs,
               clarificationTransition: {
                 sourceNode:
@@ -259,9 +304,13 @@ export function createHelpchatUnderstandingRouter({
           missingDimension:
             action.node,
           provider:
+            graphInputProvider ||
             "clarification_graph",
           model:
-            "clarification-graph-v1",
+            graphInputProvider ===
+              "clarification_text"
+              ? "clarification-text-rules-v1"
+              : "clarification-graph-v1",
           durationMs,
           clarificationTransition: {
             sourceNode:
@@ -283,9 +332,13 @@ export function createHelpchatUnderstandingRouter({
           missingDimension:
             "free_text",
           provider:
+            graphInputProvider ||
             "clarification_graph",
           model:
-            "clarification-graph-v1",
+            graphInputProvider ===
+              "clarification_text"
+              ? "clarification-text-rules-v1"
+              : "clarification-graph-v1",
           durationMs,
           clarificationTransition: {
             sourceNode:

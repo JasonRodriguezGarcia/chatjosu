@@ -1113,3 +1113,185 @@ test(
     );
   },
 );
+
+test(
+  "free text can resolve a pending need_type choice without embedding",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+
+            throw new Error(
+              "embedding no debería ejecutarse",
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Es por su salud emocional",
+        conversationContext: null,
+        pendingClarification: {
+          node: "need_type",
+          personId: "person_1",
+          mode: "choice",
+        },
+      });
+
+    assert.equal(
+      semanticCalls,
+      0,
+    );
+
+    assert.equal(
+      result.status,
+      "needs_clarification",
+    );
+
+    assert.equal(
+      result.provider,
+      "clarification_text",
+    );
+
+    assert.deepEqual(
+      result.clarificationTransition,
+      {
+        sourceNode:
+          "need_type",
+        action: {
+          type: "goto",
+          node:
+            "mental_health_detail",
+        },
+      },
+    );
+  },
+);
+
+test(
+  "free text can advance a pending emotional-health clarification",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+
+            throw new Error(
+              "embedding no debería ejecutarse",
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Ha cambiado mucho su comportamiento",
+        conversationContext: null,
+        pendingClarification: {
+          node:
+            "mental_health_detail",
+          personId:
+            "person_1",
+          mode:
+            "choice",
+        },
+      });
+
+    assert.equal(
+      semanticCalls,
+      0,
+    );
+
+    assert.equal(
+      result.status,
+      "needs_clarification",
+    );
+
+    assert.equal(
+      result.provider,
+      "clarification_text",
+    );
+
+    assert.deepEqual(
+      result.clarificationTransition,
+      {
+        sourceNode:
+          "mental_health_detail",
+        action: {
+          type: "goto",
+          node:
+            "mental_behavior_detail",
+        },
+      },
+    );
+  },
+);
+
+test(
+  "ambiguous pending text is not forced into a graph choice",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify({
+            conversationContext,
+          }) {
+            semanticCalls += 1;
+
+            return {
+              status:
+                "needs_clarification",
+              tag: null,
+              context:
+                conversationContext,
+              provider:
+                "embedding",
+              model:
+                "fake",
+              diagnostics: {
+                top1: null,
+                top2: null,
+              },
+            };
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Tiene ansiedad y tampoco consigue dormir",
+        conversationContext: null,
+        pendingClarification: {
+          node:
+            "mental_health_detail",
+          personId:
+            "person_1",
+          mode:
+            "choice",
+        },
+      });
+
+    assert.equal(
+      semanticCalls,
+      1,
+    );
+
+    assert.notEqual(
+      result.provider,
+      "clarification_text",
+    );
+  },
+);

@@ -732,6 +732,10 @@ app.post(
                     conversationContext,
                     controlledReply:
                         req.body?.controlledReply,
+                    pendingClarification:
+                        relationalContext
+                            ?.pendingClarification ||
+                        null,
                 });
         } catch (localError) {
             console.warn(
