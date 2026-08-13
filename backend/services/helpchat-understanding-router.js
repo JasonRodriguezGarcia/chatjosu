@@ -11,6 +11,10 @@ import {
   buildClarification,
 } from "../helpchat/clarification-policy-v1.js";
 
+import {
+  resolveControlledReplyV1,
+} from "../helpchat/controlled-replies-v1.js";
+
 const COGNITIVE_TAGS = new Set([
   "ALZHEIMER",
   "ENFERMEDAD NEUROLÓGICA PARCKINSON ALZHEIMER",
@@ -120,6 +124,7 @@ export function createHelpchatUnderstandingRouter({
   async function understand({
     inputMessage,
     conversationContext,
+    controlledReply = null,
   }) {
     const startedAt =
       performance.now();
@@ -128,6 +133,100 @@ export function createHelpchatUnderstandingRouter({
       normalizeConversationContextV1(
         conversationContext
       );
+
+    const controlledValue =
+      controlledReply?.type ===
+        "need_domain" &&
+      typeof controlledReply?.value ===
+        "string"
+        ? controlledReply.value.trim()
+        : null;
+
+    const controlled =
+      controlledValue
+        ? resolveControlledReplyV1(
+            controlledValue
+          )
+        : null;
+
+    if (
+      controlled?.type ===
+        "resolved_need"
+    ) {
+      const resolvedNeeds =
+        controlled.resolvedNeeds;
+
+      const primary =
+        resolvedNeeds[0];
+
+      return {
+        ...resolvedResult({
+          tag: {
+            tag_id:
+              primary.tag_id,
+            descripcion:
+              primary.descripcion,
+          },
+          context,
+          provider:
+            "controlled_reply",
+          model:
+            "controlled-replies-v1",
+          durationMs:
+            Math.round(
+              (
+                performance.now() -
+                startedAt
+              ) * 10
+            ) / 10,
+        }),
+        resolvedNeeds,
+      };
+    }
+
+    if (
+      controlled?.type ===
+        "clarification"
+    ) {
+      return clarificationResult({
+        context,
+        missingDimension:
+          controlled.missingDimension,
+        provider:
+          "controlled_reply",
+        model:
+          "controlled-replies-v1",
+        durationMs:
+          Math.round(
+            (
+              performance.now() -
+                startedAt
+            ) * 10
+          ) / 10,
+      });
+    }
+
+    if (
+      controlled?.type ===
+        "free_text"
+    ) {
+      return clarificationResult({
+        context,
+        missingDimension:
+          "free_text",
+        provider:
+          "controlled_reply",
+        model:
+          "controlled-replies-v1",
+        durationMs:
+          Math.round(
+            (
+              performance.now() -
+                startedAt
+            ) * 10
+          ) / 10,
+      });
+    }
 
     const anchors =
       resolveSemanticAnchors(

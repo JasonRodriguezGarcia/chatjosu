@@ -236,7 +236,11 @@ const HelpChat = () => {
     }
   };
 
-  const requestHelp = async ({ inputMessage, selectedProvincia: provincia }) => {
+  const requestHelp = async ({
+    inputMessage,
+    selectedProvincia: provincia,
+    controlledReply = null,
+  }) => {
     setRequestError(null);
 
     const requestStartedAt = performance.now();
@@ -250,7 +254,10 @@ const HelpChat = () => {
         body: JSON.stringify({
           inputMessage,
           selectedProvincia: provincia,
-            conversationContext: conversationContextRef.current,
+          conversationContext: conversationContextRef.current,
+          ...(controlledReply
+            ? { controlledReply }
+            : {}),
           }),
         });
 
@@ -280,6 +287,7 @@ const HelpChat = () => {
       if (needsLocation) {
         pendingLocationRequestRef.current = {
           inputMessage,
+          controlledReply,
         };
 
         setMessages((previous) => [
@@ -320,6 +328,20 @@ const HelpChat = () => {
                   typeof reply.message === "string",
               )
               .slice(0, 6)
+              .map((reply) => ({
+                id: reply.id,
+                label: reply.label,
+                message: reply.message,
+                controlledReply:
+                  reply.controlledReply &&
+                  reply.controlledReply.type === "need_domain" &&
+                  typeof reply.controlledReply.value === "string"
+                    ? {
+                        type: "need_domain",
+                        value: reply.controlledReply.value,
+                      }
+                    : null,
+              }))
           : [];
 
       const assistantContent =
@@ -371,6 +393,7 @@ const HelpChat = () => {
       setLastFailedRequest({
         inputMessage,
         selectedProvincia: provincia,
+        controlledReply,
       });
 
       return false;
@@ -400,7 +423,12 @@ const HelpChat = () => {
     }
   };
 
-  const submitMessage = (message) => {
+  const submitMessage = (
+    message,
+    {
+      controlledReply = null,
+    } = {},
+  ) => {
     const trimmedInput =
       String(message || "").trim();
 
@@ -422,6 +450,7 @@ const HelpChat = () => {
     requestQueueRef.current.push({
       inputMessage: trimmedInput,
       selectedProvincia,
+      controlledReply,
     });
 
     if (!lastFailedRequest) {
@@ -837,7 +866,13 @@ const HelpChat = () => {
                               size="small"
                               variant="outlined"
                               onClick={() =>
-                                submitMessage(reply.message)
+                                submitMessage(
+                                  reply.message,
+                                  {
+                                    controlledReply:
+                                      reply.controlledReply || null,
+                                  },
+                                )
                               }
                               disabled={isSending}
                               sx={{

@@ -554,10 +554,10 @@ test(
           reply.label
       ),
       [
-        "Vivienda",
         "Empleo",
-        "Salud",
-        "Cuidados",
+        "Salud o enfermedad",
+        "Salud emocional",
+        "Alcohol u otras adicciones",
         "Otra situación",
       ]
     );
@@ -567,4 +567,187 @@ test(
       0
     );
   }
+);
+
+test(
+  "controlled employment resuelve sin embedding",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+            throw new Error(
+              "semantic classifier no debería ejecutarse",
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Necesito orientación sobre empleo",
+        conversationContext: null,
+        controlledReply: {
+          type: "need_domain",
+          value: "employment",
+        },
+      });
+
+    assert.equal(
+      result.status,
+      "resolved",
+    );
+
+    assert.equal(
+      result.tag.descripcion,
+      "INSERCIÓN LABORAL",
+    );
+
+    assert.equal(
+      result.provider,
+      "controlled_reply",
+    );
+
+    assert.equal(
+      result.model,
+      "controlled-replies-v1",
+    );
+
+    assert.equal(
+      semanticCalls,
+      0,
+    );
+  },
+);
+
+test(
+  "controlled health pide detalle sin embedding",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+            throw new Error(
+              "semantic classifier no debería ejecutarse",
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Necesito orientación sobre salud o una enfermedad",
+        conversationContext: null,
+        controlledReply: {
+          type: "need_domain",
+          value: "health",
+        },
+      });
+
+    assert.equal(
+      result.status,
+      "needs_clarification",
+    );
+
+    assert.equal(
+      result.missingDimension,
+      "health_detail",
+    );
+
+    assert.match(
+      result.clarificationQuestion,
+      /enfermedad|problema de salud/i,
+    );
+
+    assert.equal(
+      result.provider,
+      "controlled_reply",
+    );
+
+    assert.equal(
+      semanticCalls,
+      0,
+    );
+  },
+);
+
+test(
+  "controlled reply desconocida no puede forzar resolución",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+
+            return {
+              status:
+                "needs_clarification",
+              tag: null,
+              context: {
+                version: 1,
+                subject: {
+                  relationship: null,
+                },
+                activeNeeds: [],
+                currentGoal: null,
+                facts: [],
+                constraints: [],
+                territory: {
+                  province: null,
+                  municipality: null,
+                },
+                resourcesShown: [],
+              },
+              needsClarification:
+                true,
+              provider:
+                "embedding",
+              model:
+                "fake-embedding",
+              diagnostics: {
+                top1: null,
+                top2: null,
+              },
+            };
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "una frase libre no controlada",
+        conversationContext: null,
+        controlledReply: {
+          type: "need_domain",
+          value: "invented",
+        },
+      });
+
+    assert.equal(
+      semanticCalls,
+      1,
+    );
+
+    assert.equal(
+      result.status,
+      "needs_clarification",
+    );
+
+    assert.equal(
+      result.provider,
+      "embedding",
+    );
+  },
 );

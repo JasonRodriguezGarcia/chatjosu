@@ -36,10 +36,10 @@ test(
           reply.label
       ),
       [
-        "Vivienda",
         "Empleo",
-        "Salud",
-        "Cuidados",
+        "Salud o enfermedad",
+        "Salud emocional",
+        "Alcohol u otras adicciones",
         "Otra situación",
       ]
     );
@@ -171,4 +171,44 @@ test(
       }
     );
   }
+);
+
+test(
+  "need_type emite únicamente controlled replies permitidas",
+  () => {
+    const result =
+      buildClarification({
+        missingDimension:
+          "need_type",
+      });
+
+    assert.deepEqual(
+      result.quickReplies.map(
+        (reply) =>
+          reply.controlledReply,
+      ),
+      [
+        {
+          type: "need_domain",
+          value: "employment",
+        },
+        {
+          type: "need_domain",
+          value: "health",
+        },
+        {
+          type: "need_domain",
+          value: "emotional_health",
+        },
+        {
+          type: "need_domain",
+          value: "addiction",
+        },
+        {
+          type: "need_domain",
+          value: "other",
+        },
+      ],
+    );
+  },
 );

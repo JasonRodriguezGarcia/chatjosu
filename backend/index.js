@@ -707,6 +707,8 @@ app.post(
                 await app.locals.understandHelpchat({
                     inputMessage,
                     conversationContext,
+                    controlledReply:
+                        req.body?.controlledReply,
                 });
         } catch (localError) {
             console.warn(

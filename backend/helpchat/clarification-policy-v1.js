@@ -7,34 +7,54 @@ const QUESTIONS = {
 
     quickReplies: [
       {
-        id: "housing",
-        label: "Vivienda",
-        message:
-          "Necesito orientación sobre vivienda",
-      },
-      {
         id: "employment",
         label: "Empleo",
         message:
           "Necesito orientación sobre empleo",
+        controlledReply: {
+          type: "need_domain",
+          value: "employment",
+        },
       },
       {
         id: "health",
-        label: "Salud",
+        label: "Salud o enfermedad",
         message:
-          "Necesito orientación relacionada con la salud",
+          "Necesito orientación sobre salud o una enfermedad",
+        controlledReply: {
+          type: "need_domain",
+          value: "health",
+        },
       },
       {
-        id: "care",
-        label: "Cuidados",
+        id: "emotional_health",
+        label: "Salud emocional",
         message:
-          "Necesito orientación sobre cuidados o dependencia",
+          "Necesito orientación sobre salud emocional",
+        controlledReply: {
+          type: "need_domain",
+          value: "emotional_health",
+        },
+      },
+      {
+        id: "addiction",
+        label: "Alcohol u otras adicciones",
+        message:
+          "Necesito orientación sobre alcohol u otras adicciones",
+        controlledReply: {
+          type: "need_domain",
+          value: "addiction",
+        },
       },
       {
         id: "other",
         label: "Otra situación",
         message:
           "Quiero contarte otra situación",
+        controlledReply: {
+          type: "need_domain",
+          value: "other",
+        },
       },
     ],
   },
@@ -77,6 +97,26 @@ const QUESTIONS = {
   multiple_needs: {
     question:
       "¿Cuál de estas necesidades quieres que atendamos primero?",
+  },
+
+  health_detail: {
+    question:
+      "¿Qué enfermedad, problema de salud o situación concreta estáis viviendo?",
+  },
+
+  mental_health_detail: {
+    question:
+      "¿Qué es lo que más te preocupa: el ánimo o la ansiedad, el sueño, cambios de conducta, u otra situación?",
+  },
+
+  addiction_detail: {
+    question:
+      "¿El problema está relacionado con alcohol, con otra sustancia o con otra conducta?",
+  },
+
+  free_text: {
+    question:
+      "Cuéntame con tus propias palabras qué está pasando.",
   },
 };
 
@@ -127,6 +167,13 @@ export function buildClarification({
               reply.label,
             message:
               reply.message,
+            ...(reply.controlledReply
+              ? {
+                  controlledReply: {
+                    ...reply.controlledReply,
+                  },
+                }
+              : {}),
           })
         )
       : [];

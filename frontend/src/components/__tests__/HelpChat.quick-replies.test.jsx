@@ -90,19 +90,17 @@ describe(
                       quickReplies: [
                         {
                           id:
-                            "housing",
-                          label:
-                            "Vivienda",
-                          message:
-                            "Necesito orientación sobre vivienda",
-                        },
-                        {
-                          id:
                             "employment",
                           label:
                             "Empleo",
                           message:
                             "Necesito orientación sobre empleo",
+                          controlledReply: {
+                            type:
+                              "need_domain",
+                            value:
+                              "employment",
+                          },
                         },
                       ],
 
@@ -160,31 +158,21 @@ describe(
           ),
         ).toBeInTheDocument();
 
-        const housing =
-          screen.getByRole(
-            "button",
-            {
-              name:
-                "Vivienda",
-            },
-          );
-
-        expect(
-          housing,
-        ).toBeInTheDocument();
-
-        expect(
+        const employment =
           screen.getByRole(
             "button",
             {
               name:
                 "Empleo",
             },
-          ),
+          );
+
+        expect(
+          employment,
         ).toBeInTheDocument();
 
         fireEvent.click(
-          housing,
+          employment,
         );
 
         await waitFor(() => {
@@ -197,18 +185,25 @@ describe(
           requests[1],
         ).toMatchObject({
           inputMessage:
-            "Necesito orientación sobre vivienda",
+            "Necesito orientación sobre empleo",
 
           selectedProvincia:
             "Gipuzkoa",
 
           conversationContext:
             context,
+
+          controlledReply: {
+            type:
+              "need_domain",
+            value:
+              "employment",
+          },
         });
 
         expect(
           await screen.findByText(
-            "Necesito orientación sobre vivienda",
+            "Necesito orientación sobre empleo",
           ),
         ).toBeInTheDocument();
 
@@ -435,5 +430,198 @@ describe(
         ).not.toBeInTheDocument();
       },
     );
+  },
+);
+
+it(
+  "preserves controlled reply metadata when retrying a failed quick reply",
+  { timeout: 10000 },
+  async () => {
+    const requestBodies = [];
+    let iacallCount = 0;
+
+    const context =
+      conversationContextV1({
+        province: "Gipuzkoa",
+      });
+
+    globalThis.fetch =
+      vi.fn(
+        async (
+          url,
+          options = {},
+        ) => {
+          if (
+            String(url).includes(
+              "/provincias",
+            )
+          ) {
+            return provincesResponse();
+          }
+
+          if (
+            isLocationRequest(url)
+          ) {
+            return locationResponse({
+              province:
+                "Gipuzkoa",
+            });
+          }
+
+          iacallCount += 1;
+
+          requestBodies.push(
+            JSON.parse(
+              options.body,
+            ),
+          );
+
+          if (
+            iacallCount === 1
+          ) {
+            return {
+              ok: true,
+              status: 200,
+              json:
+                async () => ({
+                  status:
+                    "needs_clarification",
+                  needsClarification:
+                    true,
+                  clarificationQuestion:
+                    "¿Sobre qué situación necesitas orientación principalmente?",
+                  quickReplies: [
+                    {
+                      id:
+                        "employment",
+                      label:
+                        "Empleo",
+                      message:
+                        "Necesito orientación sobre empleo",
+                      controlledReply: {
+                        type:
+                          "need_domain",
+                        value:
+                          "employment",
+                      },
+                    },
+                  ],
+                  context,
+                  associations: [],
+                  requestedProvince:
+                    "Gipuzkoa",
+                  resolvedProvince:
+                    "Gipuzkoa",
+                  durationMs: 5,
+                }),
+            };
+          }
+
+          if (
+            iacallCount === 2
+          ) {
+            return {
+              ok: false,
+              status: 500,
+            };
+          }
+
+          return associationResponse({
+            associationId:
+              "controlled-retry",
+          });
+        },
+      );
+
+    vi.spyOn(
+      console,
+      "error",
+    ).mockImplementation(
+      () => {},
+    );
+
+    render(<HelpChat />);
+
+    await screen.findByRole(
+      "combobox",
+      {
+        name:
+          /Provincia actual.*Gipuzkoa/i,
+      },
+    );
+
+    fireEvent.click(
+      screen.getByRole(
+        "button",
+        {
+          name:
+            "Busco orientación social",
+        },
+      ),
+    );
+
+    const employment =
+      await screen.findByRole(
+        "button",
+        {
+          name: "Empleo",
+        },
+      );
+
+    fireEvent.click(
+      employment,
+    );
+
+    const retry =
+      await screen.findByRole(
+        "button",
+        {
+          name: "Reintentar",
+        },
+      );
+
+    expect(
+      requestBodies[1],
+    ).toMatchObject({
+      inputMessage:
+        "Necesito orientación sobre empleo",
+      selectedProvincia:
+        "Gipuzkoa",
+      conversationContext:
+        context,
+      controlledReply: {
+        type:
+          "need_domain",
+        value:
+          "employment",
+      },
+    });
+
+    fireEvent.click(
+      retry,
+    );
+
+    await waitFor(() => {
+      expect(
+        iacallCount,
+      ).toBe(3);
+    });
+
+    expect(
+      requestBodies[2],
+    ).toMatchObject({
+      inputMessage:
+        "Necesito orientación sobre empleo",
+      selectedProvincia:
+        "Gipuzkoa",
+      conversationContext:
+        context,
+      controlledReply: {
+        type:
+          "need_domain",
+        value:
+          "employment",
+      },
+    });
   },
 );
