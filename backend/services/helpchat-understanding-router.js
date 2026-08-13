@@ -97,6 +97,9 @@ function clarificationResult({
     missingDimension:
       clarification.missingDimension,
 
+    quickReplies:
+      clarification.quickReplies,
+
     provider,
     model,
     durationMs,

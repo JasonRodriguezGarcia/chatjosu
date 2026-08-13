@@ -495,3 +495,76 @@ test(
     );
   },
 );
+
+test(
+  "una aclaración need_type expone quick replies sin llamar al embedding",
+  async () => {
+    let embeddingCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            embeddingCalls += 1;
+
+            throw new Error(
+              "embedding no debería ejecutarse",
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Busco orientación social",
+
+        conversationContext: {
+          version: 1,
+          subject: {
+            relationship: null,
+          },
+          activeNeeds: [],
+          currentGoal: null,
+          facts: [],
+          constraints: [],
+          territory: {
+            province:
+              "Gipuzkoa",
+            municipality:
+              null,
+          },
+          resourcesShown: [],
+        },
+      });
+
+    assert.equal(
+      result.status,
+      "needs_clarification"
+    );
+
+    assert.equal(
+      result.missingDimension,
+      "need_type"
+    );
+
+    assert.deepEqual(
+      result.quickReplies.map(
+        (reply) =>
+          reply.label
+      ),
+      [
+        "Vivienda",
+        "Empleo",
+        "Salud",
+        "Cuidados",
+        "Otra situación",
+      ]
+    );
+
+    assert.equal(
+      embeddingCalls,
+      0
+    );
+  }
+);

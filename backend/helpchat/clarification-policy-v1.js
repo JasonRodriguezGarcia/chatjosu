@@ -3,7 +3,40 @@ const MAX_QUESTION_LENGTH = 220;
 const QUESTIONS = {
   need_type: {
     question:
-      "¿Qué tipo de ayuda necesitas o qué le está ocurriendo a la persona?",
+      "¿Sobre qué situación necesitas orientación principalmente?",
+
+    quickReplies: [
+      {
+        id: "housing",
+        label: "Vivienda",
+        message:
+          "Necesito orientación sobre vivienda",
+      },
+      {
+        id: "employment",
+        label: "Empleo",
+        message:
+          "Necesito orientación sobre empleo",
+      },
+      {
+        id: "health",
+        label: "Salud",
+        message:
+          "Necesito orientación relacionada con la salud",
+      },
+      {
+        id: "care",
+        label: "Cuidados",
+        message:
+          "Necesito orientación sobre cuidados o dependencia",
+      },
+      {
+        id: "other",
+        label: "Otra situación",
+        message:
+          "Quiero contarte otra situación",
+      },
+    ],
   },
 
   symptom_domain: {
@@ -24,6 +57,21 @@ const QUESTIONS = {
   subject: {
     question:
       "¿Para quién estás buscando la ayuda?",
+
+    quickReplies: [
+      {
+        id: "self",
+        label: "Para mí",
+        message:
+          "Busco ayuda para mí",
+      },
+      {
+        id: "other_person",
+        label: "Para otra persona",
+        message:
+          "Busco ayuda para otra persona",
+      },
+    ],
   },
 
   multiple_needs: {
@@ -67,6 +115,22 @@ export function buildClarification({
   const question =
     cleanQuestion(policy.question);
 
+  const quickReplies =
+    Array.isArray(
+      policy.quickReplies
+    )
+      ? policy.quickReplies.map(
+          (reply) => ({
+            id:
+              reply.id,
+            label:
+              reply.label,
+            message:
+              reply.message,
+          })
+        )
+      : [];
+
   return {
     needsClarification: true,
     clarificationQuestion: question,
@@ -74,6 +138,7 @@ export function buildClarification({
       QUESTIONS[missingDimension]
         ? missingDimension
         : "need_type",
+    quickReplies,
   };
 }
 
