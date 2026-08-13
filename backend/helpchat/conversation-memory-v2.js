@@ -86,6 +86,89 @@ export function prepareConversationMemoryV2({
   };
 }
 
+export function persistPreparedResolvedNeedsV2({
+  conversationContext,
+  personId,
+  resolvedNeeds = [],
+  subjectStatus = "resolved",
+} = {}) {
+  const context =
+    canonicalContext(
+      conversationContext,
+    );
+
+  if (
+    subjectStatus !== "resolved" ||
+    typeof personId !== "string" ||
+    !personId.trim()
+  ) {
+    return {
+      status:
+        subjectStatus ||
+        "unresolved",
+      context,
+      person: null,
+      needsPersisted: false,
+    };
+  }
+
+  const existingPerson =
+    context.people.find(
+      (person) =>
+        person.id === personId,
+    ) || null;
+
+  if (!existingPerson) {
+    return {
+      status: "unresolved",
+      context,
+      person: null,
+      needsPersisted: false,
+    };
+  }
+
+  let nextContext =
+    context;
+
+  let persistedCount = 0;
+
+  for (
+    const rawNeed of
+    Array.isArray(resolvedNeeds)
+      ? resolvedNeeds
+      : []
+  ) {
+    const need =
+      normalizeNeed(rawNeed);
+
+    if (!need) {
+      continue;
+    }
+
+    nextContext =
+      addPersonNeed(
+        nextContext,
+        personId,
+        need,
+      );
+
+    persistedCount += 1;
+  }
+
+  return {
+    status: "resolved",
+    context:
+      nextContext,
+    person:
+      nextContext.people.find(
+        (person) =>
+          person.id === personId,
+      ) || existingPerson,
+    needsPersisted:
+      persistedCount > 0,
+  };
+}
+
 export function persistResolvedNeedsV2({
   conversationContext,
   inputMessage,

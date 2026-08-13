@@ -1,6 +1,6 @@
 import {
   prepareConversationMemoryV2,
-  persistResolvedNeedsV2,
+  persistPreparedResolvedNeedsV2,
   buildLegacyConversationContextV1,
 } from "./conversation-memory-v2.js";
 
@@ -24,6 +24,9 @@ export function prepareHelpchatRuntimeContextV2({
       ),
     person:
       memory.person,
+    personId:
+      memory.person?.id ||
+      null,
     relationship:
       memory.relationship,
     source:
@@ -35,13 +38,15 @@ export function prepareHelpchatRuntimeContextV2({
 
 export function finalizeHelpchatRuntimeContextV2({
   relationalContext,
-  inputMessage,
+  personId,
+  subjectStatus = "resolved",
   resolvedNeeds,
 } = {}) {
-  return persistResolvedNeedsV2({
+  return persistPreparedResolvedNeedsV2({
     conversationContext:
       relationalContext,
-    inputMessage,
+    personId,
+    subjectStatus,
     resolvedNeeds,
   });
 }

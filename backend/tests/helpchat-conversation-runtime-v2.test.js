@@ -253,8 +253,10 @@ describe(
           finalizeHelpchatRuntimeContextV2({
             relationalContext:
               prepared.relationalContext,
-            inputMessage:
-              "También ha perdido el trabajo",
+            personId:
+              prepared.personId,
+            subjectStatus:
+              prepared.status,
             resolvedNeeds: [
               {
                 descripcion:
@@ -345,8 +347,10 @@ describe(
           finalizeHelpchatRuntimeContextV2({
             relationalContext:
               prepared.relationalContext,
-            inputMessage:
-              "Mi hermano ha perdido el trabajo",
+            personId:
+              prepared.personId,
+            subjectStatus:
+              prepared.status,
             resolvedNeeds: [
               "EMPLEO",
             ],
@@ -355,6 +359,280 @@ describe(
         expect(
           finalized.needsPersisted,
         ).toBe(false);
+      },
+    );
+  },
+);
+
+describe(
+  "prepared subject persistence",
+  () => {
+    it(
+      "does not create a second person when finalizing mi otro hermano",
+      () => {
+        const initialContext = {
+          version: 2,
+          people: [
+            {
+              id: "self",
+              relationship:
+                "self",
+              needs: [],
+              facts: [],
+              constraints: [],
+            },
+            {
+              id: "person_1",
+              relationship:
+                "hermano",
+              needs: [
+                "ALCOHOLISMO",
+              ],
+              facts: [],
+              constraints: [],
+            },
+          ],
+          currentFocus:
+            "person_1",
+          currentGoal: null,
+          territory: {
+            province: null,
+            municipality: null,
+          },
+          resourcesShown: [],
+        };
+
+        const prepared =
+          prepareHelpchatRuntimeContextV2({
+            conversationContext:
+              initialContext,
+            inputMessage:
+              "Mi otro hermano necesita vivienda",
+          });
+
+        expect(
+          prepared.status,
+        ).toBe("resolved");
+
+        expect(
+          prepared.personId,
+        ).toBe("person_2");
+
+        expect(
+          prepared.relationalContext.people.filter(
+            (person) =>
+              person.relationship ===
+              "hermano",
+          ),
+        ).toHaveLength(2);
+
+        const finalized =
+          finalizeHelpchatRuntimeContextV2({
+            relationalContext:
+              prepared.relationalContext,
+            personId:
+              prepared.personId,
+            subjectStatus:
+              prepared.status,
+            resolvedNeeds: [
+              "VIVIENDA",
+            ],
+          });
+
+        expect(
+          finalized.status,
+        ).toBe("resolved");
+
+        expect(
+          finalized.context.people.filter(
+            (person) =>
+              person.relationship ===
+              "hermano",
+          ),
+        ).toHaveLength(2);
+
+        expect(
+          finalized.context.people,
+        ).toHaveLength(3);
+
+        expect(
+          finalized.context.people.find(
+            (person) =>
+              person.id ===
+              "person_2",
+          ).needs,
+        ).toEqual([
+          "VIVIENDA",
+        ]);
+
+        expect(
+          finalized.context.people.find(
+            (person) =>
+              person.id ===
+              "person_1",
+          ).needs,
+        ).toEqual([
+          "ALCOHOLISMO",
+        ]);
+      },
+    );
+
+    it(
+      "does not persist when prepared subject was ambiguous",
+      () => {
+        const prepared =
+          prepareHelpchatRuntimeContextV2({
+            conversationContext: {
+              version: 2,
+              people: [
+                {
+                  id: "self",
+                  relationship:
+                    "self",
+                  needs: [],
+                  facts: [],
+                  constraints: [],
+                },
+                {
+                  id: "person_1",
+                  relationship:
+                    "hermano",
+                  needs: [],
+                  facts: [],
+                  constraints: [],
+                },
+                {
+                  id: "person_2",
+                  relationship:
+                    "hermano",
+                  needs: [],
+                  facts: [],
+                  constraints: [],
+                },
+              ],
+              currentFocus: null,
+              currentGoal: null,
+              territory: {
+                province: null,
+                municipality: null,
+              },
+              resourcesShown: [],
+            },
+            inputMessage:
+              "Mi hermano necesita vivienda",
+          });
+
+        expect(
+          prepared.status,
+        ).toBe(
+          "ambiguous_subject",
+        );
+
+        expect(
+          prepared.personId,
+        ).toBeNull();
+
+        const finalized =
+          finalizeHelpchatRuntimeContextV2({
+            relationalContext:
+              prepared.relationalContext,
+            personId:
+              prepared.personId,
+            subjectStatus:
+              prepared.status,
+            resolvedNeeds: [
+              "VIVIENDA",
+            ],
+          });
+
+        expect(
+          finalized.needsPersisted,
+        ).toBe(false);
+
+        expect(
+          finalized.context.people
+            .filter(
+              (person) =>
+                person.id !==
+                "self",
+            )
+            .every(
+              (person) =>
+                person.needs.length ===
+                0,
+            ),
+        ).toBe(true);
+      },
+    );
+
+    it(
+      "refuses an invalid prepared person id",
+      () => {
+        const prepared =
+          prepareHelpchatRuntimeContextV2({
+            conversationContext: {
+              version: 2,
+              people: [
+                {
+                  id: "self",
+                  relationship:
+                    "self",
+                  needs: [],
+                  facts: [],
+                  constraints: [],
+                },
+                {
+                  id: "person_1",
+                  relationship:
+                    "madre",
+                  needs: [],
+                  facts: [],
+                  constraints: [],
+                },
+              ],
+              currentFocus:
+                "person_1",
+              currentGoal: null,
+              territory: {
+                province: null,
+                municipality: null,
+              },
+              resourcesShown: [],
+            },
+            inputMessage:
+              "Ella necesita ayuda",
+          });
+
+        const finalized =
+          finalizeHelpchatRuntimeContextV2({
+            relationalContext:
+              prepared.relationalContext,
+            personId:
+              "person_999",
+            subjectStatus:
+              prepared.status,
+            resolvedNeeds: [
+              "SOLEDAD",
+            ],
+          });
+
+        expect(
+          finalized.status,
+        ).toBe(
+          "unresolved",
+        );
+
+        expect(
+          finalized.needsPersisted,
+        ).toBe(false);
+
+        expect(
+          finalized.context.people.find(
+            (person) =>
+              person.id ===
+              "person_1",
+          ).needs,
+        ).toEqual([]);
       },
     );
   },
