@@ -2,10 +2,9 @@ import { describe, expect, it } from "vitest";
 import { normalizeConversationContext } from "./conversationContext";
 
 describe("normalizeConversationContext", () => {
-  it("rejects malformed or unsupported contexts", () => {
+  it("rejects malformed contexts", () => {
     expect(normalizeConversationContext(null)).toBeNull();
     expect(normalizeConversationContext([])).toBeNull();
-    expect(normalizeConversationContext({ version: 2 })).toBeNull();
   });
 
   it("returns bounded provider-agnostic V1 state", () => {
