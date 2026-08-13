@@ -1,9 +1,9 @@
 import {
+  fireEvent,
   render,
   screen,
   waitFor,
 } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import HelpChat from "../HelpChat";
 import {
@@ -17,7 +17,6 @@ import {
 
 describe("HelpChat retry queue semantics", () => {
   it("retries the failed request before continuing queued messages", async () => {
-    const user = userEvent.setup();
     const firstRequest = deferred();
 
     vi.spyOn(console, "error").mockImplementation(() => {});
@@ -58,13 +57,23 @@ describe("HelpChat retry queue semantics", () => {
 
     const input = screen.getByRole("textbox", { name: /Escribe qué necesitas/i });
 
-    await user.type(input, "Mensaje A");
-    await user.click(
+    fireEvent.change(input, {
+      target: {
+        value: "Mensaje A",
+      },
+    });
+
+    fireEvent.click(
       screen.getByRole("button", { name: "Enviar" }),
     );
 
-    await user.type(input, "Mensaje B");
-    await user.click(
+    fireEvent.change(input, {
+      target: {
+        value: "Mensaje B",
+      },
+    });
+
+    fireEvent.click(
       screen.getByRole("button", { name: "Enviar" }),
     );
 
@@ -83,7 +92,7 @@ describe("HelpChat retry queue semantics", () => {
 
     expect(iacallCount).toBe(1);
 
-    await user.click(retry);
+    fireEvent.click(retry);
 
     await waitFor(() => {
       expect(iacallCount).toBe(3);

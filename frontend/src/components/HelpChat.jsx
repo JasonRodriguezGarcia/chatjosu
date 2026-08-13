@@ -385,8 +385,9 @@ const HelpChat = () => {
     }
   };
 
-  const handleSend = () => {
-    const trimmedInput = input.trim();
+  const submitMessage = (message) => {
+    const trimmedInput =
+      String(message || "").trim();
 
     if (!trimmedInput) {
       setErrorInput(true);
@@ -411,6 +412,10 @@ const HelpChat = () => {
     if (!lastFailedRequest) {
       void processRequestQueue();
     }
+  };
+
+  const handleSend = () => {
+    submitMessage(input);
   };
 
   const handleRetry = () => {
@@ -521,8 +526,7 @@ const HelpChat = () => {
   };
 
   const handleSuggestion = (suggestion) => {
-    setInput(suggestion);
-    setErrorInput(false);
+    submitMessage(suggestion);
   };
 
   const showInitialState =
