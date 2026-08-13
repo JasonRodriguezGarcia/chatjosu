@@ -81,7 +81,7 @@ describe("HelpChat silent IP location", () => {
     ).toBeInTheDocument();
   });
 
-  it("keeps the fallback when silent location is unavailable", async () => {
+  it("keeps province unselected when silent location is unavailable", async () => {
     globalThis.fetch = vi.fn((url) => {
       if (String(url).includes("/provincias")) {
         return Promise.resolve(provincesResponse());
@@ -106,13 +106,13 @@ describe("HelpChat silent IP location", () => {
 
     expect(
       await screen.findByRole("combobox", {
-        name: /Provincia actual.*Burgos/i,
+        name: /Provincia actual.*sin seleccionar/i,
       }),
     ).toBeInTheDocument();
   });
 
 
-  it("keeps the normal fallback when location detection fails", async () => {
+  it("keeps province unselected when location detection fails", async () => {
     globalThis.fetch = vi.fn((url) => {
       if (String(url).includes("/provincias")) {
         return Promise.resolve(provincesResponse());
@@ -131,7 +131,7 @@ describe("HelpChat silent IP location", () => {
 
     expect(
       await screen.findByRole("combobox", {
-        name: /Provincia actual.*Burgos/i,
+        name: /Provincia actual.*sin seleccionar/i,
       }),
     ).toBeInTheDocument();
   });
@@ -154,7 +154,7 @@ describe("HelpChat silent IP location", () => {
     render(<HelpChat />);
 
     const select = await screen.findByRole("combobox", {
-      name: /Provincia actual.*Burgos/i,
+      name: /Provincia actual.*sin seleccionar/i,
     });
 
     fireEvent.mouseDown(select);

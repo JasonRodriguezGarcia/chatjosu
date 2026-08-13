@@ -147,6 +147,7 @@ const HelpChat = () => {
   const processingQueueRef = useRef(false);
   const conversationContextRef = useRef(null);
   const manualProvinciaRef = useRef(false);
+  const pendingLocationRequestRef = useRef(null);
   const speechRecognitionRef = useRef(null);
   const speechBaseInputRef = useRef("");
   const speechFinalTranscriptRef = useRef("");
@@ -170,10 +171,6 @@ const HelpChat = () => {
         const datosProvincias = Array.isArray(data) ? data : [];
 
         setProvincias(datosProvincias);
-
-        if (!manualProvinciaRef.current) {
-          setSelectedProvincia(datosProvincias[0]?.label ?? "");
-        }
 
         try {
           const locationResponse = await fetch("/api/v1/helpchat/location", {
@@ -275,6 +272,27 @@ const HelpChat = () => {
             conversationContextRef.current = nextConversationContext;
           }
         }
+
+      const needsLocation =
+        data?.needsLocation === true ||
+        data?.status === "needs_location";
+
+      if (needsLocation) {
+        pendingLocationRequestRef.current = {
+          inputMessage,
+        };
+
+        setMessages((previous) => [
+          ...previous,
+          createMessage(
+            "assistant",
+            "Para mostrarte recursos cercanos necesito saber tu provincia. Puedes elegirla en el control de ubicación.",
+          ),
+        ]);
+
+        setLastFailedRequest(null);
+        return false;
+      }
 
       const needsClarification =
         data?.needsClarification === true;
@@ -410,8 +428,24 @@ const HelpChat = () => {
   };
 
   const handleSetSelectedProvincia = (event) => {
+    const nextProvince = event.target.value;
+
     manualProvinciaRef.current = true;
-    setSelectedProvincia(event.target.value);
+    setSelectedProvincia(nextProvince);
+
+    const pendingRequest =
+      pendingLocationRequestRef.current;
+
+    if (pendingRequest && nextProvince) {
+      pendingLocationRequestRef.current = null;
+
+      requestQueueRef.current.unshift({
+        ...pendingRequest,
+        selectedProvincia: nextProvince,
+      });
+
+      void processRequestQueue();
+    }
   };
 
   const handleToggleSpeech = () => {
