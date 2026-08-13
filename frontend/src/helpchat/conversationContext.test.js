@@ -99,6 +99,7 @@ describe("normalizeConversationContext V2", () => {
       ],
       currentFocus: "person_2",
       currentGoal: "encontrar apoyo",
+      pendingClarification: null,
       territory: {
         province: "Burgos",
         municipality: null,
