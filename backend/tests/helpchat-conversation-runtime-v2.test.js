@@ -7,6 +7,7 @@ import {
 import {
   applyClarificationTransitionV2,
   finalizeHelpchatRuntimeContextV2,
+  mergeLegacyGlobalsIntoRuntimeContextV2,
   prepareHelpchatRuntimeContextV2,
 } from "../helpchat/conversation-runtime-v2.js";
 
@@ -751,6 +752,160 @@ describe(
         expect(
           result.pendingClarification,
         ).toBeNull();
+      },
+    );
+  },
+);
+
+describe(
+  "legacy global runtime bridge",
+  () => {
+    it(
+      "merges territory goal and resources without flattening needs",
+      () => {
+        const result =
+          mergeLegacyGlobalsIntoRuntimeContextV2({
+            relationalContext: {
+              version: 2,
+              people: [
+                {
+                  id: "self",
+                  relationship:
+                    "self",
+                  needs: [],
+                },
+                {
+                  id: "person_1",
+                  relationship:
+                    "hermano",
+                  needs: [
+                    "SALUD MENTAL",
+                  ],
+                },
+              ],
+              currentFocus:
+                "person_1",
+              currentGoal: null,
+              pendingClarification: {
+                node:
+                  "mental_health_detail",
+                personId:
+                  "person_1",
+                mode:
+                  "choice",
+              },
+              territory: {
+                province: null,
+                municipality: null,
+              },
+              resourcesShown: [],
+            },
+
+            legacyContext: {
+              version: 1,
+              subject: {
+                relationship:
+                  "hermano",
+              },
+              activeNeeds: [
+                "ALCOHOLISMO",
+              ],
+              currentGoal:
+                "buscar apoyo",
+              facts: [],
+              constraints: [],
+              territory: {
+                province:
+                  "Burgos",
+                municipality:
+                  "Burgos",
+              },
+              resourcesShown: [
+                "123",
+              ],
+            },
+          });
+
+        expect(
+          result.currentGoal,
+        ).toBe(
+          "buscar apoyo",
+        );
+
+        expect(
+          result.territory,
+        ).toEqual({
+          province:
+            "Burgos",
+          municipality:
+            "Burgos",
+        });
+
+        expect(
+          result.resourcesShown,
+        ).toEqual([
+          "123",
+        ]);
+
+        expect(
+          result.people.find(
+            (person) =>
+              person.id ===
+              "person_1",
+          ).needs,
+        ).toEqual([
+          "SALUD MENTAL",
+        ]);
+
+        expect(
+          result.pendingClarification,
+        ).toEqual({
+          node:
+            "mental_health_detail",
+          personId:
+            "person_1",
+          mode:
+            "choice",
+        });
+      },
+    );
+
+    it(
+      "does not create a relational person from the legacy subject",
+      () => {
+        const result =
+          mergeLegacyGlobalsIntoRuntimeContextV2({
+            relationalContext: {
+              version: 2,
+              people: [
+                {
+                  id: "self",
+                  relationship:
+                    "self",
+                },
+              ],
+              currentFocus:
+                null,
+            },
+            legacyContext: {
+              version: 1,
+              subject: {
+                relationship:
+                  "cuñado",
+              },
+              activeNeeds: [
+                "VIVIENDA",
+              ],
+            },
+          });
+
+        expect(
+          result.people,
+        ).toHaveLength(1);
+
+        expect(
+          result.people[0].id,
+        ).toBe("self");
       },
     );
   },

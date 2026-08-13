@@ -9,6 +9,14 @@ import {
   setPendingClarificationV2,
 } from "./conversation-clarification-v2.js";
 
+import {
+  normalizeConversationContextV1,
+} from "./conversation-context-v1.js";
+
+import {
+  normalizeConversationContextV2,
+} from "./conversation-context-v2.js";
+
 export function prepareHelpchatRuntimeContextV2({
   conversationContext,
   inputMessage,
@@ -107,4 +115,33 @@ export function applyClarificationTransitionV2({
   }
 
   return relationalContext;
+}
+
+export function mergeLegacyGlobalsIntoRuntimeContextV2({
+  relationalContext,
+  legacyContext,
+} = {}) {
+  const relational =
+    normalizeConversationContextV2(
+      relationalContext,
+    );
+
+  if (!relational) {
+    return relationalContext;
+  }
+
+  const legacy =
+    normalizeConversationContextV1(
+      legacyContext,
+    );
+
+  return normalizeConversationContextV2({
+    ...relational,
+    currentGoal:
+      legacy.currentGoal,
+    territory:
+      legacy.territory,
+    resourcesShown:
+      legacy.resourcesShown,
+  });
 }
