@@ -109,7 +109,73 @@ test(
         "emotional_health",
         "addiction",
         "other",
+        "mental_mood_anxiety",
+        "mental_sleep",
+        "mental_behavior_changes",
+        "mental_other",
       ],
+    );
+  },
+);
+
+test(
+  "ramas guiadas de salud emocional evitan clasificación libre",
+  () => {
+    assert.deepEqual(
+      resolveControlledReplyV1(
+        "mental_mood_anxiety",
+      ),
+      {
+        type: "resolved_need",
+        resolvedNeeds: [
+          {
+            tag_id: 31,
+            descripcion:
+              "SALUD MENTAL",
+            source:
+              "controlled_reply",
+          },
+        ],
+      },
+    );
+
+    assert.deepEqual(
+      resolveControlledReplyV1(
+        "mental_sleep",
+      ),
+      {
+        type: "resolved_need",
+        resolvedNeeds: [
+          {
+            tag_id: 31,
+            descripcion:
+              "SALUD MENTAL",
+            source:
+              "controlled_reply",
+          },
+        ],
+      },
+    );
+
+    assert.deepEqual(
+      resolveControlledReplyV1(
+        "mental_behavior_changes",
+      ),
+      {
+        type:
+          "clarification",
+        missingDimension:
+          "mental_behavior_detail",
+      },
+    );
+
+    assert.deepEqual(
+      resolveControlledReplyV1(
+        "mental_other",
+      ),
+      {
+        type: "free_text",
+      },
     );
   },
 );

@@ -28,6 +28,38 @@ const CONTROLLED_REPLIES = Object.freeze({
   other: {
     type: "free_text",
   },
+
+  mental_mood_anxiety: {
+    type: "resolved_need",
+    resolvedNeeds: [
+      {
+        tag_id: 31,
+        descripcion: "SALUD MENTAL",
+        source: "controlled_reply",
+      },
+    ],
+  },
+
+  mental_sleep: {
+    type: "resolved_need",
+    resolvedNeeds: [
+      {
+        tag_id: 31,
+        descripcion: "SALUD MENTAL",
+        source: "controlled_reply",
+      },
+    ],
+  },
+
+  mental_behavior_changes: {
+    type: "clarification",
+    missingDimension:
+      "mental_behavior_detail",
+  },
+
+  mental_other: {
+    type: "free_text",
+  },
 });
 
 function cleanValue(value) {

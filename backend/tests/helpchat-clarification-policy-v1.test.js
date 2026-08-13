@@ -212,3 +212,40 @@ test(
     );
   },
 );
+
+test(
+  "mental_health_detail ofrece respuestas rápidas específicas",
+  () => {
+    const result =
+      buildClarification({
+        missingDimension:
+          "mental_health_detail",
+      });
+
+    assert.deepEqual(
+      result.quickReplies.map(
+        (reply) =>
+          reply.label,
+      ),
+      [
+        "Ánimo o ansiedad",
+        "Sueño",
+        "Cambios de conducta",
+        "Otra situación",
+      ],
+    );
+
+    assert.deepEqual(
+      result.quickReplies.map(
+        (reply) =>
+          reply.controlledReply?.value,
+      ),
+      [
+        "mental_mood_anxiety",
+        "mental_sleep",
+        "mental_behavior_changes",
+        "mental_other",
+      ],
+    );
+  },
+);

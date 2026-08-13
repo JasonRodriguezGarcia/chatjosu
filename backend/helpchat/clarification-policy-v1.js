@@ -107,6 +107,54 @@ const QUESTIONS = {
   mental_health_detail: {
     question:
       "¿Qué es lo que más te preocupa: el ánimo o la ansiedad, el sueño, cambios de conducta, u otra situación?",
+
+    quickReplies: [
+      {
+        id: "mood_anxiety",
+        label: "Ánimo o ansiedad",
+        message:
+          "Lo que más preocupa es el ánimo o la ansiedad",
+        controlledReply: {
+          type: "need_domain",
+          value: "mental_mood_anxiety",
+        },
+      },
+      {
+        id: "sleep",
+        label: "Sueño",
+        message:
+          "Lo que más preocupa es el sueño",
+        controlledReply: {
+          type: "need_domain",
+          value: "mental_sleep",
+        },
+      },
+      {
+        id: "behavior_changes",
+        label: "Cambios de conducta",
+        message:
+          "Lo que más preocupa son los cambios de conducta",
+        controlledReply: {
+          type: "need_domain",
+          value: "mental_behavior_changes",
+        },
+      },
+      {
+        id: "mental_other",
+        label: "Otra situación",
+        message:
+          "Quiero contarte otra situación relacionada con la salud emocional",
+        controlledReply: {
+          type: "need_domain",
+          value: "mental_other",
+        },
+      },
+    ],
+  },
+
+  mental_behavior_detail: {
+    question:
+      "¿Qué cambios de conducta has notado y desde cuándo están ocurriendo?",
   },
 
   addiction_detail: {

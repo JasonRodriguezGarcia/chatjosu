@@ -643,3 +643,282 @@ it(
     });
   },
 );
+
+it(
+  "renders second-level emotional health quick replies",
+  { timeout: 10000 },
+  async () => {
+    const requestBodies = [];
+    let iacallCount = 0;
+
+    const context =
+      conversationContextV1({
+        province: "Gipuzkoa",
+      });
+
+    globalThis.fetch =
+      vi.fn(
+        async (
+          url,
+          options = {},
+        ) => {
+          if (
+            String(url).includes(
+              "/provincias",
+            )
+          ) {
+            return provincesResponse();
+          }
+
+          if (
+            isLocationRequest(url)
+          ) {
+            return locationResponse({
+              province:
+                "Gipuzkoa",
+            });
+          }
+
+          iacallCount += 1;
+
+          requestBodies.push(
+            JSON.parse(
+              options.body,
+            ),
+          );
+
+          if (
+            iacallCount === 1
+          ) {
+            return {
+              ok: true,
+              status: 200,
+              json:
+                async () => ({
+                  status:
+                    "needs_clarification",
+                  needsClarification:
+                    true,
+                  clarificationQuestion:
+                    "¿Sobre qué situación necesitas orientación principalmente?",
+                  quickReplies: [
+                    {
+                      id:
+                        "emotional_health",
+                      label:
+                        "Salud emocional",
+                      message:
+                        "Necesito orientación sobre salud emocional",
+                      controlledReply: {
+                        type:
+                          "need_domain",
+                        value:
+                          "emotional_health",
+                      },
+                    },
+                  ],
+                  context,
+                  associations: [],
+                  requestedProvince:
+                    "Gipuzkoa",
+                  resolvedProvince:
+                    "Gipuzkoa",
+                  durationMs: 2,
+                }),
+            };
+          }
+
+          if (
+            iacallCount === 2
+          ) {
+            return {
+              ok: true,
+              status: 200,
+              json:
+                async () => ({
+                  status:
+                    "needs_clarification",
+                  needsClarification:
+                    true,
+                  clarificationQuestion:
+                    "¿Qué es lo que más te preocupa: el ánimo o la ansiedad, el sueño, cambios de conducta, u otra situación?",
+                  quickReplies: [
+                    {
+                      id:
+                        "mood_anxiety",
+                      label:
+                        "Ánimo o ansiedad",
+                      message:
+                        "Lo que más preocupa es el ánimo o la ansiedad",
+                      controlledReply: {
+                        type:
+                          "need_domain",
+                        value:
+                          "mental_mood_anxiety",
+                      },
+                    },
+                    {
+                      id:
+                        "sleep",
+                      label:
+                        "Sueño",
+                      message:
+                        "Lo que más preocupa es el sueño",
+                      controlledReply: {
+                        type:
+                          "need_domain",
+                        value:
+                          "mental_sleep",
+                      },
+                    },
+                    {
+                      id:
+                        "behavior_changes",
+                      label:
+                        "Cambios de conducta",
+                      message:
+                        "Lo que más preocupa son los cambios de conducta",
+                      controlledReply: {
+                        type:
+                          "need_domain",
+                        value:
+                          "mental_behavior_changes",
+                      },
+                    },
+                    {
+                      id:
+                        "mental_other",
+                      label:
+                        "Otra situación",
+                      message:
+                        "Quiero contarte otra situación relacionada con la salud emocional",
+                      controlledReply: {
+                        type:
+                          "need_domain",
+                        value:
+                          "mental_other",
+                      },
+                    },
+                  ],
+                  context,
+                  associations: [],
+                  requestedProvince:
+                    "Gipuzkoa",
+                  resolvedProvince:
+                    "Gipuzkoa",
+                  durationMs: 1,
+                }),
+            };
+          }
+
+          return associationResponse({
+            associationId:
+              "mental-sleep-result",
+          });
+        },
+      );
+
+    render(<HelpChat />);
+
+    await screen.findByRole(
+      "combobox",
+      {
+        name:
+          /Provincia actual.*Gipuzkoa/i,
+      },
+    );
+
+    fireEvent.click(
+      screen.getByRole(
+        "button",
+        {
+          name:
+            "Busco orientación social",
+        },
+      ),
+    );
+
+    const emotionalHealth =
+      await screen.findByRole(
+        "button",
+        {
+          name:
+            "Salud emocional",
+        },
+      );
+
+    fireEvent.click(
+      emotionalHealth,
+    );
+
+    expect(
+      await screen.findByText(
+        /Qué es lo que más te preocupa/i,
+      ),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole(
+        "button",
+        {
+          name:
+            "Ánimo o ansiedad",
+        },
+      ),
+    ).toBeInTheDocument();
+
+    const sleep =
+      screen.getByRole(
+        "button",
+        {
+          name:
+            "Sueño",
+        },
+      );
+
+    expect(
+      sleep,
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole(
+        "button",
+        {
+          name:
+            "Cambios de conducta",
+        },
+      ),
+    ).toBeInTheDocument();
+
+    fireEvent.click(
+      sleep,
+    );
+
+    await waitFor(() => {
+      expect(
+        iacallCount,
+      ).toBe(3);
+    });
+
+    expect(
+      requestBodies[2],
+    ).toMatchObject({
+      inputMessage:
+        "Lo que más preocupa es el sueño",
+      selectedProvincia:
+        "Gipuzkoa",
+      controlledReply: {
+        type:
+          "need_domain",
+        value:
+          "mental_sleep",
+      },
+    });
+
+    await waitFor(() => {
+      expect(
+        sleep,
+      ).toBeDisabled();
+    });
+  },
+);
