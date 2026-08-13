@@ -417,3 +417,81 @@ test(
     );
   }
 );
+
+test(
+  "los starters genéricos piden aclaración sin usar embedding",
+  async () => {
+    let embeddingCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            embeddingCalls += 1;
+
+            throw new Error(
+              "embedding no debería ejecutarse",
+            );
+          },
+        },
+      });
+
+    for (
+      const inputMessage of [
+        "Busco orientación social",
+        "Necesito apoyo relacionado con una enfermedad",
+      ]
+    ) {
+      const result =
+        await router.understand({
+          inputMessage,
+
+          conversationContext: {
+            version: 1,
+            subject: {
+              relationship: null,
+            },
+            activeNeeds: [],
+            currentGoal: null,
+            facts: [],
+            constraints: [],
+            territory: {
+              province: "Gipuzkoa",
+              municipality: null,
+            },
+            resourcesShown: [],
+          },
+        });
+
+      assert.equal(
+        result.status,
+        "needs_clarification",
+      );
+
+      assert.equal(
+        result.needsClarification,
+        true,
+      );
+
+      assert.equal(
+        result.provider,
+        "rule",
+      );
+
+      assert.equal(
+        result.model,
+        "semantic-fast-gates-v1",
+      );
+
+      assert.equal(
+        result.tag,
+        null,
+      );
+    }
+
+    assert.equal(
+      embeddingCalls,
+      0,
+    );
+  },
+);

@@ -171,3 +171,40 @@ test(
     );
   }
 );
+
+test(
+  "trata los starters genéricos como información insuficiente",
+  () => {
+    const emptyContext = {
+      version: 1,
+      subject: {
+        relationship: null,
+      },
+      activeNeeds: [],
+      currentGoal: null,
+      facts: [],
+      constraints: [],
+      territory: {
+        province: null,
+        municipality: null,
+      },
+      resourcesShown: [],
+    };
+
+    assert.equal(
+      isClearlyInsufficient(
+        "Busco orientación social",
+        emptyContext,
+      ),
+      true,
+    );
+
+    assert.equal(
+      isClearlyInsufficient(
+        "Necesito apoyo relacionado con una enfermedad",
+        emptyContext,
+      ),
+      true,
+    );
+  },
+);

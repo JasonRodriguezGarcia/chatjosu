@@ -125,6 +125,8 @@ const INSUFFICIENT_PATTERNS = [
   /^necesito ayuda para (?:mi|un|una) \w+$/,
   /^busco ayuda$/,
   /^busco orientacion$/,
+  /^busco orientacion social$/,
+  /^necesito apoyo relacionado con una enfermedad$/,
   /^no se que hacer$/,
   /^no sabemos que hacer(?: con .+)?$/,
   /^(?:mi|el|la) \w+ esta muy mal$/,
