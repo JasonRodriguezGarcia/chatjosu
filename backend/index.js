@@ -1255,8 +1255,6 @@ const isMainModule =
 
 // Start Server
 if (isMainModule) {
-    await warmHelpchatSemanticRouter();
-
     app.listen(
         PORT,
         BACKEND_HOST,
@@ -1265,6 +1263,8 @@ if (isMainModule) {
                 `Server running on ` +
                 `http://${BACKEND_HOST}:${PORT}`
             );
+
+            void warmHelpchatSemanticRouter();
         }
     );
 }
