@@ -388,3 +388,90 @@ test(
     }
   }
 );
+
+test(
+  "warmup can use a larger timeout without changing normal classification",
+  async () => {
+    const calls = [];
+
+    const embeddingService = {
+      model: "fake-embedding",
+
+      async embed(
+        input,
+        options,
+      ) {
+        calls.push({
+          input,
+          options,
+        });
+
+        const count =
+          Array.isArray(input)
+            ? input.length
+            : 1;
+
+        return {
+          vectors:
+            Array.from(
+              {
+                length: count,
+              },
+              () => [
+                1,
+                0,
+              ],
+            ),
+        };
+      },
+    };
+
+    const classifier =
+      createHelpchatSemanticClassifier({
+        embeddingService,
+        prototypes: [
+          {
+            tagId: 1,
+            tag: "UNO",
+            text: "uno",
+          },
+          {
+            tagId: 2,
+            tag: "DOS",
+            text: "dos",
+          },
+        ],
+      });
+
+    await classifier.warmup({
+      timeoutMs: 15000,
+    });
+
+    assert.equal(
+      calls.length,
+      1,
+    );
+
+    assert.deepEqual(
+      calls[0].options,
+      {
+        timeoutMs: 15000,
+      },
+    );
+
+    await classifier.classify({
+      inputMessage: "uno",
+      conversationContext: null,
+    });
+
+    assert.equal(
+      calls.length,
+      2,
+    );
+
+    assert.equal(
+      calls[1].options,
+      undefined,
+    );
+  },
+);

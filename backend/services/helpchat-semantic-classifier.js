@@ -73,7 +73,9 @@ export function createHelpchatSemanticClassifier({
 
   let prototypePromise = null;
 
-  async function loadPrototypeVectors() {
+  async function loadPrototypeVectors({
+    timeoutMs = null,
+  } = {}) {
     if (!prototypePromise) {
       prototypePromise = (
         async () => {
@@ -81,7 +83,12 @@ export function createHelpchatSemanticClassifier({
             await embeddingService.embed(
               prototypes.map(
                 (entry) => entry.text
-              )
+              ),
+              timeoutMs
+                ? {
+                    timeoutMs,
+                  }
+                : undefined,
             );
 
           if (
@@ -228,7 +235,13 @@ export function createHelpchatSemanticClassifier({
 
   return {
     classify,
-    warmup: loadPrototypeVectors,
+    warmup({
+      timeoutMs = null,
+    } = {}) {
+      return loadPrototypeVectors({
+        timeoutMs,
+      });
+    },
   };
 }
 

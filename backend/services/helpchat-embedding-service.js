@@ -18,13 +18,27 @@ export function createHelpchatEmbeddingService({
   const endpoint =
     `${baseUrl.replace(/\/$/, "")}/api/embed`;
 
-  async function embed(input) {
+  async function embed(
+    input,
+    {
+      timeoutMs:
+        callTimeoutMs = timeoutMs,
+    } = {},
+  ) {
+    const effectiveTimeoutMs =
+      Number.isFinite(
+        Number(callTimeoutMs),
+      ) &&
+      Number(callTimeoutMs) > 0
+        ? Number(callTimeoutMs)
+        : timeoutMs;
+
     const controller =
       new AbortController();
 
     const timeout = setTimeout(
       () => controller.abort(),
-      timeoutMs
+      effectiveTimeoutMs
     );
 
     try {
@@ -94,7 +108,7 @@ export function createHelpchatEmbeddingService({
     } catch (error) {
       if (error?.name === "AbortError") {
         throw createTimeoutError(
-          timeoutMs
+          effectiveTimeoutMs
         );
       }
 

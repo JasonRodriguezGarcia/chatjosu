@@ -144,6 +144,13 @@ const HELPCHAT_EMBEDDING_KEEP_ALIVE =
     process.env.HELPCHAT_EMBEDDING_KEEP_ALIVE?.trim() ||
     "30m";
 
+
+const HELPCHAT_EMBEDDING_WARMUP_TIMEOUT_MS =
+    positiveIntegerEnv(
+        "HELPCHAT_EMBEDDING_WARMUP_TIMEOUT_MS",
+        15000
+    );
+
 const HELPCHAT_SEMANTIC_MIN_SCORE =
     Number(
         process.env.HELPCHAT_SEMANTIC_MIN_SCORE ||
@@ -374,7 +381,10 @@ async function warmHelpchatSemanticRouter() {
         performance.now();
 
     try {
-        await helpchatSemanticClassifier.warmup();
+        await helpchatSemanticClassifier.warmup({
+            timeoutMs:
+                HELPCHAT_EMBEDDING_WARMUP_TIMEOUT_MS,
+        });
 
         helpchatSemanticReady = true;
         helpchatSemanticWarmupError = null;
