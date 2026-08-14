@@ -14,6 +14,10 @@ import {
 } from "./conversation-clarification-v2.js";
 
 import {
+  setPersonResolvedDimension,
+} from "./conversation-context-people-v2.js";
+
+import {
   normalizeConversationContextV1,
 } from "./conversation-context-v1.js";
 
@@ -120,6 +124,28 @@ export function applyClarificationTransitionV2({
         personId,
         mode: "free_text",
       },
+    );
+  }
+
+  if (
+    action.type ===
+      "resolve_dimension" &&
+    typeof action.dimension ===
+      "string" &&
+    typeof action.value ===
+      "string" &&
+    personId
+  ) {
+    const updated =
+      setPersonResolvedDimension(
+        relationalContext,
+        personId,
+        action.dimension,
+        action.value,
+      );
+
+    return clearPendingClarificationV2(
+      updated,
     );
   }
 

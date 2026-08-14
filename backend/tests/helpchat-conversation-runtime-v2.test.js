@@ -724,6 +724,70 @@ describe(
     );
 
     it(
+      "persists a resolved dimension on the target person",
+      () => {
+        const result =
+          applyClarificationTransitionV2({
+            relationalContext: {
+              version: 2,
+              people: [
+                {
+                  id: "self",
+                  relationship:
+                    "self",
+                },
+                {
+                  id: "person_1",
+                  relationship:
+                    "hermano",
+                },
+              ],
+              currentFocus:
+                "person_1",
+              pendingClarification: {
+                node:
+                  "health_detail",
+                personId:
+                  "person_1",
+                mode:
+                  "free_text",
+              },
+            },
+            personId:
+              "person_1",
+            sourceNode:
+              "health_detail",
+            action: {
+              type:
+                "resolve_dimension",
+              dimension:
+                "diagnosis_status",
+              value:
+                "not_confirmed",
+            },
+          });
+
+        const brother =
+          result.people.find(
+            (person) =>
+              person.id ===
+              "person_1",
+          );
+
+        expect(
+          brother.resolvedDimensions,
+        ).toEqual({
+          diagnosis_status:
+            "not_confirmed",
+        });
+
+        expect(
+          result.pendingClarification,
+        ).toBeNull();
+      },
+    );
+
+    it(
       "resolution clears pending clarification",
       () => {
         const result =
