@@ -6,9 +6,8 @@ import TesterFeedbackComposer from "./TesterFeedbackComposer";
 import { HELPCHAT_BRAND as BRAND } from "./helpChatBrand";
 import { normalizeConversationContext } from "../helpchat/conversationContext";
 import {
-  createSpeechRecognition,
-  isSpeechRecognitionSupported,
-} from "../helpchat/speechRecognition";
+  useHelpChatSpeech,
+} from "../helpchat/useHelpChatSpeech";
 import {
   findDetectedProvince,
   normalizeDetectedLocation,
@@ -37,23 +36,6 @@ const STARTER_SUGGESTIONS = [
   "Busco orientación social",
   "Necesito apoyo relacionado con una enfermedad",
 ];
-
-const composeSpeechInput = (base, finalTranscript, interimTranscript) => {
-  const transcript = [finalTranscript, interimTranscript]
-    .map((value) => String(value || "").trim())
-    .filter(Boolean)
-    .join(" ");
-
-  if (!transcript) {
-    return base;
-  }
-
-  if (!base) {
-    return transcript;
-  }
-
-  return `${base}${/\s$/.test(base) ? "" : " "}${transcript}`;
-};
 
 const createMessage = (role, content, extra = {}) => ({
   id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
@@ -130,13 +112,23 @@ const HelpChat = () => {
   const [isSending, setIsSending] = useState(false);
   const [requestError, setRequestError] = useState(null);
   const [lastFailedRequest, setLastFailedRequest] = useState(null);
-  const [isListening, setIsListening] = useState(false);
-  const [speechError, setSpeechError] = useState(null);
   const [testerFeedbackMode, setTesterFeedbackMode] = useState(false);
   const [testerFeedbackReason, setTesterFeedbackReason] = useState("");
   const [testerFeedbackSending, setTesterFeedbackSending] = useState(false);
   const [testerFeedbackStatus, setTesterFeedbackStatus] = useState(null);
   const [testerCapturedTurnCount, setTesterCapturedTurnCount] = useState(0);
+
+  const speech =
+    useHelpChatSpeech();
+
+  const isListening =
+    speech.isListening;
+
+  const speechError =
+    speech.error;
+
+  const speechRecognitionSupported =
+    speech.supported;
 
   const bottomRef = useRef(null);
   const requestQueueRef = useRef([]);
@@ -144,9 +136,6 @@ const HelpChat = () => {
   const conversationContextRef = useRef(null);
   const manualProvinciaRef = useRef(false);
   const pendingLocationRequestRef = useRef(null);
-  const speechRecognitionRef = useRef(null);
-  const speechBaseInputRef = useRef("");
-  const speechFinalTranscriptRef = useRef("");
 
   const testerModeRef =
     useRef(
@@ -185,8 +174,6 @@ const HelpChat = () => {
 
   const testerFeedbackReasonSourceRef =
     useRef("text");
-
-  const speechRecognitionSupported = isSpeechRecognitionSupported(globalThis);
 
   useEffect(() => {
     if (
@@ -279,13 +266,6 @@ const HelpChat = () => {
     };
 
     fetchingProvincias();
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      speechRecognitionRef.current?.abort();
-      speechRecognitionRef.current = null;
-    };
   }, []);
 
   useEffect(() => {
@@ -720,93 +700,32 @@ const HelpChat = () => {
   };
 
   const handleToggleSpeech = () => {
-    if (isListening) {
-      speechRecognitionRef.current?.stop();
-      return;
-    }
-
-    setSpeechError(null);
-    speechBaseInputRef.current =
+    if (
+      !isListening &&
       testerFeedbackMode
-        ? testerFeedbackReason
-        : input;
-
-    speechFinalTranscriptRef.current = "";
-
-    if (testerFeedbackMode) {
+    ) {
       testerFeedbackReasonSourceRef.current =
         "speech";
     }
 
-    const adapter = createSpeechRecognition({
-      target: globalThis,
-      language: "es-ES",
-      onStart: () => {
-        setIsListening(true);
-      },
-      onResult: ({ interimTranscript, finalTranscript }) => {
-        if (finalTranscript) {
-          speechFinalTranscriptRef.current = [
-            speechFinalTranscriptRef.current,
-            finalTranscript,
-          ]
-            .map((value) => value.trim())
-            .filter(Boolean)
-            .join(" ");
-        }
+    speech.toggle({
+      baseValue:
+        testerFeedbackMode
+          ? testerFeedbackReason
+          : input,
 
-        const composed =
-          composeSpeechInput(
-            speechBaseInputRef.current,
-            speechFinalTranscriptRef.current,
-            interimTranscript,
-          );
-
+      onValueChange: (value) => {
         if (testerFeedbackMode) {
           setTesterFeedbackReason(
-            composed,
+            value,
           );
-        } else {
-          setInput(
-            composed,
-          );
-          setErrorInput(false);
+          return;
         }
-      },
-      onError: (error) => {
-        setIsListening(false);
 
-        if (error === "not-allowed" || error === "service-not-allowed") {
-          setSpeechError(
-            "No he podido acceder al micrófono. Puedes seguir escribiendo normalmente.",
-          );
-        } else {
-          setSpeechError(
-            "No he podido completar el dictado. Puedes seguir escribiendo normalmente.",
-          );
-        }
-      },
-      onEnd: () => {
-        setIsListening(false);
-        speechRecognitionRef.current = null;
+        setInput(value);
+        setErrorInput(false);
       },
     });
-
-    if (!adapter) {
-      return;
-    }
-
-    speechRecognitionRef.current = adapter;
-
-    try {
-      adapter.start();
-    } catch {
-      speechRecognitionRef.current = null;
-      setIsListening(false);
-      setSpeechError(
-        "No he podido iniciar el dictado. Puedes seguir escribiendo normalmente.",
-      );
-    }
   };
 
   const handleTesterFeedbackStart = () => {
@@ -832,14 +751,12 @@ const HelpChat = () => {
     setTesterFeedbackStatus(null);
     setTesterFeedbackMode(true);
     setErrorInput(false);
-    setSpeechError(null);
+    speech.clearError();
   };
 
   const handleTesterFeedbackCancel = () => {
-    speechRecognitionRef.current?.abort();
-    speechRecognitionRef.current = null;
+    speech.abort();
 
-    setIsListening(false);
     setTesterFeedbackReason("");
     setTesterFeedbackMode(false);
 
