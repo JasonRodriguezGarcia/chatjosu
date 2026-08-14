@@ -100,6 +100,12 @@ function cleanPersonId(value) {
   return cleaned;
 }
 
+const PENDING_CLARIFICATION_DIMENSIONS =
+  new Set([
+    "diagnosis_status",
+    "goal",
+  ]);
+
 function normalizePendingClarification(
   value,
   validPersonIds,
@@ -143,10 +149,24 @@ function normalizePendingClarification(
       ? "free_text"
       : "choice";
 
+  const dimension =
+    typeof value.dimension ===
+      "string" &&
+    PENDING_CLARIFICATION_DIMENSIONS.has(
+      value.dimension,
+    )
+      ? value.dimension
+      : null;
+
   return {
     node,
     personId,
     mode,
+    ...(dimension
+      ? {
+          dimension,
+        }
+      : {}),
   };
 }
 

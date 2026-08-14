@@ -18,6 +18,7 @@ export function setPendingClarificationV2(
     node,
     personId = null,
     mode = "choice",
+    dimension = null,
   } = {},
 ) {
   const context =
@@ -48,9 +49,21 @@ export function setPendingClarificationV2(
       mode === "free_text"
         ? "free_text"
         : "choice",
+    ...(typeof dimension ===
+      "string"
+      ? {
+          dimension,
+        }
+      : {}),
   };
 
-  return context;
+  /*
+   * El normalizador sigue siendo
+   * autoridad sobre dimensiones válidas.
+   */
+  return canonicalContext(
+    context,
+  );
 }
 
 export function clearPendingClarificationV2(

@@ -647,6 +647,86 @@ describe(
     );
 
     it(
+      "preserves an explicit pending clarification dimension",
+      () => {
+        const result =
+          normalizeConversationContextV2({
+            version: 2,
+            people: [
+              {
+                id: "person_1",
+                relationship:
+                  "hermano",
+              },
+            ],
+            currentFocus:
+              "person_1",
+            pendingClarification: {
+              node:
+                "health_detail",
+              personId:
+                "person_1",
+              mode:
+                "free_text",
+              dimension:
+                "diagnosis_status",
+            },
+          });
+
+        expect(
+          result.pendingClarification,
+        ).toEqual({
+          node:
+            "health_detail",
+          personId:
+            "person_1",
+          mode:
+            "free_text",
+          dimension:
+            "diagnosis_status",
+        });
+      },
+    );
+
+    it(
+      "drops an unsupported pending clarification dimension",
+      () => {
+        const result =
+          normalizeConversationContextV2({
+            version: 2,
+            people: [
+              {
+                id: "person_1",
+                relationship:
+                  "hermano",
+              },
+            ],
+            pendingClarification: {
+              node:
+                "health_detail",
+              personId:
+                "person_1",
+              mode:
+                "free_text",
+              dimension:
+                "invented_dimension",
+            },
+          });
+
+        expect(
+          result.pendingClarification,
+        ).toEqual({
+          node:
+            "health_detail",
+          personId:
+            "person_1",
+          mode:
+            "free_text",
+        });
+      },
+    );
+
+    it(
       "drops an unknown clarification node",
       () => {
         const result =
