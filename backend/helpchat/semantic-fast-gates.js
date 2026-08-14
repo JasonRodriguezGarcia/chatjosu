@@ -123,6 +123,9 @@ const ANCHORS = [
 const INSUFFICIENT_PATTERNS = [
   /^necesito ayuda$/,
   /^necesito orientacion$/,
+  /^necesito seguimiento$/,
+  /^necesito apoyo$/,
+  /^necesito asesoramiento$/,
   /^necesito ayuda para (?:mi|un|una) \w+$/,
   /^busco ayuda$/,
   /^busco orientacion$/,

@@ -19,6 +19,43 @@ function tagKey(tag) {
   );
 }
 
+function normalizeClauseText(value) {
+  return cleanText(value)
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(
+      /[\u0300-\u036f]/g,
+      ""
+    );
+}
+
+function isGenericDependentClause(
+  value
+) {
+  const text =
+    normalizeClauseText(
+      value
+    );
+
+  if (!text) {
+    return true;
+  }
+
+  return [
+    /^necesito (?:ayuda|orientacion|apoyo|asesoramiento|seguimiento)$/,
+    /^necesitamos (?:ayuda|orientacion|apoyo|asesoramiento|seguimiento)$/,
+    /^busco (?:ayuda|orientacion|apoyo|asesoramiento|seguimiento)$/,
+    /^buscamos (?:ayuda|orientacion|apoyo|asesoramiento|seguimiento)$/,
+    /^quiero (?:ayuda|orientacion|apoyo|asesoramiento|seguimiento)$/,
+    /^queremos (?:ayuda|orientacion|apoyo|asesoramiento|seguimiento)$/,
+    /^necesito que me orienten$/,
+    /^necesitamos que nos orienten$/,
+  ].some(
+    (pattern) =>
+      pattern.test(text)
+  );
+}
+
 export function splitCompoundNeedClauses(
   inputMessage
 ) {
@@ -152,9 +189,23 @@ export async function resolveMultipleNeeds({
     return resolved;
   }
 
+  const independentClauses =
+    clauses.filter(
+      (clause) =>
+        !isGenericDependentClause(
+          clause
+        )
+    );
+
+  if (
+    independentClauses.length === 0
+  ) {
+    return resolved;
+  }
+
   const settled =
     await Promise.allSettled(
-      clauses.map(
+      independentClauses.map(
         (clause) =>
           understand({
             inputMessage:

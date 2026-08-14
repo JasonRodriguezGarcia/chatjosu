@@ -285,3 +285,155 @@ test(
     );
   }
 );
+
+test(
+  "una petición genérica de seguimiento no se convierte en segunda necesidad",
+  async () => {
+    let genericCalls = 0;
+
+    const result =
+      await resolveMultipleNeeds({
+        inputMessage:
+          "El médico me ha dicho que tengo la glucosa demasiado alta y necesito seguimiento",
+        conversationContext:
+          null,
+        primaryUnderstanding: {
+          status:
+            "resolved",
+          tag: {
+            tag_id: 13,
+            descripcion:
+              "DIABETES",
+          },
+          provider:
+            "embedding",
+        },
+        async understand({
+          inputMessage,
+        }) {
+          if (
+            /seguimiento/i.test(
+              inputMessage
+            )
+          ) {
+            genericCalls += 1;
+
+            return {
+              status:
+                "resolved",
+              tag: {
+                tag_id: 8,
+                descripcion:
+                  "CÁRITAS BIENESTAR SOCIAL",
+              },
+              provider:
+                "embedding",
+              needsClarification:
+                false,
+            };
+          }
+
+          return {
+            status:
+              "resolved",
+            tag: {
+              tag_id: 13,
+              descripcion:
+                "DIABETES",
+            },
+            provider:
+              "embedding",
+            needsClarification:
+              false,
+          };
+        },
+      });
+
+    assert.equal(
+      genericCalls,
+      0,
+    );
+
+    assert.deepEqual(
+      result.map(
+        (need) =>
+          need.descripcion
+      ),
+      [
+        "DIABETES",
+      ],
+    );
+  },
+);
+
+test(
+  "multi necesidad conserva dos problemas explícitos independientes",
+  async () => {
+    const result =
+      await resolveMultipleNeeds({
+        inputMessage:
+          "Bebe demasiado y se ha quedado sin trabajo",
+        conversationContext:
+          null,
+        primaryUnderstanding: {
+          status:
+            "resolved",
+          tag: {
+            tag_id: 2,
+            descripcion:
+              "ALCOHOLISMO",
+          },
+          provider:
+            "anchor",
+        },
+        async understand({
+          inputMessage,
+        }) {
+          if (
+            /trabajo/i.test(
+              inputMessage
+            )
+          ) {
+            return {
+              status:
+                "resolved",
+              tag: {
+                tag_id: 25,
+                descripcion:
+                  "INSERCIÓN LABORAL",
+              },
+              provider:
+                "anchor",
+              needsClarification:
+                false,
+            };
+          }
+
+          return {
+            status:
+              "resolved",
+            tag: {
+              tag_id: 2,
+              descripcion:
+                "ALCOHOLISMO",
+            },
+            provider:
+              "anchor",
+            needsClarification:
+              false,
+          };
+        },
+      });
+
+    assert.deepEqual(
+      result.map(
+        (need) =>
+          need.descripcion
+      ),
+      [
+        "ALCOHOLISMO",
+        "INSERCIÓN LABORAL",
+      ],
+    );
+  },
+);

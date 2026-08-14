@@ -221,3 +221,26 @@ test(
     );
   },
 );
+
+test(
+  "seguimiento apoyo y asesoramiento aislados son insuficientes",
+  () => {
+    for (
+      const message
+      of [
+        "Necesito seguimiento",
+        "Necesito apoyo",
+        "Necesito asesoramiento",
+      ]
+    ) {
+      assert.equal(
+        isClearlyInsufficient(
+          message,
+          null,
+        ),
+        true,
+        message,
+      );
+    }
+  },
+);
