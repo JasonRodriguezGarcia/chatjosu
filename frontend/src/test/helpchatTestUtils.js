@@ -108,3 +108,23 @@ export const locationResponse = ({
     source: "ip",
     confidence: "coarse",
   });
+
+export const isTesterSessionRequest = (url) =>
+  String(url).includes(
+    "/api/v1/helpchat/tester/sessions",
+  );
+
+export const isTesterTurnRequest = (url) =>
+  String(url).includes(
+    "/api/v1/helpchat/tester/turns",
+  );
+
+export const isTesterFeedbackRequest = (url) =>
+  String(url).includes(
+    "/api/v1/helpchat/tester/feedback",
+  );
+
+export const isIacallRequest = (url) =>
+  String(url).includes(
+    "/api/v1/helpchat/iacall",
+  );

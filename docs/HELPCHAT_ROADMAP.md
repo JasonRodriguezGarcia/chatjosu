@@ -153,6 +153,30 @@ Objetivos UX:
 - Qwen en background;
 - captura de tester fuera del camino crítico.
 
+### 🟡 Feedback Analyst automático
+
+Objetivo:
+
+- analizar automáticamente cada feedback de tester fuera del camino crítico;
+- reconstruir la conversación hasta `snapshotThroughTurnId`;
+- clasificar el fallo y estimar severidad/confianza;
+- identificar invariantes probablemente violadas;
+- proponer módulos afectados y solución;
+- generar candidatos de regresión;
+- permitir generación posterior de patch candidato;
+- no aplicar cambios ni promover expectativas automáticamente.
+
+Estrategia de modelos:
+
+- LLM local para triage y casos claros;
+- LLM remoto potente para análisis ambiguo, arquitectónico o de código complejo;
+- contexto mínimo y pseudonimizado;
+- análisis siempre asíncrono.
+
+Estados previstos:
+
+`pending -> analyzing -> analyzed -> reviewed -> promoted|dismissed`
+
 ### ⬜ Pendiente
 
 - benchmark sistemático p50/p95;
@@ -262,10 +286,31 @@ Verificado:
 - validación de feedback;
 - PostgreSQL real.
 
+### ✅ Frontend Tester Capture V1
+
+Implementado:
+
+- activación explícita mediante `?tester=1`;
+- `sessionId` independiente de los mensajes UI;
+- `turnId` independiente por intercambio conversacional;
+- secuencia estable;
+- snapshot de Context V2 antes/después;
+- metadata runtime reducida;
+- persistencia asíncrona fuera del camino crítico;
+- retry limitado de captura;
+- mismo `turnId` al reintentar `/iacall`;
+- preservación del turno durante solicitud de provincia.
+
+Verificado:
+
+- la respuesta visible no espera a PostgreSQL;
+- FIFO y contexto conversacional siguen funcionando;
+- retry conserva identidad;
+- frontend build y lint correctos.
+
 ### 🟡 En curso
 
-- integración de `sessionId` y `turnId` en frontend;
-- captura automática asíncrona de conversaciones.
+- interfaz visible para reportar problemas de conversación.
 
 ### ⬜ Pendiente
 

@@ -13,6 +13,13 @@ import {
   normalizeDetectedLocation,
 } from "../helpchat/location";
 import {
+  cloneTesterSnapshot,
+  createHelpchatTesterCaptureClient,
+  createTesterId,
+  isHelpchatTesterModeEnabled,
+  projectTesterRuntimeMetadata,
+} from "../helpchat/testerCapture";
+import {
   Box,
   Button,
   IconButton,
@@ -141,6 +148,11 @@ const HelpChat = () => {
   const [lastFailedRequest, setLastFailedRequest] = useState(null);
   const [isListening, setIsListening] = useState(false);
   const [speechError, setSpeechError] = useState(null);
+  const [testerFeedbackMode, setTesterFeedbackMode] = useState(false);
+  const [testerFeedbackReason, setTesterFeedbackReason] = useState("");
+  const [testerFeedbackSending, setTesterFeedbackSending] = useState(false);
+  const [testerFeedbackStatus, setTesterFeedbackStatus] = useState(null);
+  const [testerCapturedTurnCount, setTesterCapturedTurnCount] = useState(0);
 
   const bottomRef = useRef(null);
   const requestQueueRef = useRef([]);
@@ -151,7 +163,81 @@ const HelpChat = () => {
   const speechRecognitionRef = useRef(null);
   const speechBaseInputRef = useRef("");
   const speechFinalTranscriptRef = useRef("");
+
+  const testerModeRef =
+    useRef(
+      isHelpchatTesterModeEnabled(),
+    );
+
+  const testerSessionIdRef =
+    useRef(
+      testerModeRef.current
+        ? createTesterId(
+            "session",
+          )
+        : null,
+    );
+
+  const testerSequenceRef =
+    useRef(0);
+
+  const testerCaptureClientRef =
+    useRef(
+      testerModeRef.current
+        ? createHelpchatTesterCaptureClient({
+            retries: 1,
+          })
+        : null,
+    );
+
+  const testerSessionReadyRef =
+    useRef(null);
+
+  const testerCapturedTurnsRef =
+    useRef([]);
+
+  const testerFeedbackSnapshotTurnIdRef =
+    useRef(null);
+
+  const testerFeedbackReasonSourceRef =
+    useRef("text");
+
   const speechRecognitionSupported = isSpeechRecognitionSupported(globalThis);
+
+  useEffect(() => {
+    if (
+      !testerModeRef.current ||
+      !testerCaptureClientRef.current ||
+      !testerSessionIdRef.current
+    ) {
+      return;
+    }
+
+    const sessionPromise =
+      testerCaptureClientRef.current
+        .createSession({
+          sessionId:
+            testerSessionIdRef.current,
+          environment:
+            import.meta.env.MODE ||
+            "development",
+          buildRevision:
+            import.meta.env
+              .VITE_BUILD_REVISION ||
+            null,
+        })
+        .catch((error) => {
+          console.warn(
+            "Tester Capture session failed:",
+            error,
+          );
+
+          return null;
+        });
+
+    testerSessionReadyRef.current =
+      sessionPromise;
+  }, []);
 
   useEffect(() => {
     const fetchingProvincias = async () => {
@@ -229,9 +315,17 @@ const HelpChat = () => {
   }, [messages, isSending, requestError]);
 
   const handleInput = (event) => {
-    setInput(event.target.value);
+    const value =
+      event.target.value;
 
-    if (errorInput && event.target.value.trim()) {
+    if (testerFeedbackMode) {
+      setTesterFeedbackReason(value);
+      return;
+    }
+
+    setInput(value);
+
+    if (errorInput && value.trim()) {
       setErrorInput(false);
     }
   };
@@ -240,8 +334,16 @@ const HelpChat = () => {
     inputMessage,
     selectedProvincia: provincia,
     controlledReply = null,
+    testerTurn = null,
   }) => {
     setRequestError(null);
+
+    const contextBefore =
+      testerTurn
+        ? cloneTesterSnapshot(
+            conversationContextRef.current,
+          )
+        : null;
 
     const requestStartedAt = performance.now();
 
@@ -288,6 +390,7 @@ const HelpChat = () => {
         pendingLocationRequestRef.current = {
           inputMessage,
           controlledReply,
+          testerTurn,
         };
 
         setMessages((previous) => [
@@ -414,6 +517,89 @@ const HelpChat = () => {
         }),
       ]);
 
+      if (
+        testerTurn &&
+        testerCaptureClientRef.current &&
+        testerSessionIdRef.current
+      ) {
+        const contextAfter =
+          cloneTesterSnapshot(
+            conversationContextRef.current,
+          );
+
+        const captureTurn =
+          async () => {
+            await testerSessionReadyRef.current;
+
+            return testerCaptureClientRef.current
+              .appendTurn({
+                sessionId:
+                  testerSessionIdRef.current,
+                turnId:
+                  testerTurn.turnId,
+                sequence:
+                  testerTurn.sequence,
+                inputMessage,
+                assistantMessage:
+                  assistantContent,
+                controlledReply,
+                contextBefore,
+                contextAfter,
+                runtimeMetadata:
+                  projectTesterRuntimeMetadata(
+                    data,
+                    {
+                      roundTripMs,
+                      selectedProvincia:
+                        provincia,
+                    },
+                  ),
+              });
+          };
+
+        void captureTurn()
+          .then((result) => {
+            if (
+              result?.status !== "created" &&
+              result?.status !== "duplicate"
+            ) {
+              return;
+            }
+
+            const alreadyCaptured =
+              testerCapturedTurnsRef.current
+                .some(
+                  (turn) =>
+                    turn.turnId ===
+                    testerTurn.turnId,
+                );
+
+            if (alreadyCaptured) {
+              return;
+            }
+
+            testerCapturedTurnsRef.current.push({
+              turnId:
+                testerTurn.turnId,
+              sequence:
+                testerTurn.sequence,
+              inputMessage,
+              assistantMessage:
+                assistantContent,
+            });
+
+            setTesterCapturedTurnCount(
+              testerCapturedTurnsRef.current.length,
+            );
+          })
+          .catch((error) => {
+            console.warn(
+              "Tester Capture turn failed:",
+              error,
+            );
+          });
+      }
+
       setLastFailedRequest(null);
       return true;
     } catch (err) {
@@ -427,6 +613,7 @@ const HelpChat = () => {
         inputMessage,
         selectedProvincia: provincia,
         controlledReply,
+        testerTurn,
       });
 
       return false;
@@ -480,10 +667,23 @@ const HelpChat = () => {
 
     setInput("");
 
+    const testerTurn =
+      testerModeRef.current
+        ? {
+            turnId:
+              createTesterId(
+                "turn",
+              ),
+            sequence:
+              ++testerSequenceRef.current,
+          }
+        : null;
+
     requestQueueRef.current.push({
       inputMessage: trimmedInput,
       selectedProvincia,
       controlledReply,
+      testerTurn,
     });
 
     if (!lastFailedRequest) {
@@ -492,6 +692,11 @@ const HelpChat = () => {
   };
 
   const handleSend = () => {
+    if (testerFeedbackMode) {
+      void handleTesterFeedbackSubmit();
+      return;
+    }
+
     submitMessage(input);
   };
 
@@ -537,8 +742,17 @@ const HelpChat = () => {
     }
 
     setSpeechError(null);
-    speechBaseInputRef.current = input;
+    speechBaseInputRef.current =
+      testerFeedbackMode
+        ? testerFeedbackReason
+        : input;
+
     speechFinalTranscriptRef.current = "";
+
+    if (testerFeedbackMode) {
+      testerFeedbackReasonSourceRef.current =
+        "speech";
+    }
 
     const adapter = createSpeechRecognition({
       target: globalThis,
@@ -557,14 +771,23 @@ const HelpChat = () => {
             .join(" ");
         }
 
-        setInput(
+        const composed =
           composeSpeechInput(
             speechBaseInputRef.current,
             speechFinalTranscriptRef.current,
             interimTranscript,
-          ),
-        );
-        setErrorInput(false);
+          );
+
+        if (testerFeedbackMode) {
+          setTesterFeedbackReason(
+            composed,
+          );
+        } else {
+          setInput(
+            composed,
+          );
+          setErrorInput(false);
+        }
       },
       onError: (error) => {
         setIsListening(false);
@@ -599,6 +822,112 @@ const HelpChat = () => {
       setSpeechError(
         "No he podido iniciar el dictado. Puedes seguir escribiendo normalmente.",
       );
+    }
+  };
+
+  const handleTesterFeedbackStart = () => {
+    const capturedTurns =
+      testerCapturedTurnsRef.current;
+
+    const latestTurn =
+      capturedTurns[
+        capturedTurns.length - 1
+      ];
+
+    if (!latestTurn) {
+      return;
+    }
+
+    testerFeedbackSnapshotTurnIdRef.current =
+      latestTurn.turnId;
+
+    testerFeedbackReasonSourceRef.current =
+      "text";
+
+    setTesterFeedbackReason("");
+    setTesterFeedbackStatus(null);
+    setTesterFeedbackMode(true);
+    setErrorInput(false);
+    setSpeechError(null);
+  };
+
+  const handleTesterFeedbackCancel = () => {
+    speechRecognitionRef.current?.abort();
+    speechRecognitionRef.current = null;
+
+    setIsListening(false);
+    setTesterFeedbackReason("");
+    setTesterFeedbackMode(false);
+
+    testerFeedbackSnapshotTurnIdRef.current =
+      null;
+
+    testerFeedbackReasonSourceRef.current =
+      "text";
+  };
+
+  const handleTesterFeedbackSubmit = async () => {
+    const reason =
+      testerFeedbackReason.trim();
+
+    if (
+      !reason ||
+      !testerCaptureClientRef.current ||
+      !testerSessionIdRef.current
+    ) {
+      return;
+    }
+
+    const snapshotThroughTurnId =
+      testerFeedbackSnapshotTurnIdRef.current;
+
+    if (!snapshotThroughTurnId) {
+      return;
+    }
+
+    setTesterFeedbackSending(true);
+    setTesterFeedbackStatus(null);
+
+    try {
+      await testerCaptureClientRef.current
+        .createFeedback({
+          sessionId:
+            testerSessionIdRef.current,
+          snapshotThroughTurnId,
+          anchorTurnIds: [],
+          category:
+            "other",
+          reasonText:
+            reason,
+          expectedText:
+            null,
+          reasonSource:
+            testerFeedbackReasonSourceRef.current,
+        });
+
+      setTesterFeedbackReason("");
+      setTesterFeedbackMode(false);
+
+      testerFeedbackSnapshotTurnIdRef.current =
+        null;
+
+      testerFeedbackReasonSourceRef.current =
+        "text";
+
+      setTesterFeedbackStatus(
+        "Gracias. He guardado el problema para revisarlo.",
+      );
+    } catch (error) {
+      console.warn(
+        "Tester Capture feedback failed:",
+        error,
+      );
+
+      setTesterFeedbackStatus(
+        "No he podido guardar el problema. Puedes intentarlo de nuevo.",
+      );
+    } finally {
+      setTesterFeedbackSending(false);
     }
   };
 
@@ -1045,123 +1374,390 @@ const HelpChat = () => {
       <Box
         sx={{
           borderTop: 1,
-          borderColor: BRAND.border,
-          bgcolor: BRAND.header,
+          borderColor:
+            testerFeedbackMode
+              ? BRAND.coral
+              : BRAND.border,
+          bgcolor:
+            testerFeedbackMode
+              ? BRAND.plumSoft
+              : BRAND.header,
           px: { xs: 1, sm: 2 },
           py: { xs: 1, sm: 1.5 },
         }}
       >
-        <Stack
-          direction="row"
-          spacing={1.5}
-
+        <Box
           sx={{
-            alignItems: "flex-start",
-              width: "100%",
+            width: "100%",
             maxWidth: 800,
             mx: "auto",
+            ...(testerFeedbackMode
+              ? {
+                  border: 1,
+                  borderColor: BRAND.coral,
+                  borderRadius: 3,
+                  p: 1.25,
+                  bgcolor: BRAND.surface,
+                }
+              : {}),
           }}
         >
-          <TextField
-            fullWidth
-            id="mensaje"
-            name="mensaje"
-            label="Escribe qué necesitas"
-            value={input}
-            required
-            minRows={1}
-            maxRows={5}
-            multiline
-            error={errorInput}
-            helperText={
-              errorInput
-                ? "El mensaje no puede estar vacío"
-                : speechError || (isListening ? "Escuchando…" : "")
-            }
-            slotProps={{
-              formHelperText: {
-                role: "status",
-                "aria-live": "polite",
-              },
-            }}
-            placeholder="Cuéntanos qué necesitas…"
-            onChange={handleInput}
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                bgcolor: BRAND.surface,
-                borderRadius: 3,
-                "& fieldset": {
-                  borderColor: BRAND.border,
-                },
-                "&:hover fieldset": {
-                  borderColor: BRAND.plum,
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: BRAND.plum,
-                },
-              },
-            }}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" && !event.shiftKey) {
-                event.preventDefault();
-                handleSend();
-              }
-            }}
-          />
+          {testerFeedbackMode ? (
+            <>
+              <Stack
+                direction="row"
+                spacing={1}
+                sx={{
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  mb: 1,
+                }}
+              >
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: BRAND.plumDark,
+                    fontWeight: 700,
+                  }}
+                >
+                  ⚑ Estás reportando un problema
+                </Typography>
 
-          {speechRecognitionSupported && (
-            <IconButton
-              type="button"
-              onClick={handleToggleSpeech}
-              aria-label={isListening ? "Detener dictado" : "Dictar mensaje"}
-              aria-pressed={isListening}
+                <IconButton
+                  type="button"
+                  size="small"
+                  onClick={handleTesterFeedbackCancel}
+                  aria-label="Cancelar reporte de problema"
+                  sx={{
+                    width: 36,
+                    height: 36,
+                    flexShrink: 0,
+                    color: BRAND.coral,
+                    border: 1,
+                    borderColor: BRAND.border,
+                  }}
+                >
+                  ✕
+                </IconButton>
+              </Stack>
+
+              <Typography
+                variant="caption"
+                sx={{
+                  display: "block",
+                  mb: 1,
+                  color: BRAND.textSecondary,
+                }}
+              >
+                ¿Qué ha ocurrido? ¿Cuál es el error que has detectado?
+              </Typography>
+
+              <TextField
+                fullWidth
+                id="mensaje"
+                name="mensaje"
+                value={testerFeedbackReason}
+                slotProps={{
+                  htmlInput: {
+                    "aria-label":
+                      "¿Qué ha ocurrido? ¿Cuál es el error que has detectado?",
+                  },
+                  formHelperText: {
+                    role: "status",
+                    "aria-live": "polite",
+                  },
+                }}
+                required
+                minRows={3}
+                maxRows={7}
+                multiline
+                placeholder="Puedes explicarlo escribiendo o usando el micrófono…"
+                onChange={handleInput}
+                helperText={
+                  speechError ||
+                  (isListening
+                    ? "Escuchando…"
+                    : "")
+                }
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    bgcolor: BRAND.surface,
+                    borderRadius: 3,
+                    "& fieldset": {
+                      borderColor: BRAND.coral,
+                    },
+                  },
+                }}
+                onKeyDown={(event) => {
+                  if (
+                    event.key === "Enter" &&
+                    !event.shiftKey
+                  ) {
+                    event.preventDefault();
+                    handleSend();
+                  }
+                }}
+              />
+
+              <Stack
+                direction="row"
+                spacing={1}
+                sx={{
+                  mt: 1,
+                  alignItems: "center",
+                  justifyContent: "flex-end",
+                }}
+              >
+                {speechRecognitionSupported && (
+                  <IconButton
+                    type="button"
+                    onClick={handleToggleSpeech}
+                    aria-label={
+                      isListening
+                        ? "Detener dictado"
+                        : "Dictar reporte de problema"
+                    }
+                    aria-pressed={isListening}
+                    sx={{
+                      width: 46,
+                      height: 46,
+                      flexShrink: 0,
+                      color: BRAND.coral,
+                      border: 1,
+                      borderColor: BRAND.coral,
+                      bgcolor: BRAND.surface,
+                    }}
+                  >
+                    {isListening
+                      ? <StopIcon />
+                      : <MicIcon />}
+                  </IconButton>
+                )}
+
+                <Button
+                  type="submit"
+                  variant="contained"
+                  disabled={
+                    testerFeedbackSending ||
+                    !testerFeedbackReason.trim()
+                  }
+                  sx={{
+                    minHeight: 46,
+                    px: 2.25,
+                    borderRadius: 3,
+                    textTransform: "none",
+                    fontWeight: 700,
+                    bgcolor: BRAND.coral,
+                    "&:hover": {
+                      bgcolor: BRAND.coral,
+                    },
+                  }}
+                >
+                  {testerFeedbackSending
+                    ? "Guardando…"
+                    : "Enviar error"}
+                </Button>
+              </Stack>
+            </>
+          ) : (
+            <Stack
+              direction="row"
+              spacing={{
+                xs: 0.75,
+                sm: 1.5,
+              }}
               sx={{
-                mt: 0.25,
-                width: 52,
-                height: 52,
-                flexShrink: 0,
-                color: isListening ? BRAND.coral : BRAND.plum,
-                border: 1,
-                borderColor: isListening ? BRAND.coral : BRAND.border,
-                bgcolor: BRAND.surface,
-                "&:hover": {
-                  bgcolor: BRAND.plumSoft,
-                },
-                "&:focus-visible": {
-                  outline: `3px solid ${BRAND.yellow}`,
-                  outlineOffset: 2,
-                },
+                alignItems: "flex-start",
+                width: "100%",
               }}
             >
-              {isListening ? <StopIcon /> : <MicIcon />}
-            </IconButton>
-          )}
+              <Box
+                sx={{
+                  position: "relative",
+                  flex: 1,
+                  minWidth: 0,
+                }}
+              >
+                {testerModeRef.current && (
+                  <IconButton
+                    type="button"
+                    disabled={
+                      testerCapturedTurnCount === 0
+                    }
+                    onClick={handleTesterFeedbackStart}
+                    aria-label="Reportar un problema en esta conversación"
+                    aria-pressed={false}
+                    size="small"
+                    sx={{
+                      position: "absolute",
+                      left: 8,
+                      top: 8,
+                      zIndex: 2,
+                      width: 32,
+                      height: 32,
+                      color: BRAND.coral,
+                      bgcolor: BRAND.surface,
+                      border: 1,
+                      borderColor: BRAND.border,
+                      "&:hover": {
+                        bgcolor: BRAND.plumSoft,
+                      },
+                    }}
+                  >
+                    ⚑
+                  </IconButton>
+                )}
 
-          <Button
-            type="submit"
-            variant="contained"
-            disabled={!input.trim()}
+                <TextField
+                  fullWidth
+                id="mensaje"
+                name="mensaje"
+                label="Escribe qué necesitas"
+                value={input}
+                required
+                minRows={1}
+                maxRows={5}
+                multiline
+                error={errorInput}
+                helperText={
+                  errorInput
+                    ? "El mensaje no puede estar vacío"
+                    : speechError ||
+                      (isListening
+                        ? "Escuchando…"
+                        : "")
+                }
+                slotProps={{
+                  formHelperText: {
+                    role: "status",
+                    "aria-live": "polite",
+                  },
+                }}
+                placeholder="Cuéntanos qué necesitas…"
+                onChange={handleInput}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    bgcolor: BRAND.surface,
+                    borderRadius: 3,
+                    ...(testerModeRef.current
+                      ? {
+                          pl: 5,
+                        }
+                      : {}),
+                    "& fieldset": {
+                      borderColor: BRAND.border,
+                    },
+                  },
+                }}
+                onKeyDown={(event) => {
+                  if (
+                    event.key === "Enter" &&
+                    !event.shiftKey
+                  ) {
+                    event.preventDefault();
+                    handleSend();
+                  }
+                }}
+                />
+              </Box>
+
+              {speechRecognitionSupported && (
+                <IconButton
+                  type="button"
+                  onClick={handleToggleSpeech}
+                  aria-label={
+                    isListening
+                      ? "Detener dictado"
+                      : "Dictar mensaje"
+                  }
+                  aria-pressed={isListening}
+                  sx={{
+                    mt: 0.25,
+                    width: {
+                      xs: 44,
+                      sm: 52,
+                    },
+                    height: {
+                      xs: 44,
+                      sm: 52,
+                    },
+                    flexShrink: 0,
+                    color:
+                      isListening
+                        ? BRAND.coral
+                        : BRAND.plum,
+                    border: 1,
+                    borderColor:
+                      isListening
+                        ? BRAND.coral
+                        : BRAND.border,
+                    bgcolor: BRAND.surface,
+                  }}
+                >
+                  {isListening
+                    ? <StopIcon />
+                    : <MicIcon />}
+                </IconButton>
+              )}
+
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={!input.trim()}
+                sx={{
+                  minHeight: {
+                    xs: 44,
+                    sm: 56,
+                  },
+                  minWidth: {
+                    xs: 68,
+                    sm: 96,
+                  },
+                  px: {
+                    xs: 1,
+                    sm: 2.5,
+                  },
+                  borderRadius: 3,
+                  textTransform: "none",
+                  fontWeight: 700,
+                  bgcolor: BRAND.plum,
+                  "&:hover": {
+                    bgcolor: BRAND.plumDark,
+                  },
+                }}
+              >
+                Enviar
+              </Button>
+            </Stack>
+          )}
+        </Box>
+      </Box>
+
+      {testerModeRef.current &&
+        testerFeedbackStatus && (
+          <Typography
+            role="status"
+            aria-live="polite"
+            variant="caption"
             sx={{
-              minHeight: 56,
-              minWidth: { xs: 76, sm: 96 },
-              px: { xs: 1.5, sm: 2.5 },
-              borderRadius: 3,
-              textTransform: "none",
-              fontWeight: 700,
-              bgcolor: BRAND.plum,
-              "&:hover": {
-                bgcolor: BRAND.plumDark,
-              },
-              "&:focus-visible": {
-                outline: `3px solid ${BRAND.yellow}`,
-                outlineOffset: 2,
-              },
+              position: "fixed",
+              right: 16,
+              bottom: 90,
+              zIndex: 1400,
+              px: 2,
+              py: 1,
+              borderRadius: 2,
+              bgcolor: BRAND.surface,
+              color: BRAND.text,
+              border: 1,
+              borderColor: BRAND.border,
+              boxShadow: 2,
+              maxWidth: 360,
             }}
           >
-            Enviar
-          </Button>
-        </Stack>
-      </Box>
+            {testerFeedbackStatus}
+          </Typography>
+        )}
     </Box>
   );
 };
