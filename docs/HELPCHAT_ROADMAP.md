@@ -239,15 +239,36 @@ Incluye:
 - detección de conflictos;
 - validación de anchors.
 
+### ✅ Persistencia operativa
+
+- backup PostgreSQL previo validado;
+- esquema 007 aplicado;
+- constraints verificadas;
+- repository probado contra PostgreSQL real.
+
+### ✅ API Tester Capture V1
+
+Endpoints operativos:
+
+- `POST /api/v1/helpchat/tester/sessions`;
+- `POST /api/v1/helpchat/tester/turns`;
+- `POST /api/v1/helpchat/tester/feedback`.
+
+Verificado:
+
+- persistencia real;
+- retry idempotente;
+- conflicto de `turnId`;
+- validación de feedback;
+- PostgreSQL real.
+
 ### 🟡 En curso
 
-- backup previo a migración;
-- aplicar esquema 007;
-- probar repository contra PostgreSQL real.
+- integración de `sessionId` y `turnId` en frontend;
+- captura automática asíncrona de conversaciones.
 
 ### ⬜ Pendiente
 
-- endpoints de captura;
 - sessionId/turnId frontend;
 - persistencia asíncrona/no bloqueante;
 - modo tester;

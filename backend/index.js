@@ -50,6 +50,12 @@ import {
 import {
   resolveHelpchatLocationRequirement,
 } from "./helpchat/location-requirement-v1.js";
+import {
+  createTesterCaptureRepositoryV1,
+} from "./helpchat/tester-capture-repository-v1.js";
+import {
+  createTesterCaptureServiceV1,
+} from "./helpchat/tester-capture-service-v1.js";
 
 import {
   applyClarificationStateV2,
@@ -372,6 +378,22 @@ console.log(
 );
 
 app.locals.tagSaving = tagSaving;
+
+const testerCaptureRepository =
+    createTesterCaptureRepositoryV1({
+        pool,
+        schemaName:
+            SCHEMA_NAME,
+    });
+
+const testerCaptureService =
+    createTesterCaptureServiceV1({
+        repository:
+            testerCaptureRepository,
+    });
+
+app.locals.testerCaptureService =
+    testerCaptureService;
 
 const helpchatEmbeddingService =
     createHelpchatEmbeddingService({
@@ -1108,6 +1130,139 @@ app.get('/api/ready', async (req, res) => {
         });
     }
 });
+
+function testerCaptureErrorResponse(
+    error,
+    res
+) {
+    const message =
+        String(
+            error?.message ||
+            ""
+        );
+
+    if (
+        message.includes(
+            "obligatorio"
+        ) ||
+        message.includes(
+            "sequence"
+        ) ||
+        message ===
+            "UNKNOWN_FEEDBACK_TURN"
+    ) {
+        return res.status(400).json({
+            error:
+                "Los datos de captura no son válidos.",
+            code:
+                message ===
+                "UNKNOWN_FEEDBACK_TURN"
+                    ? "UNKNOWN_FEEDBACK_TURN"
+                    : "INVALID_TESTER_CAPTURE",
+        });
+    }
+
+    if (
+        message ===
+        "TURN_ID_CONFLICT"
+    ) {
+        return res.status(409).json({
+            error:
+                "El turno ya existe con datos diferentes.",
+            code:
+                "TURN_ID_CONFLICT",
+        });
+    }
+
+    console.error(
+        "Tester Capture error:",
+        error
+    );
+
+    return res.status(500).json({
+        error:
+            "No se pudo registrar la captura de prueba.",
+        code:
+            "TESTER_CAPTURE_ERROR",
+    });
+}
+
+app.post(
+    '/api/v1/helpchat/tester/sessions',
+    helpchatRateLimit,
+    async (req, res) => {
+        try {
+            const result =
+                await app.locals
+                    .testerCaptureService
+                    .createSession(
+                        req.body
+                    );
+
+            return res
+                .status(201)
+                .json(result);
+        } catch (error) {
+            return testerCaptureErrorResponse(
+                error,
+                res
+            );
+        }
+    }
+);
+
+app.post(
+    '/api/v1/helpchat/tester/turns',
+    helpchatRateLimit,
+    async (req, res) => {
+        try {
+            const result =
+                await app.locals
+                    .testerCaptureService
+                    .appendTurn(
+                        req.body
+                    );
+
+            return res
+                .status(
+                    result.status ===
+                        "duplicate"
+                        ? 200
+                        : 201
+                )
+                .json(result);
+        } catch (error) {
+            return testerCaptureErrorResponse(
+                error,
+                res
+            );
+        }
+    }
+);
+
+app.post(
+    '/api/v1/helpchat/tester/feedback',
+    helpchatRateLimit,
+    async (req, res) => {
+        try {
+            const result =
+                await app.locals
+                    .testerCaptureService
+                    .createFeedback(
+                        req.body
+                    );
+
+            return res
+                .status(201)
+                .json(result);
+        } catch (error) {
+            return testerCaptureErrorResponse(
+                error,
+                res
+            );
+        }
+    }
+);
 
 app.post(
     '/api/v1/helpchat/iacall',
