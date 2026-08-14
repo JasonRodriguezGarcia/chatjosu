@@ -189,6 +189,34 @@ Stop application containers:
 The PostgreSQL container is managed by its separate Compose project and is not
 removed by the HelpChat application Compose lifecycle.
 
+## Development deployment workflow
+
+HelpChat is deployed from the Docker image. A successful host-side Vite build
+or test run does not update the running application by itself.
+
+After any frontend or backend code change that must be validated in the
+running/public application:
+
+1. Run the relevant automated tests.
+2. Run the frontend/backend build checks required by the change.
+3. Rebuild the application image:
+
+       docker compose -f compose.helpchat.yml build backend
+
+4. Recreate the application containers:
+
+       docker compose -f compose.helpchat.yml up -d --force-recreate backend feedback-analyst
+
+5. Wait until `copilot-ong-backend-docker` reports `healthy`.
+6. Verify the application locally through `127.0.0.1:5174`.
+7. Verify the public Cloudflare endpoint without restarting the tunnel.
+
+The deployed frontend is the `frontend/dist` generated during the Docker image
+build. The host-side `frontend/dist` directory is not the deployed artifact.
+
+Cloudflare remains outside Docker and must not be restarted merely to deploy a
+new HelpChat image.
+
 ## Health checks
 
 Local frontend:
