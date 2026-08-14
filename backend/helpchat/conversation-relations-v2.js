@@ -129,6 +129,36 @@ function usesContextualPronoun(
   );
 }
 
+function impliesGenericHelpRequest(
+  inputMessage,
+) {
+  const text =
+    normalizeText(inputMessage);
+
+  return (
+    /\b(?:necesito|necesitamos|busco|buscamos|quiero|queremos)\b/
+      .test(text) &&
+    /\b(?:ayuda|orientacion|apoyo|asesoramiento)\b/
+      .test(text)
+  );
+}
+
+function impliesUnspecifiedThirdPerson(
+  inputMessage,
+) {
+  const text =
+    normalizeText(inputMessage);
+
+  return (
+    /\bpara\s+(?:otra|otra persona|alguien)\b/
+      .test(text) ||
+    /\b(?:un|una)\s+familiar\b/
+      .test(text) ||
+    /\b(?:otra persona|alguien cercano)\b/
+      .test(text)
+  );
+}
+
 function safeContext(value) {
   return (
     normalizeConversationContextV2(
@@ -400,11 +430,62 @@ export function resolveConversationSubjectV2({
     };
   }
 
+  if (
+    impliesUnspecifiedThirdPerson(
+      inputMessage,
+    )
+  ) {
+    return {
+      status: "unresolved",
+      context,
+      person: null,
+      relationship: null,
+      source:
+        "unspecified_third_person",
+    };
+  }
+
+  if (
+    !impliesGenericHelpRequest(
+      inputMessage,
+    )
+  ) {
+    return {
+      status: "unresolved",
+      context,
+      person: null,
+      relationship: null,
+      source: null,
+    };
+  }
+
+  const self =
+    context.people.find(
+      (person) =>
+        person.id === "self",
+    ) || null;
+
+  if (!self) {
+    return {
+      status: "unresolved",
+      context,
+      person: null,
+      relationship: null,
+      source: null,
+    };
+  }
+
+  context =
+    setCurrentFocus(
+      context,
+      "self",
+    );
+
   return {
-    status: "unresolved",
+    status: "resolved",
     context,
-    person: null,
-    relationship: null,
-    source: null,
+    person: self,
+    relationship: "self",
+    source: "implicit_self",
   };
 }

@@ -338,3 +338,81 @@ describe(
     );
   },
 );
+
+it(
+  "defaults a generic help request to self when no third person is implied",
+  () => {
+    const result =
+      resolveConversationSubjectV2({
+        conversationContext:
+          createEmptyConversationContextV2(),
+        inputMessage:
+          "Busco orientación social",
+      });
+
+    expect(
+      result.status,
+    ).toBe("resolved");
+
+    expect(
+      result.person,
+    ).toMatchObject({
+      id: "self",
+      relationship: "self",
+    });
+
+    expect(
+      result.context.currentFocus,
+    ).toBe("self");
+
+    expect(
+      result.source,
+    ).toBe("implicit_self");
+  },
+);
+
+it(
+  "does not default a generic third-person request to self",
+  () => {
+    const result =
+      resolveConversationSubjectV2({
+        conversationContext:
+          createEmptyConversationContextV2(),
+        inputMessage:
+          "Busco ayuda para otra persona",
+      });
+
+    expect(
+      result.status,
+    ).toBe("unresolved");
+
+    expect(
+      result.person,
+    ).toBeNull();
+
+    expect(
+      result.context.currentFocus,
+    ).toBeNull();
+  },
+);
+
+it(
+  "does not default an unspecified family member to self",
+  () => {
+    const result =
+      resolveConversationSubjectV2({
+        conversationContext:
+          createEmptyConversationContextV2(),
+        inputMessage:
+          "Necesito ayuda para un familiar",
+      });
+
+    expect(
+      result.status,
+    ).toBe("unresolved");
+
+    expect(
+      result.person,
+    ).toBeNull();
+  },
+);
