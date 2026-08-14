@@ -1765,3 +1765,56 @@ test(
     );
   },
 );
+
+test(
+  "necesito orientación pide need_type sin embedding",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+
+            throw new Error(
+              "embedding no debería ejecutarse",
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Necesito orientación",
+        conversationContext:
+          null,
+      });
+
+    assert.equal(
+      semanticCalls,
+      0,
+    );
+
+    assert.equal(
+      result.status,
+      "needs_clarification",
+    );
+
+    assert.equal(
+      result.tag,
+      null,
+    );
+
+    assert.equal(
+      result.provider,
+      "rule",
+    );
+
+    assert.equal(
+      result.missingDimension,
+      "need_type",
+    );
+  },
+);

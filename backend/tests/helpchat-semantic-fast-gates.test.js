@@ -208,3 +208,16 @@ test(
     );
   },
 );
+
+test(
+  "necesito orientación es un starter genérico insuficiente",
+  () => {
+    assert.equal(
+      isClearlyInsufficient(
+        "Necesito orientación",
+        null,
+      ),
+      true,
+    );
+  },
+);
