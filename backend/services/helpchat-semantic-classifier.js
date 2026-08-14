@@ -120,6 +120,7 @@ export function createHelpchatSemanticClassifier({
   async function classify({
     inputMessage,
     conversationContext,
+    allowedTagIds,
   }) {
     const startedAt =
       performance.now();
@@ -128,6 +129,60 @@ export function createHelpchatSemanticClassifier({
       normalizeConversationContextV1(
         conversationContext
       );
+
+    const bounded =
+      Array.isArray(
+        allowedTagIds,
+      );
+
+    const allowed =
+      bounded
+        ? new Set(
+            allowedTagIds
+              .map(Number)
+              .filter(
+                Number.isFinite,
+              ),
+          )
+        : null;
+
+    if (
+      bounded &&
+      allowed.size === 0
+    ) {
+      return {
+        status:
+          "needs_clarification",
+        tag: null,
+        context,
+        needsClarification: true,
+        clarificationQuestion:
+          "¿Puedes contarme un poco más sobre lo que está ocurriendo?",
+        provider:
+          "embedding",
+        model:
+          embeddingService.model,
+        diagnostics: {
+          top1: null,
+          top2: null,
+          candidates: [],
+          margin: 0,
+          minimumScore,
+          minimumMargin,
+          bounded: true,
+          allowedTagIds: [],
+          reason:
+            "empty_allowed_catalog",
+        },
+        durationMs:
+          Math.round(
+            (
+              performance.now() -
+              startedAt
+            ) * 10
+          ) / 10,
+      };
+    }
 
     const semanticInput =
       buildSemanticTurnInput({
@@ -148,10 +203,22 @@ export function createHelpchatSemanticClassifier({
     const queryVector =
       queryResult.vectors[0];
 
+    const eligiblePrototypeVectors =
+      bounded
+        ? prototypeVectors.filter(
+            (entry) =>
+              allowed.has(
+                Number(
+                  entry.tagId,
+                ),
+              ),
+          )
+        : prototypeVectors;
+
     const candidates =
       topCandidates(
         queryVector,
-        prototypeVectors
+        eligiblePrototypeVectors
       );
 
     const top1 =
@@ -221,6 +288,13 @@ export function createHelpchatSemanticClassifier({
         margin,
         minimumScore,
         minimumMargin,
+        bounded,
+        allowedTagIds:
+          bounded
+            ? Array.from(
+                allowed,
+              )
+            : null,
       },
 
       durationMs:
