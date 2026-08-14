@@ -502,6 +502,62 @@ let helpchatLocalLlmState = {
         null,
 };
 
+async function inspectHelpchatLocalLlmState() {
+    const inspection =
+        await helpchatOllamaReadiness.inspectModel(
+            HELPCHAT_LOCAL_LLM_MODEL
+        );
+
+    if (
+        inspection.state === "ready"
+    ) {
+        return {
+            ...helpchatLocalLlmState,
+            state: "ready",
+            installed: true,
+            loaded: true,
+            error: null,
+        };
+    }
+
+    if (
+        inspection.state === "cold"
+    ) {
+        return {
+            ...helpchatLocalLlmState,
+            state: "cold",
+            installed: true,
+            loaded: false,
+            error: null,
+        };
+    }
+
+    if (
+        inspection.state === "missing"
+    ) {
+        return {
+            ...helpchatLocalLlmState,
+            state: "missing",
+            installed: false,
+            loaded: false,
+            error:
+                "MODEL_NOT_INSTALLED",
+        };
+    }
+
+    return {
+        ...helpchatLocalLlmState,
+        state: "degraded",
+        installed:
+            inspection.installed,
+        loaded:
+            inspection.loaded,
+        error:
+            inspection.error ||
+            "OLLAMA_UNAVAILABLE",
+    };
+}
+
 async function warmHelpchatLocalLlm() {
     const startedAt =
         performance.now();
@@ -980,6 +1036,9 @@ app.get('/api/ready', async (req, res) => {
     try {
         await pool.query("SELECT 1");
 
+        const currentLocalLlmState =
+            await inspectHelpchatLocalLlmState();
+
         return res.json({
             status: "ready",
             database: "ok",
@@ -995,7 +1054,7 @@ app.get('/api/ready', async (req, res) => {
             semanticWarmupMs:
                 helpchatSemanticWarmupMs,
             localLlm:
-                helpchatLocalLlmState,
+                currentLocalLlmState,
         });
     } catch (error) {
         console.error(
