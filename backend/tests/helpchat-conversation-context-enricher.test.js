@@ -135,6 +135,10 @@ const PROVINCES = [
     province_key: "VIZCAYA",
     name: "Bizkaia",
   },
+  {
+    province_key: "A CORUNA",
+    name: "Coruña, A",
+  },
 ];
 
 test(
@@ -179,6 +183,39 @@ test(
     assert.equal(
       matcher("Vizcaya"),
       "Bizkaia"
+    );
+  }
+);
+
+test(
+  "no interpreta artículos o preposiciones como territorio",
+  async () => {
+    const {
+      createProvinceMatcher,
+    } = await import(
+      "../helpchat/conversation-context-enricher-v1.js"
+    );
+
+    const matcher =
+      createProvinceMatcher(
+        PROVINCES
+      );
+
+    assert.equal(
+      matcher("A Coruña"),
+      "Coruña, A"
+    );
+
+    assert.equal(
+      matcher("Coruña"),
+      "Coruña, A"
+    );
+
+    assert.equal(
+      matcher(
+        "a mi hermano le han detectado una mancha en el pulmón"
+      ),
+      null
     );
   }
 );

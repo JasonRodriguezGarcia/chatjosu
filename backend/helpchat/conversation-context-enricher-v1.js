@@ -117,7 +117,19 @@ function provinceAliases(province) {
       for (
         const part of parts
       ) {
-        aliases.add(part);
+        /*
+         * Evita convertir partículas
+         * administrativas como "A" en
+         * aliases territoriales globales.
+         *
+         * "Coruña, A" puede aportar
+         * "Coruña", pero nunca "A".
+         */
+        if (
+          part.length >= 3
+        ) {
+          aliases.add(part);
+        }
       }
     }
   };
