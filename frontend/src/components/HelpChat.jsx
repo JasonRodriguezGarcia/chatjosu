@@ -1,9 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
-import MicIcon from "@mui/icons-material/Mic";
-import StopIcon from "@mui/icons-material/Stop";
 import AssociationCard from "./AssociationCard";
 import HelpChatComposer from "./HelpChatComposer";
+import TesterFeedbackComposer from "./TesterFeedbackComposer";
 import { HELPCHAT_BRAND as BRAND } from "./helpChatBrand";
 import { normalizeConversationContext } from "../helpchat/conversationContext";
 import {
@@ -29,7 +28,6 @@ import {
   MenuItem,
   Select,
   Stack,
-  TextField,
   Toolbar,
   Typography,
 } from "@mui/material";
@@ -1389,162 +1387,23 @@ const HelpChat = () => {
           }}
         >
           {testerFeedbackMode ? (
-            <>
-              <Stack
-                direction="row"
-                spacing={1}
-                sx={{
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  mb: 1,
-                }}
-              >
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: BRAND.plumDark,
-                    fontWeight: 700,
-                  }}
-                >
-                  ⚑ Estás reportando un problema
-                </Typography>
-
-                <IconButton
-                  type="button"
-                  size="small"
-                  onClick={handleTesterFeedbackCancel}
-                  aria-label="Cancelar reporte de problema"
-                  sx={{
-                    width: 36,
-                    height: 36,
-                    flexShrink: 0,
-                    color: BRAND.coral,
-                    border: 1,
-                    borderColor: BRAND.border,
-                  }}
-                >
-                  ✕
-                </IconButton>
-              </Stack>
-
-              <Typography
-                variant="caption"
-                sx={{
-                  display: "block",
-                  mb: 1,
-                  color: BRAND.textSecondary,
-                }}
-              >
-                ¿Qué ha ocurrido? ¿Cuál es el error que has detectado?
-              </Typography>
-
-              <TextField
-                fullWidth
-                id="mensaje"
-                name="mensaje"
-                value={testerFeedbackReason}
-                slotProps={{
-                  htmlInput: {
-                    "aria-label":
-                      "¿Qué ha ocurrido? ¿Cuál es el error que has detectado?",
-                  },
-                  formHelperText: {
-                    role: "status",
-                    "aria-live": "polite",
-                  },
-                }}
-                required
-                minRows={3}
-                maxRows={7}
-                multiline
-                placeholder="Puedes explicarlo escribiendo o usando el micrófono…"
-                onChange={handleInput}
-                helperText={
-                  speechError ||
-                  (isListening
-                    ? "Escuchando…"
-                    : "")
-                }
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    bgcolor: BRAND.surface,
-                    borderRadius: 3,
-                    "& fieldset": {
-                      borderColor: BRAND.coral,
-                    },
-                  },
-                }}
-                onKeyDown={(event) => {
-                  if (
-                    event.key === "Enter" &&
-                    !event.shiftKey
-                  ) {
-                    event.preventDefault();
-                    handleSend();
-                  }
-                }}
-              />
-
-              <Stack
-                direction="row"
-                spacing={1}
-                sx={{
-                  mt: 1,
-                  alignItems: "center",
-                  justifyContent: "flex-end",
-                }}
-              >
-                {speechRecognitionSupported && (
-                  <IconButton
-                    type="button"
-                    onClick={handleToggleSpeech}
-                    aria-label={
-                      isListening
-                        ? "Detener dictado"
-                        : "Dictar reporte de problema"
-                    }
-                    aria-pressed={isListening}
-                    sx={{
-                      width: 46,
-                      height: 46,
-                      flexShrink: 0,
-                      color: BRAND.coral,
-                      border: 1,
-                      borderColor: BRAND.coral,
-                      bgcolor: BRAND.surface,
-                    }}
-                  >
-                    {isListening
-                      ? <StopIcon />
-                      : <MicIcon />}
-                  </IconButton>
-                )}
-
-                <Button
-                  type="submit"
-                  variant="contained"
-                  disabled={
-                    testerFeedbackSending ||
-                    !testerFeedbackReason.trim()
-                  }
-                  sx={{
-                    minHeight: 46,
-                    px: 2.25,
-                    borderRadius: 3,
-                    textTransform: "none",
-                    fontWeight: 700,
-                    bgcolor: BRAND.coral,
-                    "&:hover": {
-                      bgcolor: BRAND.coral,
-                    },
-                  }}
-                >
-                  {testerFeedbackSending
-                    ? "Guardando…"
-                    : "Enviar error"}
-                </Button>
-              </Stack>
-            </>
+            <TesterFeedbackComposer
+              reason={testerFeedbackReason}
+              sending={testerFeedbackSending}
+              speechError={speechError}
+              isListening={isListening}
+              speechRecognitionSupported={
+                speechRecognitionSupported
+              }
+              onChange={handleInput}
+              onSend={handleSend}
+              onCancel={
+                handleTesterFeedbackCancel
+              }
+              onToggleSpeech={
+                handleToggleSpeech
+              }
+            />
           ) : (
             <HelpChatComposer
               input={input}
