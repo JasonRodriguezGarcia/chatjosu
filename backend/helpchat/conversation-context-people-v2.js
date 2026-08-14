@@ -398,6 +398,50 @@ export function replacePersonFact(
   return context;
 }
 
+export function setPersonResolvedDimension(
+  value,
+  personId,
+  dimension,
+  resolvedValue,
+) {
+  const context =
+    cloneContext(value);
+
+  const person =
+    context &&
+    getPerson(
+      context,
+      personId,
+    );
+
+  if (!person) {
+    return context;
+  }
+
+  const candidate =
+    normalizeConversationContextV2({
+      ...context,
+      people:
+        context.people.map(
+          (entry) =>
+            entry.id === personId
+              ? {
+                  ...entry,
+                  resolvedDimensions: {
+                    ...(entry
+                      .resolvedDimensions ||
+                      {}),
+                    [dimension]:
+                      resolvedValue,
+                  },
+                }
+              : entry,
+        ),
+    });
+
+  return candidate || context;
+}
+
 export function addPersonConstraint(
   value,
   personId,

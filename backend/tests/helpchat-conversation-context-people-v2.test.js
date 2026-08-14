@@ -14,6 +14,7 @@ import {
   removePersonNeed,
   replacePersonFact,
   setCurrentFocus,
+  setPersonResolvedDimension,
 } from "../helpchat/conversation-context-people-v2.js";
 
 import {
@@ -359,6 +360,45 @@ describe(
         ).toEqual([
           "vive solo",
         ]);
+      },
+    );
+
+    it(
+      "sets a resolved dimension only on the target person",
+      () => {
+        const result =
+          setPersonResolvedDimension(
+            contextWithPeople(),
+            "person_1",
+            "diagnosis_status",
+            "not_confirmed",
+          );
+
+        const brother =
+          result.people.find(
+            (person) =>
+              person.id ===
+              "person_1",
+          );
+
+        const brotherInLaw =
+          result.people.find(
+            (person) =>
+              person.id ===
+              "person_2",
+          );
+
+        expect(
+          brother.resolvedDimensions,
+        ).toEqual({
+          diagnosis_status:
+            "not_confirmed",
+        });
+
+        expect(
+          brotherInLaw
+            .resolvedDimensions,
+        ).toBeUndefined();
       },
     );
 

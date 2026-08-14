@@ -13,6 +13,16 @@ const MAX_ITEM_LENGTH = 180;
 const MAX_RESOURCES = 20;
 const MAX_PERSON_ID = 64;
 
+const RESOLVED_DIMENSION_VALUES =
+  Object.freeze({
+    diagnosis_status:
+      new Set([
+        "confirmed",
+        "not_confirmed",
+        "uncertain",
+      ]),
+  });
+
 function cleanString(
   value,
   maxLength = MAX_ITEM_LENGTH,
@@ -140,6 +150,50 @@ function normalizePendingClarification(
   };
 }
 
+function normalizeResolvedDimensions(
+  value,
+) {
+  if (
+    !value ||
+    typeof value !== "object" ||
+    Array.isArray(value)
+  ) {
+    return null;
+  }
+
+  const output = {};
+
+  for (
+    const [
+      dimension,
+      allowedValues,
+    ]
+    of Object.entries(
+      RESOLVED_DIMENSION_VALUES,
+    )
+  ) {
+    const resolvedValue =
+      cleanString(
+        value[dimension],
+        80,
+      );
+
+    if (
+      resolvedValue &&
+      allowedValues.has(
+        resolvedValue,
+      )
+    ) {
+      output[dimension] =
+        resolvedValue;
+    }
+  }
+
+  return Object.keys(output).length > 0
+    ? output
+    : null;
+}
+
 function emptySelf() {
   return {
     id: "self",
@@ -186,6 +240,11 @@ function normalizePerson(value) {
     return null;
   }
 
+  const resolvedDimensions =
+    normalizeResolvedDimensions(
+      value.resolvedDimensions,
+    );
+
   return {
     id,
     relationship,
@@ -198,6 +257,11 @@ function normalizePerson(value) {
     constraints: cleanStringArray(
       value.constraints,
     ),
+    ...(resolvedDimensions
+      ? {
+          resolvedDimensions,
+        }
+      : {}),
   };
 }
 

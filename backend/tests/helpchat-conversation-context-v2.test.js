@@ -134,6 +134,108 @@ describe(
     );
 
     it(
+      "normalizes supported resolved dimensions per person",
+      () => {
+        const result =
+          normalizeConversationContextV2({
+            version: 2,
+            people: [
+              {
+                id: "person_1",
+                relationship:
+                  "hermano",
+                resolvedDimensions: {
+                  diagnosis_status:
+                    "not_confirmed",
+                  unsupported_dimension:
+                    "must disappear",
+                },
+              },
+              {
+                id: "person_2",
+                relationship:
+                  "madre",
+                resolvedDimensions: {
+                  diagnosis_status:
+                    "invalid_value",
+                },
+              },
+            ],
+          });
+
+        const brother =
+          result.people.find(
+            (person) =>
+              person.id ===
+              "person_1",
+          );
+
+        const mother =
+          result.people.find(
+            (person) =>
+              person.id ===
+              "person_2",
+          );
+
+        expect(
+          brother.resolvedDimensions,
+        ).toEqual({
+          diagnosis_status:
+            "not_confirmed",
+        });
+
+        expect(
+          mother.resolvedDimensions,
+        ).toBeUndefined();
+      },
+    );
+
+    it(
+      "keeps resolved dimensions isolated between people",
+      () => {
+        const result =
+          normalizeConversationContextV2({
+            version: 2,
+            people: [
+              {
+                id: "person_1",
+                relationship:
+                  "hermano",
+                resolvedDimensions: {
+                  diagnosis_status:
+                    "not_confirmed",
+                },
+              },
+              {
+                id: "person_2",
+                relationship:
+                  "madre",
+              },
+            ],
+          });
+
+        expect(
+          result.people.find(
+            (person) =>
+              person.id ===
+              "person_1",
+          ).resolvedDimensions,
+        ).toEqual({
+          diagnosis_status:
+            "not_confirmed",
+        });
+
+        expect(
+          result.people.find(
+            (person) =>
+              person.id ===
+              "person_2",
+          ).resolvedDimensions,
+        ).toBeUndefined();
+      },
+    );
+
+    it(
       "allows two people with the same relationship when ids differ",
       () => {
         const result =
