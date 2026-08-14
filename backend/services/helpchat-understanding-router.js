@@ -37,6 +37,10 @@ import {
 } from "../helpchat/health-statement-authority-v1.js";
 
 import {
+  interpretHealthClarificationAnswerV1,
+} from "../helpchat/health-clarification-answer-v1.js";
+
+import {
   buildOpenClarificationCandidatesV1,
 } from "../helpchat/open-clarification-candidates-v1.js";
 
@@ -583,6 +587,75 @@ export function createHelpchatUnderstandingRouter({
         openNodeId ===
           "health_detail"
       ) {
+        const diagnosisAnswer =
+          interpretHealthClarificationAnswerV1({
+            dimension:
+              "diagnosis_status",
+            inputMessage,
+          });
+
+        const canResolveDiagnosisStatus =
+          pendingClarification
+            ?.dimension ===
+            "diagnosis_status" ||
+          (
+            !pendingClarification
+              ?.dimension &&
+            pendingClarification
+              ?.node ===
+              "health_detail"
+          );
+
+        if (
+          canResolveDiagnosisStatus &&
+          diagnosisAnswer.status ===
+            "resolved"
+        ) {
+          return clarificationResult({
+            context,
+            missingDimension:
+              "goal",
+            provider:
+              "conversation_policy",
+            model:
+              "conversation-policy-v1",
+            durationMs:
+              Math.round(
+                (
+                  performance.now() -
+                    startedAt
+                ) * 10
+              ) / 10,
+            diagnostics: {
+              bounded: true,
+              reason:
+                "diagnosis_status_resolved",
+              resolvedDimension: {
+                dimension:
+                  diagnosisAnswer
+                    .dimension,
+                value:
+                  diagnosisAnswer
+                    .value,
+              },
+            },
+            clarificationTransition: {
+              sourceNode:
+                openNodeId,
+              action: {
+                type:
+                  "resolve_dimension",
+                dimension:
+                  diagnosisAnswer
+                    .dimension,
+                value:
+                  diagnosisAnswer
+                    .value,
+              },
+            },
+          });
+        }
+
         const healthAuthority =
           assessHealthStatementAuthorityV1(
             inputMessage
@@ -618,6 +691,14 @@ export function createHelpchatUnderstandingRouter({
             }),
             clarificationQuestion:
               "¿Os han indicado ya alguna enfermedad o diagnóstico, o de momento estáis observando estos síntomas?",
+            clarificationState: {
+              node:
+                "health_detail",
+              mode:
+                "free_text",
+              dimension:
+                "diagnosis_status",
+            },
           };
         }
       }

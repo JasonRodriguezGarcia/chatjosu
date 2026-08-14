@@ -2500,6 +2500,106 @@ test(
       result.clarificationQuestion,
       /enfermedad|diagnóstico|síntomas/i,
     );
+
+    assert.deepEqual(
+      result.clarificationState,
+      {
+        node:
+          "health_detail",
+        mode:
+          "free_text",
+        dimension:
+          "diagnosis_status",
+      },
+    );
+  },
+);
+
+test(
+  "answering that symptoms are still being observed does not repeat the diagnosis-status question",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify({
+            conversationContext,
+          }) {
+            semanticCalls += 1;
+
+            return {
+              status:
+                "needs_clarification",
+              tag: null,
+              context:
+                conversationContext,
+              provider:
+                "embedding",
+              model:
+                "fake",
+              diagnostics: {
+                candidates: [],
+              },
+            };
+          },
+        },
+      });
+
+    const previousQuestion =
+      "¿Os han indicado ya alguna enfermedad o diagnóstico, o de momento estáis observando estos síntomas?";
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "observando estos síntomas",
+        conversationContext:
+          null,
+        pendingClarification: {
+          node:
+            "health_detail",
+          personId:
+            "person_1",
+          mode:
+            "free_text",
+        },
+      });
+
+    assert.notEqual(
+      result.clarificationQuestion,
+      previousQuestion,
+    );
+
+    assert.notEqual(
+      result.diagnostics?.reason,
+      "condition_not_declared",
+    );
+
+    assert.equal(
+      semanticCalls,
+      0,
+    );
+
+    assert.equal(
+      result.missingDimension,
+      "goal",
+    );
+
+    assert.deepEqual(
+      result.clarificationTransition,
+      {
+        sourceNode:
+          "health_detail",
+        action: {
+          type:
+            "resolve_dimension",
+          dimension:
+            "diagnosis_status",
+          value:
+            "not_confirmed",
+        },
+      },
+    );
   },
 );
 

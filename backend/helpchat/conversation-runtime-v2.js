@@ -212,6 +212,11 @@ export function applyClarificationStateV2({
         clarificationState.mode === "free_text"
           ? "free_text"
           : "choice",
+      dimension:
+        typeof clarificationState
+          .dimension === "string"
+          ? clarificationState.dimension
+          : null,
     },
   );
 }
