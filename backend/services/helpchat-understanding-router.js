@@ -24,6 +24,15 @@ import {
   resolveClarificationTextV1,
 } from "../helpchat/clarification-text-resolver-v1.js";
 
+import {
+  getOpenClarificationPolicyV1,
+} from "../helpchat/open-clarification-policy-v1.js";
+
+import {
+  buildOpenClarificationCandidatesV1,
+} from "../helpchat/open-clarification-candidates-v1.js";
+
+
 const COGNITIVE_TAGS = new Set([
   "ALZHEIMER",
   "ENFERMEDAD NEUROLÓGICA PARCKINSON ALZHEIMER",
@@ -448,6 +457,133 @@ export function createHelpchatUnderstandingRouter({
                 startedAt
             ) * 10
           ) / 10,
+      });
+    }
+
+    const openNodeId =
+      typeof pendingClarification?.node ===
+        "string" &&
+      pendingClarification.mode ===
+        "free_text"
+        ? pendingClarification.node
+        : null;
+
+    const openPolicy =
+      openNodeId
+        ? getOpenClarificationPolicyV1(
+            openNodeId,
+          )
+        : null;
+
+    if (openPolicy) {
+      const openCandidates =
+        buildOpenClarificationCandidatesV1(
+          openNodeId,
+        );
+
+      const allowedTagIds =
+        openCandidates.map(
+          (candidate) =>
+            candidate.tagId,
+        );
+
+      if (
+        openPolicy.canResolveDirectly !==
+          true ||
+        allowedTagIds.length === 0
+      ) {
+        return clarificationResult({
+          context,
+          missingDimension:
+            openNodeId,
+          provider:
+            "open_clarification_policy",
+          model:
+            "open-clarification-policy-v1",
+          durationMs:
+            Math.round(
+              (
+                performance.now() -
+                startedAt
+              ) * 10
+            ) / 10,
+          diagnostics: {
+            bounded: true,
+            allowedTagIds: [],
+            reason:
+              "no_operational_catalog",
+          },
+        });
+      }
+
+      const semantic =
+        await semanticClassifier.classify({
+          inputMessage,
+          conversationContext:
+            context,
+          allowedTagIds,
+        });
+
+      const totalDurationMs =
+        Math.round(
+          (
+            performance.now() -
+              startedAt
+          ) * 10
+        ) / 10;
+
+      if (
+        semantic.status ===
+          "resolved" &&
+        semantic.tag
+      ) {
+        return resolvedResult({
+          tag:
+            semantic.tag,
+          context:
+            semantic.context,
+          provider:
+            semantic.provider,
+          model:
+            semantic.model,
+          durationMs:
+            totalDurationMs,
+          diagnostics:
+            semantic.diagnostics,
+          clarificationTransition: {
+            sourceNode:
+              openNodeId,
+            action: {
+              type:
+                "resolve_need",
+              resolvedNeeds: [
+                {
+                  tag_id:
+                    semantic.tag
+                      .tag_id,
+                  descripcion:
+                    semantic.tag
+                      .descripcion,
+                },
+              ],
+            },
+          },
+        });
+      }
+
+      return clarificationResult({
+        context:
+          semantic.context,
+        missingDimension:
+          openNodeId,
+        provider:
+          semantic.provider,
+        model:
+          semantic.model,
+        durationMs:
+          totalDurationMs,
+        diagnostics:
+          semantic.diagnostics,
       });
     }
 

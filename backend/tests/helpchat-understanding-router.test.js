@@ -1418,3 +1418,350 @@ test(
     );
   },
 );
+
+test(
+  "pending health_detail uses only its bounded semantic catalog",
+  async () => {
+    let semanticCalls = 0;
+    let receivedAllowedTagIds = null;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify({
+            conversationContext,
+            allowedTagIds,
+          }) {
+            semanticCalls += 1;
+            receivedAllowedTagIds =
+              allowedTagIds;
+
+            return {
+              status:
+                "resolved",
+              tag: {
+                tag_id: 13,
+                descripcion:
+                  "DIABETES",
+              },
+              context:
+                conversationContext,
+              needsClarification:
+                false,
+              provider:
+                "embedding",
+              model:
+                "fake",
+              diagnostics: {
+                top1: {
+                  tagId: 13,
+                  tag:
+                    "DIABETES",
+                  score: 0.9,
+                },
+                top2: null,
+                candidates: [
+                  {
+                    tagId: 13,
+                    tag:
+                      "DIABETES",
+                    score: 0.9,
+                  },
+                ],
+              },
+            };
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Le han diagnosticado diabetes",
+        conversationContext:
+          null,
+        pendingClarification: {
+          node:
+            "health_detail",
+          personId:
+            "self",
+          mode:
+            "free_text",
+        },
+      });
+
+    assert.equal(
+      semanticCalls,
+      1,
+    );
+
+    assert.ok(
+      receivedAllowedTagIds
+        .includes(13),
+    );
+
+    assert.equal(
+      receivedAllowedTagIds
+        .includes(25),
+      false,
+    );
+
+    assert.equal(
+      receivedAllowedTagIds
+        .includes(2),
+      false,
+    );
+
+    assert.equal(
+      result.status,
+      "resolved",
+    );
+
+    assert.equal(
+      result.tag.descripcion,
+      "DIABETES",
+    );
+
+    assert.deepEqual(
+      result.clarificationTransition,
+      {
+        sourceNode:
+          "health_detail",
+        action: {
+          type:
+            "resolve_need",
+          resolvedNeeds: [
+            {
+              tag_id: 13,
+              descripcion:
+                "DIABETES",
+            },
+          ],
+        },
+      },
+    );
+  },
+);
+
+test(
+  "pending health_detail cannot escape to a global alcohol anchor",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify({
+            conversationContext,
+            allowedTagIds,
+          }) {
+            semanticCalls += 1;
+
+            assert.equal(
+              allowedTagIds
+                .includes(2),
+              false,
+            );
+
+            return {
+              status:
+                "needs_clarification",
+              tag: null,
+              context:
+                conversationContext,
+              needsClarification:
+                true,
+              provider:
+                "embedding",
+              model:
+                "fake",
+              diagnostics: {
+                top1: null,
+                top2: null,
+                candidates: [],
+              },
+            };
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Es por alcohol",
+        conversationContext:
+          null,
+        pendingClarification: {
+          node:
+            "health_detail",
+          personId:
+            "self",
+          mode:
+            "free_text",
+        },
+      });
+
+    assert.equal(
+      semanticCalls,
+      1,
+    );
+
+    assert.equal(
+      result.status,
+      "needs_clarification",
+    );
+
+    assert.equal(
+      result.tag,
+      null,
+    );
+
+    assert.equal(
+      result.missingDimension,
+      "health_detail",
+    );
+
+    assert.notEqual(
+      result.provider,
+      "anchor",
+    );
+  },
+);
+
+test(
+  "pending behavioral addiction with no catalog does not call semantic classification",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+
+            throw new Error(
+              "semantic classification should not run",
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "No puede dejar las apuestas online",
+        conversationContext:
+          null,
+        pendingClarification: {
+          node:
+            "addiction_behavior_detail",
+          personId:
+            "person_1",
+          mode:
+            "free_text",
+        },
+      });
+
+    assert.equal(
+      semanticCalls,
+      0,
+    );
+
+    assert.equal(
+      result.status,
+      "needs_clarification",
+    );
+
+    assert.equal(
+      result.tag,
+      null,
+    );
+
+    assert.equal(
+      result.provider,
+      "open_clarification_policy",
+    );
+
+    assert.equal(
+      result.missingDimension,
+      "addiction_behavior_detail",
+    );
+
+    assert.equal(
+      result.diagnostics.reason,
+      "no_operational_catalog",
+    );
+
+    assert.deepEqual(
+      result.diagnostics
+        .allowedTagIds,
+      [],
+    );
+  },
+);
+
+test(
+  "pending substance addiction with no catalog cannot fall through to alcohol",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+
+            throw new Error(
+              "semantic classification should not run",
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Consume cocaína",
+        conversationContext:
+          null,
+        pendingClarification: {
+          node:
+            "addiction_substance_detail",
+          personId:
+            "self",
+          mode:
+            "free_text",
+        },
+      });
+
+    assert.equal(
+      semanticCalls,
+      0,
+    );
+
+    assert.equal(
+      result.status,
+      "needs_clarification",
+    );
+
+    assert.equal(
+      result.tag,
+      null,
+    );
+
+    assert.equal(
+      result.provider,
+      "open_clarification_policy",
+    );
+
+    assert.equal(
+      result.missingDimension,
+      "addiction_substance_detail",
+    );
+
+    assert.equal(
+      result.diagnostics.reason,
+      "no_operational_catalog",
+    );
+  },
+);
