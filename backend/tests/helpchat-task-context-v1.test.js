@@ -7,6 +7,7 @@ import {
 import {
   buildClarificationTaskContext,
   buildNeedClassificationTaskContext,
+  buildOpenClarificationTaskContext,
   buildSubjectResolutionTaskContext,
 } from "../helpchat/task-context-v1.js";
 
@@ -274,6 +275,80 @@ describe(
           result.territory,
         ).toBeUndefined();
       },
+    );
+  },
+);
+
+it(
+  "builds a bounded open clarification context",
+  () => {
+    const result =
+      buildOpenClarificationTaskContext({
+        nodeId:
+          "health_detail",
+        inputMessage:
+          "Le han diagnosticado diabetes",
+        relationalContext:
+          context(),
+        candidates: [
+          {
+            tagId: 13,
+            tag: "DIABETES",
+            score: 0.91,
+          },
+          {
+            tagId: 31,
+            tag: "SALUD MENTAL",
+            score: 0.42,
+          },
+        ],
+      });
+
+    expect(result).toEqual({
+      version: 1,
+      task:
+        "resolve_open_clarification",
+      message:
+        "Le han diagnosticado diabetes",
+      focus: {
+        relationship:
+          "hermano",
+        needs: [
+          "ALCOHOLISMO",
+        ],
+        facts: [
+          "vive solo",
+        ],
+        constraints: [
+          "no conduce",
+        ],
+      },
+      node:
+        "health_detail",
+      candidates: [
+        {
+          tagId: 13,
+          tag: "DIABETES",
+          score: 0.91,
+        },
+        {
+          tagId: 31,
+          tag: "SALUD MENTAL",
+          score: 0.42,
+        },
+      ],
+    });
+
+    expect(
+      JSON.stringify(result),
+    ).not.toContain(
+      "VIVIENDA",
+    );
+
+    expect(
+      JSON.stringify(result),
+    ).not.toContain(
+      "resourcesShown",
     );
   },
 );

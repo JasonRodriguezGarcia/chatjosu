@@ -218,3 +218,66 @@ export function buildClarificationTaskContext({
         : [],
   };
 }
+
+export function buildOpenClarificationTaskContext({
+  nodeId,
+  inputMessage,
+  relationalContext,
+  candidates = [],
+} = {}) {
+  const classification =
+    buildNeedClassificationTaskContext({
+      inputMessage,
+      relationalContext,
+    });
+
+  return {
+    ...classification,
+
+    task:
+      "resolve_open_clarification",
+
+    node:
+      cleanString(
+        nodeId,
+        80,
+      ),
+
+    candidates:
+      Array.isArray(candidates)
+        ? candidates
+            .slice(0, 5)
+            .map(
+              (candidate) => ({
+                tagId:
+                  Number.isFinite(
+                    Number(
+                      candidate?.tagId,
+                    ),
+                  )
+                    ? Number(
+                        candidate.tagId,
+                      )
+                    : null,
+                tag:
+                  cleanString(
+                    candidate?.tag,
+                    120,
+                  ),
+                score:
+                  Number.isFinite(
+                    candidate?.score,
+                  )
+                    ? candidate.score
+                    : null,
+              }),
+            )
+            .filter(
+              (candidate) =>
+                candidate.tag &&
+                candidate.tagId !==
+                  null,
+            )
+        : [],
+  };
+}
