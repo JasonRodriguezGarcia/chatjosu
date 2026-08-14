@@ -1,0 +1,16 @@
+.git
+.gitignore
+
+backend/node_modules
+frontend/node_modules
+frontend/dist
+
+backend/tmp
+backend/scripts/__pycache__
+
+*.xlsx
+*.xls
+*.dump
+*.log
+
+data

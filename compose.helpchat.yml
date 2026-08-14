@@ -1,0 +1,78 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: docker/app/Dockerfile
+
+    image: copilot-ong-helpchat:dev
+
+    container_name: copilot-ong-backend-docker
+
+    restart: unless-stopped
+
+    env_file:
+      - ./backend/.env.docker.local
+
+    environment:
+      PORT: "5000"
+      BACKEND_HOST: "0.0.0.0"
+      SERVE_FRONTEND: "true"
+      HELPCHAT_EMBEDDING_BASE_URL: "http://host.docker.internal:11434"
+
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+    ports:
+      - "127.0.0.1:${HELPCHAT_HOST_PORT:-5174}:5000"
+
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - >-
+          fetch('http://127.0.0.1:5000/api/v1/helpchat/provincias')
+          .then(r => { if (!r.ok) process.exit(1); })
+          .catch(() => process.exit(1))
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 20s
+
+    networks:
+      - default
+      - postgres
+
+  feedback-analyst:
+    image: copilot-ong-helpchat:dev
+
+    container_name: copilot-ong-feedback-analyst
+
+    restart: unless-stopped
+
+    depends_on:
+      backend:
+        condition: service_healthy
+
+    env_file:
+      - ./backend/.env.docker.local
+
+    environment:
+      HELPCHAT_EMBEDDING_BASE_URL: "http://host.docker.internal:11434"
+      HELPCHAT_FEEDBACK_ANALYST_BASE_URL: "http://host.docker.internal:11434"
+
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+    command:
+      - node
+      - scripts/run-helpchat-feedback-analysis-worker.js
+
+    networks:
+      - default
+      - postgres
+
+networks:
+  postgres:
+    external: true
+    name: local_default
