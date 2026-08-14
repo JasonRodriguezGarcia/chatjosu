@@ -29,6 +29,10 @@ import {
 } from "../helpchat/open-clarification-policy-v1.js";
 
 import {
+  resolveOpenClarificationReentryV1,
+} from "../helpchat/open-clarification-reentry-v1.js";
+
+import {
   buildOpenClarificationCandidatesV1,
 } from "../helpchat/open-clarification-candidates-v1.js";
 
@@ -498,6 +502,55 @@ export function createHelpchatUnderstandingRouter({
           true ||
         allowedTagIds.length === 0
       ) {
+        const reentry =
+          resolveOpenClarificationReentryV1({
+            nodeId:
+              openNodeId,
+            inputMessage,
+          });
+
+        if (
+          reentry.status ===
+            "resolved" &&
+          reentry.targetNode
+        ) {
+          return clarificationResult({
+            context,
+            missingDimension:
+              reentry.targetNode,
+            provider:
+              "open_clarification_reentry",
+            model:
+              "open-clarification-reentry-v1",
+            durationMs:
+              Math.round(
+                (
+                  performance.now() -
+                    startedAt
+                ) * 10
+              ) / 10,
+            diagnostics: {
+              bounded: true,
+              sourceNode:
+                openNodeId,
+              targetNode:
+                reentry.targetNode,
+              reason:
+                "branch_reentry",
+            },
+            clarificationTransition: {
+              sourceNode:
+                openNodeId,
+              action: {
+                type:
+                  "goto",
+                node:
+                  reentry.targetNode,
+              },
+            },
+          });
+        }
+
         return clarificationResult({
           context,
           missingDimension:
@@ -510,7 +563,7 @@ export function createHelpchatUnderstandingRouter({
             Math.round(
               (
                 performance.now() -
-                startedAt
+                  startedAt
               ) * 10
             ) / 10,
           diagnostics: {

@@ -2339,3 +2339,84 @@ test(
     );
   },
 );
+
+test(
+  "behavioral addiction reenters mental health when the answer describes mood changes",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+            throw new Error(
+              "semantic classification should not run"
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "tiene cambios bruscos de humor y temperamento",
+        conversationContext:
+          null,
+        pendingClarification: {
+          node:
+            "addiction_behavior_detail",
+          personId:
+            "person_1",
+          mode:
+            "free_text",
+        },
+      });
+
+    assert.equal(
+      semanticCalls,
+      0,
+    );
+
+    assert.equal(
+      result.status,
+      "needs_clarification",
+    );
+
+    assert.equal(
+      result.missingDimension,
+      "mental_health_detail",
+    );
+
+    assert.equal(
+      result.provider,
+      "open_clarification_reentry",
+    );
+
+    assert.deepEqual(
+      result.quickReplies.map(
+        (reply) =>
+          reply.id,
+      ),
+      [
+        "mood_anxiety",
+        "sleep",
+        "behavior_changes",
+        "mental_other",
+      ],
+    );
+
+    assert.deepEqual(
+      result.clarificationTransition,
+      {
+        sourceNode:
+          "addiction_behavior_detail",
+        action: {
+          type: "goto",
+          node:
+            "mental_health_detail",
+        },
+      },
+    );
+  },
+);
