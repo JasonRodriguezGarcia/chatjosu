@@ -1578,36 +1578,6 @@ const HelpChat = () => {
                   minWidth: 0,
                 }}
               >
-                {testerModeRef.current && (
-                  <IconButton
-                    type="button"
-                    disabled={
-                      testerCapturedTurnCount === 0
-                    }
-                    onClick={handleTesterFeedbackStart}
-                    aria-label="Reportar un problema en esta conversación"
-                    aria-pressed={false}
-                    size="small"
-                    sx={{
-                      position: "absolute",
-                      left: 8,
-                      top: 8,
-                      zIndex: 2,
-                      width: 32,
-                      height: 32,
-                      color: BRAND.coral,
-                      bgcolor: BRAND.surface,
-                      border: 1,
-                      borderColor: BRAND.border,
-                      "&:hover": {
-                        bgcolor: BRAND.plumSoft,
-                      },
-                    }}
-                  >
-                    ⚑
-                  </IconButton>
-                )}
-
                 <TextField
                   fullWidth
                 id="mensaje"
@@ -1639,11 +1609,6 @@ const HelpChat = () => {
                   "& .MuiOutlinedInput-root": {
                     bgcolor: BRAND.surface,
                     borderRadius: 3,
-                    ...(testerModeRef.current
-                      ? {
-                          pl: 5,
-                        }
-                      : {}),
                     "& fieldset": {
                       borderColor: BRAND.border,
                     },
@@ -1700,24 +1665,31 @@ const HelpChat = () => {
                 </IconButton>
               )}
 
-              <Button
-                type="submit"
-                variant="contained"
-                disabled={!input.trim()}
+              <Stack
+                spacing={0.75}
                 sx={{
-                  minHeight: {
-                    xs: 44,
-                    sm: 56,
-                  },
-                  minWidth: {
-                    xs: 68,
-                    sm: 96,
-                  },
-                  px: {
-                    xs: 1,
-                    sm: 2.5,
-                  },
-                  borderRadius: 3,
+                  flexShrink: 0,
+                  alignItems: "stretch",
+                }}
+              >
+                <Button
+                  type="submit"
+                  variant="contained"
+                  disabled={!input.trim()}
+                  sx={{
+                    minHeight: {
+                      xs: 44,
+                      sm: 56,
+                    },
+                    minWidth: {
+                      xs: 68,
+                      sm: 96,
+                    },
+                    px: {
+                      xs: 1,
+                      sm: 2.5,
+                    },
+                    borderRadius: 3,
                   textTransform: "none",
                   fontWeight: 700,
                   bgcolor: BRAND.plum,
@@ -1726,8 +1698,36 @@ const HelpChat = () => {
                   },
                 }}
               >
-                Enviar
-              </Button>
+                  Enviar
+                </Button>
+
+                {testerModeRef.current && (
+                  <IconButton
+                    type="button"
+                    disabled={
+                      testerCapturedTurnCount === 0
+                    }
+                    onClick={handleTesterFeedbackStart}
+                    aria-label="Reportar un problema en esta conversación"
+                    aria-pressed={false}
+                    size="small"
+                    sx={{
+                      alignSelf: "center",
+                      width: 32,
+                      height: 32,
+                      color: BRAND.coral,
+                      bgcolor: BRAND.surface,
+                      border: 1,
+                      borderColor: BRAND.border,
+                      "&:hover": {
+                        bgcolor: BRAND.plumSoft,
+                      },
+                    }}
+                  >
+                    ⚑
+                  </IconButton>
+                )}
+              </Stack>
             </Stack>
           )}
         </Box>
