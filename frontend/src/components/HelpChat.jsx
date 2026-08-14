@@ -9,6 +9,9 @@ import {
   useHelpChatSpeech,
 } from "../helpchat/useHelpChatSpeech";
 import {
+  useTesterFeedback,
+} from "../helpchat/useTesterFeedback";
+import {
   findDetectedProvince,
   normalizeDetectedLocation,
 } from "../helpchat/location";
@@ -112,10 +115,6 @@ const HelpChat = () => {
   const [isSending, setIsSending] = useState(false);
   const [requestError, setRequestError] = useState(null);
   const [lastFailedRequest, setLastFailedRequest] = useState(null);
-  const [testerFeedbackMode, setTesterFeedbackMode] = useState(false);
-  const [testerFeedbackReason, setTesterFeedbackReason] = useState("");
-  const [testerFeedbackSending, setTesterFeedbackSending] = useState(false);
-  const [testerFeedbackStatus, setTesterFeedbackStatus] = useState(null);
   const [testerCapturedTurnCount, setTesterCapturedTurnCount] = useState(0);
 
   const speech =
@@ -169,11 +168,27 @@ const HelpChat = () => {
   const testerCapturedTurnsRef =
     useRef([]);
 
-  const testerFeedbackSnapshotTurnIdRef =
-    useRef(null);
+  const testerFeedback =
+    useTesterFeedback({
+      capturedTurnsRef:
+        testerCapturedTurnsRef,
+      captureClientRef:
+        testerCaptureClientRef,
+      sessionIdRef:
+        testerSessionIdRef,
+    });
 
-  const testerFeedbackReasonSourceRef =
-    useRef("text");
+  const testerFeedbackMode =
+    testerFeedback.mode;
+
+  const testerFeedbackReason =
+    testerFeedback.reason;
+
+  const testerFeedbackSending =
+    testerFeedback.sending;
+
+  const testerFeedbackStatus =
+    testerFeedback.status;
 
   useEffect(() => {
     if (
@@ -287,12 +302,6 @@ const HelpChat = () => {
     if (errorInput && value.trim()) {
       setErrorInput(false);
     }
-  };
-
-  const handleTesterFeedbackInput = (event) => {
-    setTesterFeedbackReason(
-      event.target.value,
-    );
   };
 
   const requestHelp = async ({
@@ -700,8 +709,7 @@ const HelpChat = () => {
       !isListening &&
       testerFeedbackMode
     ) {
-      testerFeedbackReasonSourceRef.current =
-        "speech";
+      testerFeedback.markReasonAsSpeech();
     }
 
     speech.toggle({
@@ -712,7 +720,7 @@ const HelpChat = () => {
 
       onValueChange: (value) => {
         if (testerFeedbackMode) {
-          setTesterFeedbackReason(
+          testerFeedback.setReason(
             value,
           );
           return;
@@ -725,107 +733,30 @@ const HelpChat = () => {
   };
 
   const handleTesterFeedbackStart = () => {
-    const capturedTurns =
-      testerCapturedTurnsRef.current;
+    const started =
+      testerFeedback.start();
 
-    const latestTurn =
-      capturedTurns[
-        capturedTurns.length - 1
-      ];
-
-    if (!latestTurn) {
+    if (!started) {
       return;
     }
 
-    testerFeedbackSnapshotTurnIdRef.current =
-      latestTurn.turnId;
-
-    testerFeedbackReasonSourceRef.current =
-      "text";
-
-    setTesterFeedbackReason("");
-    setTesterFeedbackStatus(null);
-    setTesterFeedbackMode(true);
     setErrorInput(false);
     speech.clearError();
   };
 
   const handleTesterFeedbackCancel = () => {
     speech.abort();
+    testerFeedback.cancel();
+  };
 
-    setTesterFeedbackReason("");
-    setTesterFeedbackMode(false);
-
-    testerFeedbackSnapshotTurnIdRef.current =
-      null;
-
-    testerFeedbackReasonSourceRef.current =
-      "text";
+  const handleTesterFeedbackInput = (event) => {
+    testerFeedback.setReason(
+      event.target.value,
+    );
   };
 
   const handleTesterFeedbackSubmit = async () => {
-    const reason =
-      testerFeedbackReason.trim();
-
-    if (
-      !reason ||
-      !testerCaptureClientRef.current ||
-      !testerSessionIdRef.current
-    ) {
-      return;
-    }
-
-    const snapshotThroughTurnId =
-      testerFeedbackSnapshotTurnIdRef.current;
-
-    if (!snapshotThroughTurnId) {
-      return;
-    }
-
-    setTesterFeedbackSending(true);
-    setTesterFeedbackStatus(null);
-
-    try {
-      await testerCaptureClientRef.current
-        .createFeedback({
-          sessionId:
-            testerSessionIdRef.current,
-          snapshotThroughTurnId,
-          anchorTurnIds: [],
-          category:
-            "other",
-          reasonText:
-            reason,
-          expectedText:
-            null,
-          reasonSource:
-            testerFeedbackReasonSourceRef.current,
-        });
-
-      setTesterFeedbackReason("");
-      setTesterFeedbackMode(false);
-
-      testerFeedbackSnapshotTurnIdRef.current =
-        null;
-
-      testerFeedbackReasonSourceRef.current =
-        "text";
-
-      setTesterFeedbackStatus(
-        "Gracias. He guardado el problema para revisarlo.",
-      );
-    } catch (error) {
-      console.warn(
-        "Tester Capture feedback failed:",
-        error,
-      );
-
-      setTesterFeedbackStatus(
-        "No he podido guardar el problema. Puedes intentarlo de nuevo.",
-      );
-    } finally {
-      setTesterFeedbackSending(false);
-    }
+    await testerFeedback.submit();
   };
 
   const handleSuggestion = (suggestion) => {
