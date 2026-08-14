@@ -1603,7 +1603,7 @@ test(
 
     assert.equal(
       semanticCalls,
-      1,
+      0,
     );
 
     assert.equal(
@@ -1615,6 +1615,12 @@ test(
       result.tag,
       null,
     );
+
+    assert.equal(
+      result.provider,
+      "health_statement_authority",
+    );
+
 
     assert.equal(
       result.missingDimension,
@@ -2309,7 +2315,7 @@ test(
     const result =
       await router.understand({
         inputMessage:
-          "Está muy desorientado",
+          "Le han diagnosticado un trastorno neurológico",
         conversationContext:
           null,
         pendingClarification: {
@@ -2417,6 +2423,209 @@ test(
             "mental_health_detail",
         },
       },
+    );
+  },
+);
+
+test(
+  "health symptoms do not resolve to a diagnosis without a declared condition",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+
+            return {
+              status:
+                "resolved",
+              tag: {
+                tag_id: 13,
+                descripcion:
+                  "DIABETES",
+              },
+              provider:
+                "embedding",
+              model:
+                "fake",
+            };
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "no puede dormir y bebe mucho",
+        conversationContext:
+          null,
+        pendingClarification: {
+          node:
+            "health_detail",
+          personId:
+            "person_1",
+          mode:
+            "free_text",
+        },
+      });
+
+    assert.equal(
+      semanticCalls,
+      0,
+    );
+
+    assert.equal(
+      result.status,
+      "needs_clarification",
+    );
+
+    assert.equal(
+      result.tag,
+      null,
+    );
+
+    assert.equal(
+      result.provider,
+      "health_statement_authority",
+    );
+
+    assert.equal(
+      result.missingDimension,
+      "health_detail",
+    );
+
+    assert.match(
+      result.clarificationQuestion,
+      /enfermedad|diagnóstico|síntomas/i,
+    );
+  },
+);
+
+test(
+  "health hypotheses cannot resolve to a diagnosis",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+
+            throw new Error(
+              "semantic classification should not run"
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "No sé si puede ser diabetes",
+        conversationContext:
+          null,
+        pendingClarification: {
+          node:
+            "health_detail",
+          personId:
+            "self",
+          mode:
+            "free_text",
+        },
+      });
+
+    assert.equal(
+      semanticCalls,
+      0,
+    );
+
+    assert.equal(
+      result.status,
+      "needs_clarification",
+    );
+
+    assert.equal(
+      result.tag,
+      null,
+    );
+  },
+);
+
+test(
+  "declared diabetes still reaches bounded semantic classification",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify({
+            conversationContext,
+            allowedTagIds,
+          }) {
+            semanticCalls += 1;
+
+            assert.equal(
+              allowedTagIds.includes(13),
+              true,
+            );
+
+            return {
+              status:
+                "resolved",
+              tag: {
+                tag_id: 13,
+                descripcion:
+                  "DIABETES",
+              },
+              context:
+                conversationContext,
+              needsClarification:
+                false,
+              provider:
+                "embedding",
+              model:
+                "fake",
+              diagnostics: {
+                candidates: [],
+              },
+            };
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Le han diagnosticado diabetes",
+        conversationContext:
+          null,
+        pendingClarification: {
+          node:
+            "health_detail",
+          personId:
+            "self",
+          mode:
+            "free_text",
+        },
+      });
+
+    assert.equal(
+      semanticCalls,
+      1,
+    );
+
+    assert.equal(
+      result.status,
+      "resolved",
+    );
+
+    assert.equal(
+      result.tag.descripcion,
+      "DIABETES",
     );
   },
 );

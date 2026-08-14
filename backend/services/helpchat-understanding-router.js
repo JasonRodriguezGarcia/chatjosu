@@ -33,6 +33,10 @@ import {
 } from "../helpchat/open-clarification-reentry-v1.js";
 
 import {
+  assessHealthStatementAuthorityV1,
+} from "../helpchat/health-statement-authority-v1.js";
+
+import {
   buildOpenClarificationCandidatesV1,
 } from "../helpchat/open-clarification-candidates-v1.js";
 
@@ -573,6 +577,49 @@ export function createHelpchatUnderstandingRouter({
               "no_operational_catalog",
           },
         });
+      }
+
+      if (
+        openNodeId ===
+          "health_detail"
+      ) {
+        const healthAuthority =
+          assessHealthStatementAuthorityV1(
+            inputMessage
+          );
+
+        if (
+          healthAuthority.status !==
+            "explicit_condition"
+        ) {
+          return {
+            ...clarificationResult({
+              context,
+              missingDimension:
+                "health_detail",
+              provider:
+                "health_statement_authority",
+              model:
+                "health-statement-authority-v1",
+              durationMs:
+                Math.round(
+                  (
+                    performance.now() -
+                      startedAt
+                  ) * 10
+                ) / 10,
+              diagnostics: {
+                bounded: true,
+                healthAuthority:
+                  healthAuthority.status,
+                reason:
+                  "condition_not_declared",
+              },
+            }),
+            clarificationQuestion:
+              "¿Os han indicado ya alguna enfermedad o diagnóstico, o de momento estáis observando estos síntomas?",
+          };
+        }
       }
 
       const semantic =
