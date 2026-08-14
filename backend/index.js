@@ -399,6 +399,8 @@ const helpchatLocalLlmService =
             HELPCHAT_LOCAL_LLM_MODEL,
         timeoutMs:
             HELPCHAT_LOCAL_LLM_TIMEOUT_MS,
+        keepAlive:
+            HELPCHAT_LOCAL_LLM_KEEP_ALIVE,
     });
 
 const helpchatUnderstandingRouter =

@@ -279,3 +279,65 @@ describe(
     );
   },
 );
+
+it(
+  "passes configured keep alive to Ollama",
+  async () => {
+    let requestBody = null;
+
+    const service =
+      createHelpchatLocalLlmService({
+        keepAlive:
+          "30m",
+        fetchImpl:
+          async (
+            url,
+            options,
+          ) => {
+            requestBody =
+              JSON.parse(
+                options.body,
+              );
+
+            return {
+              ok: true,
+              async json() {
+                return {
+                  response:
+                    '{"status":"needs_clarification","option":null}',
+                };
+              },
+            };
+          },
+      });
+
+    await service.classify({
+      taskContext: {
+        task:
+          "resolve_open_clarification",
+        message:
+          "Está mal",
+      },
+      candidates: [
+        {
+          tagId: 4,
+          tag:
+            "ALZHEIMER",
+          score: 0.63,
+        },
+        {
+          tagId: 31,
+          tag:
+            "SALUD MENTAL",
+          score: 0.62,
+        },
+      ],
+    });
+
+    expect(
+      requestBody.keep_alive,
+    ).toBe(
+      "30m",
+    );
+  },
+);

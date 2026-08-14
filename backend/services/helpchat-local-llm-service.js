@@ -124,6 +124,7 @@ export function createHelpchatLocalLlmService({
   model =
     "qwen3:8b",
   timeoutMs = 5000,
+  keepAlive = "10m",
   fetchImpl = fetch,
 } = {}) {
   const generateUrl =
@@ -192,7 +193,7 @@ export function createHelpchatLocalLlmService({
                 stream: false,
                 format: "json",
                 keep_alive:
-                  "10m",
+                  keepAlive,
                 options: {
                   temperature: 0,
                   num_predict: 64,
