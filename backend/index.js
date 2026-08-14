@@ -20,6 +20,9 @@ import {
   createHelpchatSemanticClassifier,
 } from "./services/helpchat-semantic-classifier.js";
 import {
+  createHelpchatLocalLlmService,
+} from "./services/helpchat-local-llm-service.js";
+import {
   createHelpchatOllamaReadiness,
 } from "./services/helpchat-ollama-readiness.js";
 import {
@@ -162,6 +165,12 @@ const HELPCHAT_LOCAL_LLM_MODEL =
 const HELPCHAT_LOCAL_LLM_KEEP_ALIVE =
     process.env.HELPCHAT_LOCAL_LLM_KEEP_ALIVE?.trim() ||
     "30m";
+
+const HELPCHAT_LOCAL_LLM_TIMEOUT_MS =
+    positiveIntegerEnv(
+        "HELPCHAT_LOCAL_LLM_TIMEOUT_MS",
+        5000
+    );
 
 const HELPCHAT_LOCAL_LLM_WARMUP_TIMEOUT_MS =
     positiveIntegerEnv(
@@ -382,10 +391,22 @@ const helpchatSemanticClassifier =
             HELPCHAT_SEMANTIC_MIN_MARGIN,
     });
 
+const helpchatLocalLlmService =
+    createHelpchatLocalLlmService({
+        baseUrl:
+            HELPCHAT_EMBEDDING_BASE_URL,
+        model:
+            HELPCHAT_LOCAL_LLM_MODEL,
+        timeoutMs:
+            HELPCHAT_LOCAL_LLM_TIMEOUT_MS,
+    });
+
 const helpchatUnderstandingRouter =
     createHelpchatUnderstandingRouter({
         semanticClassifier:
             helpchatSemanticClassifier,
+        localLlmService:
+            helpchatLocalLlmService,
     });
 
 app.locals.understandHelpchat =
@@ -1061,6 +1082,7 @@ app.post(
                 await app.locals.understandHelpchat({
                     inputMessage,
                     conversationContext,
+                    relationalContext,
                     controlledReply:
                         req.body?.controlledReply,
                     pendingClarification:
