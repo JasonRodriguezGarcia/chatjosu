@@ -3,6 +3,8 @@ import ReactMarkdown from "react-markdown";
 import MicIcon from "@mui/icons-material/Mic";
 import StopIcon from "@mui/icons-material/Stop";
 import AssociationCard from "./AssociationCard";
+import HelpChatComposer from "./HelpChatComposer";
+import { HELPCHAT_BRAND as BRAND } from "./helpChatBrand";
 import { normalizeConversationContext } from "../helpchat/conversationContext";
 import {
   createSpeechRecognition,
@@ -61,22 +63,6 @@ const createMessage = (role, content, extra = {}) => ({
   content,
   ...extra,
 });
-
-const BRAND = {
-  background: "#FFF9F3",
-  surface: "#FFFFFF",
-  header: "#FFFDF9",
-  plum: "#765366",
-  plumDark: "#624456",
-  coral: "#D96F62",
-  yellow: "#EAC354",
-  mint: "#9ACDA8",
-  green: "#5F806B",
-  text: "#332D31",
-  textSecondary: "#71676C",
-  border: "#E8DDD7",
-  plumSoft: "#F4EAF0",
-};
 
 const buildAssistantContent = (data) => {
   const resources = Array.isArray(data?.associations)
@@ -1560,175 +1546,29 @@ const HelpChat = () => {
               </Stack>
             </>
           ) : (
-            <Stack
-              direction="row"
-              spacing={{
-                xs: 0.75,
-                sm: 1.5,
-              }}
-              sx={{
-                alignItems: "flex-start",
-                width: "100%",
-              }}
-            >
-              <Box
-                sx={{
-                  position: "relative",
-                  flex: 1,
-                  minWidth: 0,
-                }}
-              >
-                <TextField
-                  fullWidth
-                id="mensaje"
-                name="mensaje"
-                label="Escribe qué necesitas"
-                value={input}
-                required
-                minRows={1}
-                maxRows={5}
-                multiline
-                error={errorInput}
-                helperText={
-                  errorInput
-                    ? "El mensaje no puede estar vacío"
-                    : speechError ||
-                      (isListening
-                        ? "Escuchando…"
-                        : "")
-                }
-                slotProps={{
-                  formHelperText: {
-                    role: "status",
-                    "aria-live": "polite",
-                  },
-                }}
-                placeholder="Cuéntanos qué necesitas…"
-                onChange={handleInput}
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    bgcolor: BRAND.surface,
-                    borderRadius: 3,
-                    "& fieldset": {
-                      borderColor: BRAND.border,
-                    },
-                  },
-                }}
-                onKeyDown={(event) => {
-                  if (
-                    event.key === "Enter" &&
-                    !event.shiftKey
-                  ) {
-                    event.preventDefault();
-                    handleSend();
-                  }
-                }}
-                />
-              </Box>
-
-              {speechRecognitionSupported && (
-                <IconButton
-                  type="button"
-                  onClick={handleToggleSpeech}
-                  aria-label={
-                    isListening
-                      ? "Detener dictado"
-                      : "Dictar mensaje"
-                  }
-                  aria-pressed={isListening}
-                  sx={{
-                    mt: 0.25,
-                    width: {
-                      xs: 44,
-                      sm: 52,
-                    },
-                    height: {
-                      xs: 44,
-                      sm: 52,
-                    },
-                    flexShrink: 0,
-                    color:
-                      isListening
-                        ? BRAND.coral
-                        : BRAND.plum,
-                    border: 1,
-                    borderColor:
-                      isListening
-                        ? BRAND.coral
-                        : BRAND.border,
-                    bgcolor: BRAND.surface,
-                  }}
-                >
-                  {isListening
-                    ? <StopIcon />
-                    : <MicIcon />}
-                </IconButton>
-              )}
-
-              <Stack
-                spacing={0.75}
-                sx={{
-                  flexShrink: 0,
-                  alignItems: "stretch",
-                }}
-              >
-                <Button
-                  type="submit"
-                  variant="contained"
-                  disabled={!input.trim()}
-                  sx={{
-                    minHeight: {
-                      xs: 44,
-                      sm: 56,
-                    },
-                    minWidth: {
-                      xs: 68,
-                      sm: 96,
-                    },
-                    px: {
-                      xs: 1,
-                      sm: 2.5,
-                    },
-                    borderRadius: 3,
-                  textTransform: "none",
-                  fontWeight: 700,
-                  bgcolor: BRAND.plum,
-                  "&:hover": {
-                    bgcolor: BRAND.plumDark,
-                  },
-                }}
-              >
-                  Enviar
-                </Button>
-
-                {testerModeRef.current && (
-                  <IconButton
-                    type="button"
-                    disabled={
-                      testerCapturedTurnCount === 0
-                    }
-                    onClick={handleTesterFeedbackStart}
-                    aria-label="Reportar un problema en esta conversación"
-                    aria-pressed={false}
-                    size="small"
-                    sx={{
-                      alignSelf: "center",
-                      width: 32,
-                      height: 32,
-                      color: BRAND.coral,
-                      bgcolor: BRAND.surface,
-                      border: 1,
-                      borderColor: BRAND.border,
-                      "&:hover": {
-                        bgcolor: BRAND.plumSoft,
-                      },
-                    }}
-                  >
-                    ⚑
-                  </IconButton>
-                )}
-              </Stack>
-            </Stack>
+            <HelpChatComposer
+              input={input}
+              errorInput={errorInput}
+              speechError={speechError}
+              isListening={isListening}
+              speechRecognitionSupported={
+                speechRecognitionSupported
+              }
+              testerMode={
+                testerModeRef.current
+              }
+              testerCapturedTurnCount={
+                testerCapturedTurnCount
+              }
+              onInputChange={handleInput}
+              onSend={handleSend}
+              onToggleSpeech={
+                handleToggleSpeech
+              }
+              onTesterFeedbackStart={
+                handleTesterFeedbackStart
+              }
+            />
           )}
         </Box>
       </Box>

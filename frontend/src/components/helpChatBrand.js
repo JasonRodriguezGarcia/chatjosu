@@ -1,0 +1,15 @@
+export const HELPCHAT_BRAND = {
+  background: "#FFF9F3",
+  surface: "#FFFFFF",
+  header: "#FFFDF9",
+  plum: "#765366",
+  plumDark: "#624456",
+  coral: "#D96F62",
+  yellow: "#EAC354",
+  mint: "#9ACDA8",
+  green: "#5F806B",
+  text: "#332D31",
+  textSecondary: "#71676C",
+  border: "#E8DDD7",
+  plumSoft: "#F4EAF0",
+};
