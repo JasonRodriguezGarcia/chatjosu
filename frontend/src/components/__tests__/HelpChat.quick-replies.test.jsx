@@ -209,8 +209,14 @@ describe(
 
         await waitFor(() => {
           expect(
-            employment,
-          ).toBeDisabled();
+            screen.queryByRole(
+              "button",
+              {
+                name:
+                  "Empleo",
+              },
+            ),
+          ).not.toBeInTheDocument();
         });
 
         expect(
@@ -923,8 +929,14 @@ it(
 
     await waitFor(() => {
       expect(
-        sleep,
-      ).toBeDisabled();
+        screen.queryByRole(
+          "button",
+          {
+            name:
+              "Sueño",
+          },
+        ),
+      ).not.toBeInTheDocument();
     });
   },
 );

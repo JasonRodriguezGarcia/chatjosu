@@ -552,3 +552,205 @@ test(
     );
   },
 );
+
+test(
+  "cada nodo expone exactamente su pregunta y choices canónicas",
+  () => {
+    const matrix = {
+      need_type: {
+        question:
+          "¿Sobre qué situación necesitas orientación principalmente?",
+        choices: [
+          "employment",
+          "health",
+          "emotional_health",
+          "addiction",
+          "other",
+        ],
+      },
+
+      health_detail: {
+        question:
+          "¿Qué enfermedad, problema de salud o situación concreta estáis viviendo?",
+        choices: [],
+      },
+
+      mental_health_detail: {
+        question:
+          "¿Qué es lo que más te preocupa: el ánimo o la ansiedad, el sueño, cambios de conducta, u otra situación?",
+        choices: [
+          "mood_anxiety",
+          "sleep",
+          "behavior_changes",
+          "mental_other",
+        ],
+      },
+
+      mental_behavior_detail: {
+        question:
+          "¿Qué cambios de conducta has notado y desde cuándo están ocurriendo?",
+        choices: [],
+      },
+
+      addiction_detail: {
+        question:
+          "¿El problema está relacionado con alcohol, con otra sustancia o con otra conducta?",
+        choices: [
+          "alcohol",
+          "other_substance",
+          "other_behavior",
+        ],
+      },
+
+      addiction_substance_detail: {
+        question:
+          "¿Con qué sustancia está relacionado y qué está ocurriendo?",
+        choices: [],
+      },
+
+      addiction_behavior_detail: {
+        question:
+          "¿Con qué conducta está relacionado y qué está ocurriendo?",
+        choices: [],
+      },
+
+      free_text: {
+        question:
+          "Cuéntame con tus propias palabras qué está pasando.",
+        choices: [],
+      },
+    };
+
+    assert.deepEqual(
+      listClarificationNodesV1(),
+      Object.keys(matrix),
+    );
+
+    for (
+      const [
+        nodeId,
+        expected,
+      ]
+      of Object.entries(matrix)
+    ) {
+      const node =
+        getClarificationNodeV1(
+          nodeId,
+        );
+
+      assert.equal(
+        node.question,
+        expected.question,
+        `pregunta inesperada en ${nodeId}`,
+      );
+
+      assert.deepEqual(
+        node.choices.map(
+          (choice) =>
+            choice.id,
+        ),
+        expected.choices,
+        `choices inesperadas en ${nodeId}`,
+      );
+
+      const replies =
+        buildClarificationQuickRepliesV1(
+          nodeId,
+        );
+
+      assert.deepEqual(
+        replies.map(
+          (reply) =>
+            reply.id,
+        ),
+        expected.choices,
+        `quick replies inesperadas en ${nodeId}`,
+      );
+
+      for (
+        const reply
+        of replies
+      ) {
+        assert.deepEqual(
+          reply.controlledReply,
+          {
+            type:
+              "clarification_choice",
+            node:
+              nodeId,
+            choice:
+              reply.id,
+          },
+          `controlled reply inválida en ${nodeId}.${reply.id}`,
+        );
+      }
+    }
+  },
+);
+
+test(
+  "cada goto expone únicamente los botones del nodo destino",
+  () => {
+    for (
+      const nodeId
+      of listClarificationNodesV1()
+    ) {
+      const node =
+        getClarificationNodeV1(
+          nodeId,
+        );
+
+      for (
+        const choice
+        of node.choices
+      ) {
+        if (
+          choice.action.type !==
+            "goto"
+        ) {
+          continue;
+        }
+
+        const result =
+          resolveClarificationChoiceV1({
+            nodeId,
+            choiceId:
+              choice.id,
+          });
+
+        const targetNode =
+          getClarificationNodeV1(
+            result.action.node,
+          );
+
+        const targetReplies =
+          buildClarificationQuickRepliesV1(
+            result.action.node,
+          );
+
+        assert.deepEqual(
+          targetReplies.map(
+            (reply) =>
+              reply.id,
+          ),
+          targetNode.choices.map(
+            (targetChoice) =>
+              targetChoice.id,
+          ),
+          `${nodeId}.${choice.id} arrastra botones que no pertenecen a ${result.action.node}`,
+        );
+
+        for (
+          const reply
+          of targetReplies
+        ) {
+          assert.equal(
+            reply.controlledReply.node,
+            result.action.node,
+            `${nodeId}.${choice.id} conserva nodo antiguo`,
+          );
+        }
+      }
+    }
+  },
+);

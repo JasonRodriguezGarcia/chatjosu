@@ -882,6 +882,7 @@ const HelpChat = () => {
                     </Box>
 
                     {!isUser &&
+                      isLatestMessage &&
                       Array.isArray(message.quickReplies) &&
                       message.quickReplies.length > 0 && (
                         <Stack
