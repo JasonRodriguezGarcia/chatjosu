@@ -148,7 +148,7 @@ const HELPCHAT_EMBEDDING_TIMEOUT_MS =
 
 const HELPCHAT_EMBEDDING_KEEP_ALIVE =
     process.env.HELPCHAT_EMBEDDING_KEEP_ALIVE?.trim() ||
-    "30m";
+    "24h";
 
 
 const HELPCHAT_EMBEDDING_WARMUP_TIMEOUT_MS =
@@ -823,6 +823,46 @@ async function warmHelpchatLocalLlm() {
 app.locals.warmHelpchatLocalLlm =
     warmHelpchatLocalLlm;
 
+let helpchatLocalLlmWarmupPromise = null;
+
+function ensureHelpchatLocalLlmWarmInBackground() {
+    if (
+        helpchatLocalLlmWarmupPromise
+    ) {
+        return helpchatLocalLlmWarmupPromise;
+    }
+
+    helpchatLocalLlmWarmupPromise =
+        Promise.resolve()
+            .then(
+                () =>
+                    warmHelpchatLocalLlm()
+            )
+            .catch(
+                (error) => {
+                    console.warn(
+                        "Helpchat local LLM background warmup failed:",
+                        error?.code ||
+                        error?.message ||
+                        "unknown"
+                    );
+
+                    return false;
+                }
+            )
+            .finally(
+                () => {
+                    helpchatLocalLlmWarmupPromise =
+                        null;
+                }
+            );
+
+    return helpchatLocalLlmWarmupPromise;
+}
+
+app.locals.ensureHelpchatLocalLlmWarmInBackground =
+    ensureHelpchatLocalLlmWarmInBackground;
+
 // Middleware
 
 // Configurar cors
@@ -1090,6 +1130,9 @@ app.post(
             error: "El mensaje no puede estar vacío.",
         });
     }
+
+    void app.locals
+        .ensureHelpchatLocalLlmWarmInBackground();
 
     try {
         const classificationStartedAt =
@@ -1766,7 +1809,6 @@ if (isMainModule) {
             void (
                 async () => {
                     await warmHelpchatSemanticRouter();
-                    await warmHelpchatLocalLlm();
                 }
             )();
         }
