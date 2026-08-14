@@ -278,20 +278,21 @@ const HelpChat = () => {
     });
   }, [messages, isSending, requestError]);
 
-  const handleInput = (event) => {
+  const handleConversationInput = (event) => {
     const value =
       event.target.value;
-
-    if (testerFeedbackMode) {
-      setTesterFeedbackReason(value);
-      return;
-    }
 
     setInput(value);
 
     if (errorInput && value.trim()) {
       setErrorInput(false);
     }
+  };
+
+  const handleTesterFeedbackInput = (event) => {
+    setTesterFeedbackReason(
+      event.target.value,
+    );
   };
 
   const requestHelp = async ({
@@ -655,12 +656,7 @@ const HelpChat = () => {
     }
   };
 
-  const handleSend = () => {
-    if (testerFeedbackMode) {
-      void handleTesterFeedbackSubmit();
-      return;
-    }
-
+  const handleConversationSubmit = () => {
     submitMessage(input);
   };
 
@@ -846,7 +842,13 @@ const HelpChat = () => {
       autoComplete="off"
       onSubmit={(event) => {
         event.preventDefault();
-        handleSend();
+
+        if (testerFeedbackMode) {
+          void handleTesterFeedbackSubmit();
+          return;
+        }
+
+        handleConversationSubmit();
       }}
       sx={{
         height: "100dvh",
@@ -1312,8 +1314,12 @@ const HelpChat = () => {
               speechRecognitionSupported={
                 speechRecognitionSupported
               }
-              onChange={handleInput}
-              onSend={handleSend}
+              onChange={
+                handleTesterFeedbackInput
+              }
+              onSend={
+                handleTesterFeedbackSubmit
+              }
               onCancel={
                 handleTesterFeedbackCancel
               }
@@ -1336,8 +1342,12 @@ const HelpChat = () => {
               testerCapturedTurnCount={
                 testerCapturedTurnCount
               }
-              onInputChange={handleInput}
-              onSend={handleSend}
+              onInputChange={
+                handleConversationInput
+              }
+              onSend={
+                handleConversationSubmit
+              }
               onToggleSpeech={
                 handleToggleSpeech
               }
