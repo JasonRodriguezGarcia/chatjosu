@@ -19,6 +19,8 @@ test(
         "mental_health_detail",
         "mental_behavior_detail",
         "addiction_detail",
+        "addiction_substance_detail",
+        "addiction_behavior_detail",
         "free_text",
       ],
     );
@@ -472,5 +474,81 @@ test(
         `choice no recorrida: ${key}`,
       );
     }
+  },
+);
+
+test(
+  "addiction_detail exposes the three canonical branches",
+  () => {
+    const node =
+      getClarificationNodeV1(
+        "addiction_detail",
+      );
+
+    assert.deepEqual(
+      node.choices.map(
+        (choice) =>
+          choice.id,
+      ),
+      [
+        "alcohol",
+        "other_substance",
+        "other_behavior",
+      ],
+    );
+
+    const alcohol =
+      resolveClarificationChoiceV1({
+        nodeId:
+          "addiction_detail",
+        choiceId:
+          "alcohol",
+      });
+
+    assert.equal(
+      alcohol.action.type,
+      "resolve_need",
+    );
+
+    assert.equal(
+      alcohol.action.resolvedNeeds[0].descripcion,
+      "ALCOHOLISMO",
+    );
+
+    const substance =
+      resolveClarificationChoiceV1({
+        nodeId:
+          "addiction_detail",
+        choiceId:
+          "other_substance",
+      });
+
+    assert.equal(
+      substance.action.type,
+      "goto",
+    );
+
+    assert.equal(
+      substance.action.node,
+      "addiction_substance_detail",
+    );
+
+    const behavior =
+      resolveClarificationChoiceV1({
+        nodeId:
+          "addiction_detail",
+        choiceId:
+          "other_behavior",
+      });
+
+    assert.equal(
+      behavior.action.type,
+      "goto",
+    );
+
+    assert.equal(
+      behavior.action.node,
+      "addiction_behavior_detail",
+    );
   },
 );

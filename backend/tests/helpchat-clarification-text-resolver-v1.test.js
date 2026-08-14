@@ -169,3 +169,47 @@ test(
     );
   },
 );
+
+test(
+  "interprets natural answers inside addiction_detail without leaving the branch",
+  () => {
+    const cases = [
+      [
+        "Es por el alcohol",
+        "alcohol",
+      ],
+      [
+        "con otra sustancia",
+        "other_substance",
+      ],
+      [
+        "con otra conducta",
+        "other_behavior",
+      ],
+    ];
+
+    for (
+      const [
+        inputMessage,
+        choiceId,
+      ] of cases
+    ) {
+      const result =
+        resolveClarificationTextV1({
+          nodeId:
+            "addiction_detail",
+          inputMessage,
+        });
+
+      assert.equal(
+        result.status,
+        "resolved",
+      );
+
+      assert.equal(
+        result.choiceId,
+        choiceId,
+      );
+    }
+  },
+);

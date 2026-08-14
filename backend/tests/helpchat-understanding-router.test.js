@@ -1340,3 +1340,81 @@ test(
     );
   },
 );
+
+test(
+  "free text in pending addiction_detail advances inside the addiction branch",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+
+            throw new Error(
+              "global embedding should not run",
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "con otra conducta",
+        conversationContext:
+          null,
+        pendingClarification: {
+          node:
+            "addiction_detail",
+          personId:
+            "self",
+          mode:
+            "choice",
+        },
+      });
+
+    assert.equal(
+      semanticCalls,
+      0,
+    );
+
+    assert.equal(
+      result.status,
+      "needs_clarification",
+    );
+
+    assert.equal(
+      result.provider,
+      "clarification_text",
+    );
+
+    assert.equal(
+      result.missingDimension,
+      "addiction_behavior_detail",
+    );
+
+    assert.equal(
+      result.clarificationState.node,
+      "addiction_behavior_detail",
+    );
+
+    assert.equal(
+      result.clarificationState.mode,
+      "free_text",
+    );
+
+    assert.equal(
+      result.clarificationTransition
+        .action.type,
+      "goto",
+    );
+
+    assert.equal(
+      result.clarificationTransition
+        .action.node,
+      "addiction_behavior_detail",
+    );
+  },
+);

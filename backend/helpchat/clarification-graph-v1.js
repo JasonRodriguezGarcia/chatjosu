@@ -163,10 +163,68 @@ const NODES = Object.freeze({
   },
 
   addiction_detail: {
-    id:
-      "addiction_detail",
+    id: "addiction_detail",
     question:
       "¿El problema está relacionado con alcohol, con otra sustancia o con otra conducta?",
+    choices: [
+      {
+        id: "alcohol",
+        label: "Alcohol",
+        message:
+          "El problema está relacionado con alcohol",
+        action: {
+          type:
+            ACTION_TYPES.RESOLVE_NEED,
+          resolvedNeeds: [
+            {
+              tag_id: 2,
+              descripcion:
+                "ALCOHOLISMO",
+            },
+          ],
+        },
+      },
+      {
+        id: "other_substance",
+        label: "Otra sustancia",
+        message:
+          "El problema está relacionado con otra sustancia",
+        action: {
+          type:
+            ACTION_TYPES.GOTO,
+          node:
+            "addiction_substance_detail",
+        },
+      },
+      {
+        id: "other_behavior",
+        label: "Otra conducta",
+        message:
+          "El problema está relacionado con otra conducta",
+        action: {
+          type:
+            ACTION_TYPES.GOTO,
+          node:
+            "addiction_behavior_detail",
+        },
+      },
+    ],
+  },
+
+
+  addiction_substance_detail: {
+    id:
+      "addiction_substance_detail",
+    question:
+      "¿Con qué sustancia está relacionado y qué está ocurriendo?",
+    choices: [],
+  },
+
+  addiction_behavior_detail: {
+    id:
+      "addiction_behavior_detail",
+    question:
+      "¿Con qué conducta está relacionado y qué está ocurriendo?",
     choices: [],
   },
 

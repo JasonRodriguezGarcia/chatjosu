@@ -49,6 +49,23 @@ const CHOICE_PATTERNS =
       ],
     },
 
+    addiction_detail: {
+      alcohol: [
+        /\balcohol\b/,
+        /\bbebida\b/,
+      ],
+      other_substance: [
+        /\botra sustancia\b/,
+        /\bsustancia\b/,
+        /\bdroga[s]?\b/,
+      ],
+      other_behavior: [
+        /\botra conducta\b/,
+        /\bconducta\b/,
+        /\bcomportamiento\b/,
+      ],
+    },
+
     mental_health_detail: {
       mood_anxiety: [
         /\bansiedad\b/,
