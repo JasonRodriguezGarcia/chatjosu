@@ -32,6 +32,10 @@ import {
   buildOpenClarificationCandidatesV1,
 } from "../helpchat/open-clarification-candidates-v1.js";
 
+import {
+  buildOpenClarificationTaskContext,
+} from "../helpchat/task-context-v1.js";
+
 
 const COGNITIVE_TAGS = new Set([
   "ALZHEIMER",
@@ -156,6 +160,7 @@ function clarificationResult({
 
 export function createHelpchatUnderstandingRouter({
   semanticClassifier,
+  localLlmService = null,
 } = {}) {
   if (!semanticClassifier?.classify) {
     throw new Error(
@@ -166,6 +171,7 @@ export function createHelpchatUnderstandingRouter({
   async function understand({
     inputMessage,
     conversationContext,
+    relationalContext = null,
     controlledReply = null,
     pendingClarification = null,
   }) {
@@ -566,6 +572,155 @@ export function createHelpchatUnderstandingRouter({
                       .descripcion,
                 },
               ],
+            },
+          },
+        });
+      }
+
+      const semanticShortlist =
+        Array.isArray(
+          semantic.diagnostics
+            ?.candidates,
+        )
+          ? semantic.diagnostics
+              .candidates
+              .slice(0, 4)
+          : [];
+
+      if (
+        localLlmService?.classify &&
+        semanticShortlist.length > 0
+      ) {
+        const taskContext =
+          buildOpenClarificationTaskContext({
+            nodeId:
+              openNodeId,
+            inputMessage,
+            relationalContext,
+            candidates:
+              semanticShortlist,
+          });
+
+        let localLlm;
+
+        try {
+          localLlm =
+            await localLlmService.classify({
+              taskContext,
+              candidates:
+                semanticShortlist,
+            });
+        } catch (localLlmError) {
+          return clarificationResult({
+            context:
+              semantic.context,
+            missingDimension:
+              openNodeId,
+            provider:
+              "local_llm_error",
+            model:
+              localLlmService.model ||
+              null,
+            durationMs:
+              Math.round(
+                (
+                  performance.now() -
+                    startedAt
+                ) * 10
+              ) / 10,
+            diagnostics: {
+              semantic:
+                semantic.diagnostics,
+              localLlm: {
+                status:
+                  "error",
+                code:
+                  localLlmError?.code ||
+                  "LOCAL_LLM_ERROR",
+              },
+            },
+          });
+        }
+
+        if (
+          localLlm.status ===
+            "resolved" &&
+          localLlm.tag
+        ) {
+          return resolvedResult({
+            tag:
+              localLlm.tag,
+            context:
+              semantic.context,
+            provider:
+              localLlm.provider,
+            model:
+              localLlm.model,
+            durationMs:
+              Math.round(
+                (
+                  performance.now() -
+                    startedAt
+                ) * 10
+              ) / 10,
+            diagnostics: {
+              semantic:
+                semantic.diagnostics,
+              localLlm: {
+                status:
+                  localLlm.status,
+                durationMs:
+                  localLlm.durationMs,
+              },
+            },
+            clarificationTransition: {
+              sourceNode:
+                openNodeId,
+              action: {
+                type:
+                  "resolve_need",
+                resolvedNeeds: [
+                  {
+                    tag_id:
+                      localLlm.tag
+                        .tag_id,
+                    descripcion:
+                      localLlm.tag
+                        .descripcion,
+                  },
+                ],
+              },
+            },
+          });
+        }
+
+        return clarificationResult({
+          context:
+            semantic.context,
+          missingDimension:
+            openNodeId,
+          provider:
+            localLlm.provider ||
+            "ollama",
+          model:
+            localLlm.model ||
+            localLlmService.model ||
+            null,
+          durationMs:
+            Math.round(
+              (
+                performance.now() -
+                  startedAt
+              ) * 10
+            ) / 10,
+          diagnostics: {
+            semantic:
+              semantic.diagnostics,
+            localLlm: {
+              status:
+                "needs_clarification",
+              durationMs:
+                localLlm.durationMs,
             },
           },
         });

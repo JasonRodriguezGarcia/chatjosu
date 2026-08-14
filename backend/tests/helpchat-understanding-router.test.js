@@ -1818,3 +1818,524 @@ test(
     );
   },
 );
+
+test(
+  "ambiguous open health clarification escalates only its bounded shortlist to local llm",
+  async () => {
+    let localCalls = 0;
+    let receivedCandidates = null;
+    let receivedTaskContext = null;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify({
+            conversationContext,
+            allowedTagIds,
+          }) {
+            assert.equal(
+              allowedTagIds.includes(9),
+              true,
+            );
+
+            assert.equal(
+              allowedTagIds.includes(10),
+              true,
+            );
+
+            return {
+              status:
+                "needs_clarification",
+              tag: null,
+              context:
+                conversationContext,
+              provider:
+                "embedding",
+              model:
+                "fake-embedding",
+              diagnostics: {
+                top1: {
+                  tagId: 10,
+                  tag:
+                    "CÁNCER INFANTIL",
+                  score: 0.7594,
+                },
+                top2: {
+                  tagId: 9,
+                  tag:
+                    "CÁNCER",
+                  score: 0.7429,
+                },
+                candidates: [
+                  {
+                    tagId: 10,
+                    tag:
+                      "CÁNCER INFANTIL",
+                    score: 0.7594,
+                  },
+                  {
+                    tagId: 9,
+                    tag:
+                      "CÁNCER",
+                    score: 0.7429,
+                  },
+                ],
+                margin: 0.0165,
+              },
+            };
+          },
+        },
+
+        localLlmService: {
+          model:
+            "qwen3:8b",
+
+          async classify({
+            taskContext,
+            candidates,
+          }) {
+            localCalls += 1;
+            receivedCandidates =
+              candidates;
+            receivedTaskContext =
+              taskContext;
+
+            return {
+              status:
+                "resolved",
+              tag: {
+                tag_id: 9,
+                descripcion:
+                  "CÁNCER",
+              },
+              provider:
+                "ollama",
+              model:
+                "qwen3:8b",
+              durationMs: 35,
+            };
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Le han detectado cáncer",
+        conversationContext:
+          null,
+        relationalContext: {
+          version: 2,
+          people: [
+            {
+              id: "self",
+              relationship:
+                "self",
+              needs: [],
+              facts: [],
+              constraints: [],
+            },
+          ],
+          currentFocus:
+            "self",
+          currentGoal: null,
+          pendingClarification: {
+            node:
+              "health_detail",
+            personId:
+              "self",
+            mode:
+              "free_text",
+          },
+          territory: {
+            province: null,
+            municipality: null,
+          },
+          resourcesShown: [],
+        },
+        pendingClarification: {
+          node:
+            "health_detail",
+          personId:
+            "self",
+          mode:
+            "free_text",
+        },
+      });
+
+    assert.equal(
+      localCalls,
+      1,
+    );
+
+    assert.deepEqual(
+      receivedCandidates.map(
+        (candidate) =>
+          candidate.tagId,
+      ),
+      [
+        10,
+        9,
+      ],
+    );
+
+    assert.equal(
+      receivedTaskContext.task,
+      "resolve_open_clarification",
+    );
+
+    assert.equal(
+      receivedTaskContext.node,
+      "health_detail",
+    );
+
+    assert.equal(
+      receivedTaskContext
+        .focus.relationship,
+      "self",
+    );
+
+    assert.equal(
+      result.status,
+      "resolved",
+    );
+
+    assert.equal(
+      result.provider,
+      "ollama",
+    );
+
+    assert.equal(
+      result.tag.descripcion,
+      "CÁNCER",
+    );
+
+    assert.equal(
+      result
+        .clarificationTransition
+        .sourceNode,
+      "health_detail",
+    );
+  },
+);
+
+test(
+  "local llm may preserve clarification instead of guessing",
+  async () => {
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify({
+            conversationContext,
+          }) {
+            return {
+              status:
+                "needs_clarification",
+              tag: null,
+              context:
+                conversationContext,
+              provider:
+                "embedding",
+              model:
+                "fake",
+              diagnostics: {
+                candidates: [
+                  {
+                    tagId: 10,
+                    tag:
+                      "CÁNCER INFANTIL",
+                    score: 0.7594,
+                  },
+                  {
+                    tagId: 9,
+                    tag:
+                      "CÁNCER",
+                    score: 0.7429,
+                  },
+                ],
+              },
+            };
+          },
+        },
+
+        localLlmService: {
+          model:
+            "qwen3:8b",
+
+          async classify() {
+            return {
+              status:
+                "needs_clarification",
+              tag: null,
+              provider:
+                "ollama",
+              model:
+                "qwen3:8b",
+              durationMs: 20,
+            };
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Le han detectado cáncer",
+        conversationContext:
+          null,
+        relationalContext:
+          null,
+        pendingClarification: {
+          node:
+            "health_detail",
+          personId:
+            "self",
+          mode:
+            "free_text",
+        },
+      });
+
+    assert.equal(
+      result.status,
+      "needs_clarification",
+    );
+
+    assert.equal(
+      result.provider,
+      "ollama",
+    );
+
+    assert.equal(
+      result.missingDimension,
+      "health_detail",
+    );
+  },
+);
+
+test(
+  "clear bounded embedding resolution does not call local llm",
+  async () => {
+    let localCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify({
+            conversationContext,
+          }) {
+            return {
+              status:
+                "resolved",
+              tag: {
+                tag_id: 13,
+                descripcion:
+                  "DIABETES",
+              },
+              context:
+                conversationContext,
+              provider:
+                "embedding",
+              model:
+                "fake",
+              diagnostics: {
+                candidates: [
+                  {
+                    tagId: 13,
+                    tag:
+                      "DIABETES",
+                    score: 0.8,
+                  },
+                ],
+              },
+            };
+          },
+        },
+
+        localLlmService: {
+          async classify() {
+            localCalls += 1;
+            throw new Error(
+              "local llm should not run",
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Tengo diabetes",
+        conversationContext:
+          null,
+        pendingClarification: {
+          node:
+            "health_detail",
+          personId:
+            "self",
+          mode:
+            "free_text",
+        },
+      });
+
+    assert.equal(
+      localCalls,
+      0,
+    );
+
+    assert.equal(
+      result.tag.descripcion,
+      "DIABETES",
+    );
+  },
+);
+
+test(
+  "open node without operational catalog does not call local llm",
+  async () => {
+    let semanticCalls = 0;
+    let localCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+            throw new Error(
+              "semantic should not run",
+            );
+          },
+        },
+
+        localLlmService: {
+          async classify() {
+            localCalls += 1;
+            throw new Error(
+              "local llm should not run",
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "No puede dejar las apuestas",
+        conversationContext:
+          null,
+        pendingClarification: {
+          node:
+            "addiction_behavior_detail",
+          personId:
+            "self",
+          mode:
+            "free_text",
+        },
+      });
+
+    assert.equal(
+      semanticCalls,
+      0,
+    );
+
+    assert.equal(
+      localCalls,
+      0,
+    );
+
+    assert.equal(
+      result.diagnostics.reason,
+      "no_operational_catalog",
+    );
+  },
+);
+
+test(
+  "local llm technical failure stays inside open clarification boundary",
+  async () => {
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify({
+            conversationContext,
+          }) {
+            return {
+              status:
+                "needs_clarification",
+              tag: null,
+              context:
+                conversationContext,
+              provider:
+                "embedding",
+              model:
+                "fake",
+              diagnostics: {
+                candidates: [
+                  {
+                    tagId: 4,
+                    tag:
+                      "ALZHEIMER",
+                    score: 0.63,
+                  },
+                  {
+                    tagId: 31,
+                    tag:
+                      "SALUD MENTAL",
+                    score: 0.62,
+                  },
+                ],
+              },
+            };
+          },
+        },
+
+        localLlmService: {
+          model:
+            "qwen3:8b",
+
+          async classify() {
+            const error =
+              new Error(
+                "timeout",
+              );
+
+            error.code =
+              "LOCAL_LLM_TIMEOUT";
+
+            throw error;
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Está muy desorientado",
+        conversationContext:
+          null,
+        pendingClarification: {
+          node:
+            "health_detail",
+          personId:
+            "self",
+          mode:
+            "free_text",
+        },
+      });
+
+    assert.equal(
+      result.status,
+      "needs_clarification",
+    );
+
+    assert.equal(
+      result.provider,
+      "local_llm_error",
+    );
+
+    assert.equal(
+      result.diagnostics
+        .localLlm.code,
+      "LOCAL_LLM_TIMEOUT",
+    );
+  },
+);
