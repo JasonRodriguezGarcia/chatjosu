@@ -10,6 +10,8 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
+    "format": "prettier --write \"**/*.{js,json,md}\"",
+    "format:check": "prettier --check \"**/*.{js,json,md}\"",
     "smoke:helpchat": "node scripts/smoke-helpchat-runtime.js",
     "db:import-associations": "node scripts/import-normalized-associations-json.js data/Asociaciones_ONG_normalizadas.json"
   },
@@ -21,6 +23,7 @@
     "pg": "^8.21.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.14"
+    "nodemon": "^3.1.14",
+    "prettier": "^3.9.0"
   }
 }
