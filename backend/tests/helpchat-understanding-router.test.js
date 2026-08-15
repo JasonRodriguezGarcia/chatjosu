@@ -1342,6 +1342,160 @@ test(
 );
 
 test(
+  "behavior detail advances to broad mental-health support without diagnosing",
+  async () => {
+    let semanticCalls = 0;
+    let localLlmCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+
+            throw new Error(
+              "semantic classification should not run"
+            );
+          },
+        },
+
+        localLlmService: {
+          model: "fake-local",
+
+          async classify() {
+            localLlmCalls += 1;
+
+            throw new Error(
+              "local LLM should not run"
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "cambios de humor repentino cambio de conducta o principios o maneras de hacer cosas",
+        conversationContext: null,
+        pendingClarification: {
+          node:
+            "mental_behavior_detail",
+          personId:
+            "person_1",
+          mode:
+            "free_text",
+        },
+      });
+
+    assert.equal(
+      semanticCalls,
+      0,
+    );
+
+    assert.equal(
+      localLlmCalls,
+      0,
+    );
+
+    assert.equal(
+      result.status,
+      "resolved",
+    );
+
+    assert.deepEqual(
+      result.tag,
+      {
+        tag_id: 31,
+        descripcion:
+          "SALUD MENTAL",
+      },
+    );
+
+    assert.deepEqual(
+      result.clarificationTransition,
+      {
+        sourceNode:
+          "mental_behavior_detail",
+        action: {
+          type:
+            "resolve_need",
+          resolvedNeeds: [
+            {
+              tag_id: 31,
+              descripcion:
+                "SALUD MENTAL",
+            },
+          ],
+        },
+      },
+    );
+  },
+);
+
+test(
+  "insufficient behavior detail does not invent a mental-health resolution",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify({
+            conversationContext,
+          }) {
+            semanticCalls += 1;
+
+            return {
+              status:
+                "needs_clarification",
+              tag: null,
+              context:
+                conversationContext,
+              provider:
+                "embedding",
+              model:
+                "fake",
+              diagnostics: {
+                candidates: [],
+              },
+            };
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "no sé",
+        conversationContext: null,
+        pendingClarification: {
+          node:
+            "mental_behavior_detail",
+          personId:
+            "person_1",
+          mode:
+            "free_text",
+        },
+      });
+
+    assert.notEqual(
+      result.status,
+      "resolved",
+    );
+
+    assert.equal(
+      result.tag,
+      null,
+    );
+
+    assert.equal(
+      semanticCalls,
+      1,
+    );
+  },
+);
+
+test(
   "free text in pending addiction_detail advances inside the addiction branch",
   async () => {
     let semanticCalls = 0;

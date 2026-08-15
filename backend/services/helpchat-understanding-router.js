@@ -703,6 +703,54 @@ export function createHelpchatUnderstandingRouter({
         }
       }
 
+      if (
+        openNodeId ===
+          "mental_behavior_detail" &&
+        !isClearlyInsufficient(
+          inputMessage
+        )
+      ) {
+        return resolvedResult({
+          tag: {
+            tag_id: 31,
+            descripcion:
+              "SALUD MENTAL",
+          },
+          context,
+          provider:
+            "conversation_policy",
+          model:
+            "conversation-policy-v1",
+          durationMs:
+            Math.round(
+              (
+                performance.now() -
+                  startedAt
+              ) * 10
+            ) / 10,
+          diagnostics: {
+            bounded: true,
+            reason:
+              "behavior_detail_material_answer",
+          },
+          clarificationTransition: {
+            sourceNode:
+              openNodeId,
+            action: {
+              type:
+                "resolve_need",
+              resolvedNeeds: [
+                {
+                  tag_id: 31,
+                  descripcion:
+                    "SALUD MENTAL",
+                },
+              ],
+            },
+          },
+        });
+      }
+
       const semantic =
         await semanticClassifier.classify({
           inputMessage,

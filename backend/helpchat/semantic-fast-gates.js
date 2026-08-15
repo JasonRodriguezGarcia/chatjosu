@@ -120,6 +120,14 @@ const ANCHORS = [
   },
 ];
 
+const ALWAYS_INSUFFICIENT_PATTERNS = [
+  /^no se$/,
+  /^no lo se$/,
+  /^ni idea$/,
+  /^no tengo ni idea$/,
+  /^no sabria decirte$/,
+];
+
 const INSUFFICIENT_PATTERNS = [
   /^necesito ayuda$/,
   /^necesito orientacion$/,
@@ -185,6 +193,15 @@ export function isClearlyInsufficient(
   const text = normalizeText(
     inputMessage
   );
+
+  if (
+    ALWAYS_INSUFFICIENT_PATTERNS.some(
+      (pattern) =>
+        pattern.test(text)
+    )
+  ) {
+    return true;
+  }
 
   const activeNeeds =
     Array.isArray(

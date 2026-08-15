@@ -67,6 +67,71 @@ test(
 );
 
 test(
+  "desconocimiento aislado es insuficiente",
+  () => {
+    for (
+      const message
+      of [
+        "No sé",
+        "No lo sé",
+        "Ni idea",
+        "No tengo ni idea",
+        "No sabría decirte",
+      ]
+    ) {
+      assert.equal(
+        isClearlyInsufficient(
+          message,
+          null,
+        ),
+        true,
+        message,
+      );
+    }
+  },
+);
+
+test(
+  "desconocimiento aislado sigue siendo insuficiente con necesidades activas",
+  () => {
+    assert.equal(
+      isClearlyInsufficient(
+        "No sé",
+        {
+          activeNeeds: [
+            "salud mental",
+          ],
+        },
+      ),
+      true,
+    );
+  },
+);
+
+test(
+  "una frase con incertidumbre y hechos materiales no es insuficiente",
+  () => {
+    for (
+      const message
+      of [
+        "No sé desde cuándo, pero tiene cambios bruscos de humor",
+        "No sé si puede ser diabetes",
+        "No sé qué hacer con mi vida, he perdido el trabajo",
+      ]
+    ) {
+      assert.equal(
+        isClearlyInsufficient(
+          message,
+          null,
+        ),
+        false,
+        message,
+      );
+    }
+  },
+);
+
+test(
   "contexto activo evita declarar insuficiencia",
   () => {
     assert.equal(
