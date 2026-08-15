@@ -67,6 +67,7 @@ import {
 import {
 createHelpchatLocationResolver,
 helpchatClientIp,
+isTrustedHelpchatProxyIp,
 normalizeCloudflareLocation,
 } from "./services/helpchat-location-service.js";
 import {
@@ -945,7 +946,7 @@ app.get(
 
         if (
             HELPCHAT_TRUST_CLOUDFLARE &&
-            isLoopbackAddress(
+            isTrustedHelpchatProxyIp(
                 req.socket
                     ?.remoteAddress
             )

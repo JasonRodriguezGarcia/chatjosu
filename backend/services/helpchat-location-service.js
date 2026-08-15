@@ -103,6 +103,22 @@ export function isPrivateIp(
   return false;
 }
 
+export function isTrustedHelpchatProxyIp(
+  value
+) {
+  const ip =
+    cleanIp(value);
+
+  if (!ip) {
+    return false;
+  }
+
+  return (
+    isLoopbackIp(ip) ||
+    isPrivateIp(ip)
+  );
+}
+
 export function helpchatClientIp({
   remoteAddress,
   cloudflareConnectingIp,
@@ -122,7 +138,9 @@ export function helpchatClientIp({
    */
   if (
     trustCloudflare &&
-    isLoopbackIp(remoteIp)
+    isTrustedHelpchatProxyIp(
+      remoteIp
+    )
   ) {
     const cloudflareIp =
       cleanIp(

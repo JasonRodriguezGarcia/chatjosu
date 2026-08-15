@@ -5,6 +5,7 @@ import {
   createHelpchatLocationResolver,
   helpchatClientIp,
   isPrivateIp,
+  isTrustedHelpchatProxyIp,
   normalizeIpLocation,
 } from "../services/helpchat-location-service.js";
 
@@ -44,6 +45,49 @@ test(
         trustCloudflare: true,
       }),
       "203.0.113.5"
+    );
+  }
+);
+
+test(
+  "clasifica solo peers locales o privados como proxies confiables",
+  () => {
+    assert.equal(
+      isTrustedHelpchatProxyIp(
+        "127.0.0.1"
+      ),
+      true
+    );
+
+    assert.equal(
+      isTrustedHelpchatProxyIp(
+        "172.18.0.1"
+      ),
+      true
+    );
+
+    assert.equal(
+      isTrustedHelpchatProxyIp(
+        "8.8.8.8"
+      ),
+      false
+    );
+  }
+);
+
+test(
+  "confía en CF-Connecting-IP desde un proxy privado autorizado",
+  () => {
+    assert.equal(
+      helpchatClientIp({
+        remoteAddress:
+          "172.18.0.1",
+        cloudflareConnectingIp:
+          "8.8.8.8",
+        trustCloudflare:
+          true,
+      }),
+      "8.8.8.8"
     );
   }
 );
