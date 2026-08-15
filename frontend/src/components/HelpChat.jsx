@@ -1155,7 +1155,7 @@ const HelpChat = () => {
                       color: BRAND.textSecondary,
                     }}
                   >
-                    Buscando opciones…
+                    Estoy revisando qué puede ayudarte…
                   </Box>
                 </Box>
               )}
