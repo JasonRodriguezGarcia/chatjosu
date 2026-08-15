@@ -683,6 +683,81 @@ describe(
     );
 
     it(
+      "goto may persist a base need while opening an optional refinement",
+      () => {
+        const result =
+          applyClarificationTransitionV2({
+            relationalContext: {
+              version: 2,
+              people: [
+                {
+                  id:
+                    "self",
+                  relationship:
+                    "self",
+                },
+                {
+                  id:
+                    "person_1",
+                  relationship:
+                    "hermano",
+                  needs: [],
+                },
+              ],
+              currentFocus:
+                "person_1",
+              pendingClarification: {
+                node:
+                  "mental_health_detail",
+                personId:
+                  "person_1",
+                mode:
+                  "choice",
+              },
+            },
+            personId:
+              "person_1",
+            sourceNode:
+              "mental_health_detail",
+            action: {
+              type:
+                "goto",
+              node:
+                "mental_behavior_detail",
+              resolvedNeeds: [
+                {
+                  tag_id: 31,
+                  descripcion:
+                    "SALUD MENTAL",
+                },
+              ],
+            },
+          });
+
+        expect(
+          result.people.find(
+            (person) =>
+              person.id ===
+              "person_1",
+          ).needs,
+        ).toEqual([
+          "SALUD MENTAL",
+        ]);
+
+        expect(
+          result.pendingClarification,
+        ).toEqual({
+          node:
+            "mental_behavior_detail",
+          personId:
+            "person_1",
+          mode:
+            "free_text",
+        });
+      },
+    );
+
+    it(
       "free text preserves the originating graph node",
       () => {
         const result =

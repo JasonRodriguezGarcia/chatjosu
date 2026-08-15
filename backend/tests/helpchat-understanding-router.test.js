@@ -933,6 +933,27 @@ test(
       /cambios de conducta/i,
     );
 
+    assert.deepEqual(
+      result.clarificationTransition,
+      {
+        sourceNode:
+          "mental_health_detail",
+        action: {
+          type:
+            "goto",
+          node:
+            "mental_behavior_detail",
+          resolvedNeeds: [
+            {
+              tag_id: 31,
+              descripcion:
+                "SALUD MENTAL",
+            },
+          ],
+        },
+      },
+    );
+
     assert.equal(
       semanticCalls,
       0,
@@ -1228,9 +1249,17 @@ test(
         sourceNode:
           "mental_health_detail",
         action: {
-          type: "goto",
+          type:
+            "goto",
           node:
             "mental_behavior_detail",
+          resolvedNeeds: [
+            {
+              tag_id: 31,
+              descripcion:
+                "SALUD MENTAL",
+            },
+          ],
         },
       },
     );
@@ -1491,6 +1520,132 @@ test(
     assert.equal(
       semanticCalls,
       1,
+    );
+  },
+);
+
+test(
+  "insufficient optional behavior detail retains an existing broad need and advances",
+  async () => {
+    let semanticCalls = 0;
+    let localLlmCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+
+            throw new Error(
+              "semantic classification should not run",
+            );
+          },
+        },
+
+        localLlmService: {
+          model:
+            "fake-local",
+
+          async classify() {
+            localLlmCalls += 1;
+
+            throw new Error(
+              "local LLM should not run",
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "no sé",
+        conversationContext: null,
+        relationalContext: {
+          version: 2,
+          people: [
+            {
+              id:
+                "person_1",
+              relationship:
+                "hermano",
+              needs: [
+                "SALUD MENTAL",
+              ],
+            },
+          ],
+          currentFocus:
+            "person_1",
+          pendingClarification: {
+            node:
+              "mental_behavior_detail",
+            personId:
+              "person_1",
+            mode:
+              "free_text",
+          },
+        },
+        pendingClarification: {
+          node:
+            "mental_behavior_detail",
+          personId:
+            "person_1",
+          mode:
+            "free_text",
+        },
+      });
+
+    assert.equal(
+      result.status,
+      "resolved",
+    );
+
+    assert.deepEqual(
+      result.tag,
+      {
+        tag_id: 31,
+        descripcion:
+          "SALUD MENTAL",
+      },
+    );
+
+    assert.equal(
+      result.provider,
+      "conversation_policy",
+    );
+
+    assert.equal(
+      result.diagnostics?.reason,
+      "optional_detail_unavailable",
+    );
+
+    assert.deepEqual(
+      result.clarificationTransition,
+      {
+        sourceNode:
+          "mental_behavior_detail",
+        action: {
+          type:
+            "resolve_need",
+          resolvedNeeds: [
+            {
+              tag_id: 31,
+              descripcion:
+                "SALUD MENTAL",
+            },
+          ],
+        },
+      },
+    );
+
+    assert.equal(
+      semanticCalls,
+      0,
+    );
+
+    assert.equal(
+      localLlmCalls,
+      0,
     );
   },
 );

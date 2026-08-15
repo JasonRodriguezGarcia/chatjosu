@@ -705,50 +705,86 @@ export function createHelpchatUnderstandingRouter({
 
       if (
         openNodeId ===
-          "mental_behavior_detail" &&
-        !isClearlyInsufficient(
-          inputMessage
-        )
+          "mental_behavior_detail"
       ) {
-        return resolvedResult({
-          tag: {
-            tag_id: 31,
-            descripcion:
-              "SALUD MENTAL",
-          },
-          context,
-          provider:
-            "conversation_policy",
-          model:
-            "conversation-policy-v1",
-          durationMs:
-            Math.round(
-              (
-                performance.now() -
-                  startedAt
-              ) * 10
-            ) / 10,
-          diagnostics: {
-            bounded: true,
-            reason:
-              "behavior_detail_material_answer",
-          },
-          clarificationTransition: {
-            sourceNode:
-              openNodeId,
-            action: {
-              type:
-                "resolve_need",
-              resolvedNeeds: [
-                {
-                  tag_id: 31,
-                  descripcion:
-                    "SALUD MENTAL",
-                },
-              ],
+        const behaviorDetailInsufficient =
+          isClearlyInsufficient(
+            inputMessage
+          );
+
+        const pendingPersonId =
+          typeof pendingClarification
+            ?.personId === "string"
+            ? pendingClarification
+                .personId
+            : null;
+
+        const pendingPerson =
+          pendingPersonId &&
+          Array.isArray(
+            relationalContext?.people
+          )
+            ? relationalContext.people.find(
+                (person) =>
+                  person?.id ===
+                  pendingPersonId
+              ) || null
+            : null;
+
+        const hasBroadMentalHealthNeed =
+          Array.isArray(
+            pendingPerson?.needs
+          ) &&
+          pendingPerson.needs.includes(
+            "SALUD MENTAL"
+          );
+
+        if (
+          !behaviorDetailInsufficient ||
+          hasBroadMentalHealthNeed
+        ) {
+          return resolvedResult({
+            tag: {
+              tag_id: 31,
+              descripcion:
+                "SALUD MENTAL",
             },
-          },
-        });
+            context,
+            provider:
+              "conversation_policy",
+            model:
+              "conversation-policy-v1",
+            durationMs:
+              Math.round(
+                (
+                  performance.now() -
+                    startedAt
+                ) * 10
+              ) / 10,
+            diagnostics: {
+              bounded: true,
+              reason:
+                behaviorDetailInsufficient
+                  ? "optional_detail_unavailable"
+                  : "behavior_detail_material_answer",
+            },
+            clarificationTransition: {
+              sourceNode:
+                openNodeId,
+              action: {
+                type:
+                  "resolve_need",
+                resolvedNeeds: [
+                  {
+                    tag_id: 31,
+                    descripcion:
+                      "SALUD MENTAL",
+                  },
+                ],
+              },
+            },
+          });
+        }
       }
 
       const semantic =

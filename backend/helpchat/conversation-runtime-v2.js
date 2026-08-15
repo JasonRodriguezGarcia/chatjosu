@@ -90,6 +90,34 @@ export function applyClarificationTransitionV2({
     action.type === "goto" &&
     typeof action.node === "string"
   ) {
+    let nextContext =
+      relationalContext;
+
+    const resolvedNeeds =
+      Array.isArray(
+        action.resolvedNeeds,
+      )
+        ? action.resolvedNeeds
+        : [];
+
+    if (
+      personId &&
+      resolvedNeeds.length > 0
+    ) {
+      const persisted =
+        persistPreparedResolvedNeedsV2({
+          conversationContext:
+            nextContext,
+          personId,
+          subjectStatus:
+            "resolved",
+          resolvedNeeds,
+        });
+
+      nextContext =
+        persisted.context;
+    }
+
     const targetNode =
       getClarificationNodeV1(
         action.node,
@@ -104,7 +132,7 @@ export function applyClarificationTransitionV2({
         : "free_text";
 
     return setPendingClarificationV2(
-      relationalContext,
+      nextContext,
       {
         node: action.node,
         personId,

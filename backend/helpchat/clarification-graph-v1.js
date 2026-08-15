@@ -137,6 +137,13 @@ const NODES = Object.freeze({
           type: "goto",
           node:
             "mental_behavior_detail",
+          resolvedNeeds: [
+            {
+              tag_id: 31,
+              descripcion:
+                "SALUD MENTAL",
+            },
+          ],
         },
       },
       {

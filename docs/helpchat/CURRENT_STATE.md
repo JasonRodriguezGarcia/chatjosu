@@ -341,31 +341,64 @@ Fix:
     9101fda
     fix(helpchat): advance after unresolved diagnosis status
 
-### Abierto: Feedback #12 — mental_behavior_detail
+### Feedback #12 — mental_behavior_detail
 
-Fix implementado:
+Estado:
 
-    a51e86b
-    fix(helpchat): advance safely after behavior detail
+    CODE / REGRESSION: CLOSED
+    WORKING-TREE HTTP E2E: PASS
+    DEPLOYMENT DOCKER: PENDING REBUILD + SMOKE
 
-Tests unitarios conocidos:
+El flujo se ha corregido para que la elección:
 
-- semantic fast gates;
-- understanding router;
-- runtime/context relacionados.
+    behavior_changes
 
-Pendiente antes de cerrar el defecto:
+establezca primero una necesidad base amplia:
 
-1. reproducir runtime real;
-2. comprobar que un detalle de conducta no repite el mismo nodo;
-3. comprobar específicamente la respuesta "no sé";
-4. una respuesta insuficiente a enriquecimiento opcional debe permitir
-   continuar;
-5. convertir el comportamiento observado en regression si falta;
-6. validar latencia;
-7. desplegar/smoke.
+    SALUD MENTAL
 
-Este es el SIGUIENTE TRABAJO del workstream HelpChat.
+y después abra:
+
+    mental_behavior_detail
+
+como refinamiento adicional.
+
+Esto permite que una respuesta insuficiente como:
+
+    "no sé"
+
+no invente información clínica, pero tampoco bloquee ni repita la
+aclaración si la necesidad base ya estaba establecida.
+
+Invariantes validados:
+
+- detalle material → avanza;
+- `"no sé"` + necesidad base existente → conserva SALUD MENTAL y avanza;
+- `"no sé"` sin necesidad base → no inventa SALUD MENTAL;
+- no se llama a embeddings ni Qwen para el fallback opcional;
+- `pendingClarification` queda limpio tras avanzar.
+
+Validación dirigida:
+
+- node:test: 55/55 PASS;
+- Vitest Conversation V2: 40/40 PASS;
+- HTTP E2E sobre working tree: PASS.
+
+Último smoke observado para `"no sé"`:
+
+    provider = conversation_policy
+    model = conversation-policy-v1
+    classificationMs = 5.7
+    searchMs = 85.4
+    totalMs backend = 329
+
+El warm-up de Qwen ocurrió en background y no bloqueó este flujo.
+
+Pendiente únicamente:
+
+1. reconstruir el contenedor backend;
+2. repetir smoke sobre runtime desplegado;
+3. verificar que no reaparece `mental_behavior_detail`.
 
 ### Abierto/bloqueado: Feedback #13 — persona mayor y soledad
 
