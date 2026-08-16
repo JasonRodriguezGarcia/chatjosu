@@ -69,6 +69,15 @@ import {
   assessConversationProgressV1,
 } from "./helpchat/conversation-progress-v1.js";
 import {
+  resolveNoRepeatContextV1,
+} from "./helpchat/conversation-no-repeat-context-v1.js";
+import {
+  assessNoRepeatV1,
+} from "./helpchat/conversation-no-repeat-v1.js";
+import {
+  isClearlyInsufficient,
+} from "./helpchat/semantic-fast-gates.js";
+import {
 createHelpchatLocationResolver,
 helpchatClientIp,
 isTrustedHelpchatProxyIp,
@@ -1483,6 +1492,84 @@ app.post(
                         relationalContextBeforeClarification
                             ?.pendingClarification
                             ?.node ||
+                        null,
+                    targetNode:
+                        relationalContext
+                            ?.pendingClarification
+                            ?.node ||
+                        null,
+                }
+            );
+        }
+
+        const noRepeatContext =
+            resolveNoRepeatContextV1({
+                beforeContext:
+                    relationalContextBeforeClarification,
+                afterContext:
+                    relationalContext,
+            });
+
+        const inputInsufficient =
+            isClearlyInsufficient(
+                inputMessage,
+                conversationContext
+            );
+
+        const noRepeatDecision =
+            assessNoRepeatV1({
+                progress:
+                    conversationProgress,
+                beforePending:
+                    relationalContextBeforeClarification
+                        ?.pendingClarification ||
+                    null,
+                afterPending:
+                    relationalContext
+                        ?.pendingClarification ||
+                    null,
+                clarificationPurpose:
+                    noRepeatContext
+                        .clarificationPurpose,
+                inputInsufficient,
+                dimensionResolved:
+                    noRepeatContext
+                        .dimensionResolved,
+            });
+
+        if (
+            relationalContextBeforeClarification
+                ?.pendingClarification ||
+            relationalContext
+                ?.pendingClarification ||
+            understanding
+                .clarificationTransition ||
+            understanding
+                .clarificationState
+        ) {
+            console.log(
+                "Helpchat no-repeat guard:",
+                {
+                    status:
+                        noRepeatDecision
+                            .status,
+                    reason:
+                        noRepeatDecision
+                            .reason,
+                    inputInsufficient,
+                    clarificationPurpose:
+                        noRepeatContext
+                            .clarificationPurpose,
+                    dimensionResolved:
+                        noRepeatContext
+                            .dimensionResolved,
+                    sourceNode:
+                        relationalContextBeforeClarification
+                            ?.pendingClarification
+                            ?.node ||
+                        understanding
+                            .clarificationTransition
+                            ?.sourceNode ||
                         null,
                     targetNode:
                         relationalContext
