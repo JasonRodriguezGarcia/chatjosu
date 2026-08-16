@@ -1,0 +1,716 @@
+{
+  "format_version": 2,
+  "status": "proposal",
+  "source_id": "euskadi_registro_asociaciones",
+  "source_records": 28091,
+  "supersedes": "data/curation/semantic/source-taxonomies/euskadi-taxonomy-map-v1.proposal.json",
+  "contract": {
+    "source_assertion": "Official category itself provides an unambiguous semantic assertion usable without LLM inference.",
+    "strong_candidate": "Official category provides a high-confidence candidate; record evidence should confirm or refine before final materialization.",
+    "candidate_set": "Official category constrains the possible canonical concepts but does not assert every member.",
+    "context": "Official category supplies routing/domain context only.",
+    "none": "Official category creates no HelpChat semantic concept by itself."
+  },
+  "goal_types": [
+    {
+      "source_value": "Promoción Cultural",
+      "count": 3298,
+      "percentage": 11.7404,
+      "mode": "none",
+      "semantics": {},
+      "hints": []
+    },
+    {
+      "source_value": "Recreativas",
+      "count": 2952,
+      "percentage": 10.5087,
+      "mode": "candidate_set",
+      "semantics": {
+        "activities": [
+          "OCIO",
+          "TIEMPO_LIBRE"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "Música, Danza, Folklore",
+      "count": 2751,
+      "percentage": 9.7932,
+      "mode": "candidate_set",
+      "semantics": {
+        "activities": [
+          "MUSICA",
+          "DANZA",
+          "FOLKLORE"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "Otros Colectivos",
+      "count": 1567,
+      "percentage": 5.5783,
+      "mode": "none",
+      "semantics": {},
+      "hints": []
+    },
+    {
+      "source_value": "Deportivas (no competitivas)",
+      "count": 1228,
+      "percentage": 4.3715,
+      "mode": "strong_candidate",
+      "semantics": {
+        "activities": [
+          "DEPORTE"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "De Vecinos",
+      "count": 1147,
+      "percentage": 4.0832,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "neighbourhood_association"
+      ]
+    },
+    {
+      "source_value": "De Padres de Alumnos",
+      "count": 1135,
+      "percentage": 4.0404,
+      "mode": "source_assertion",
+      "semantics": {
+        "populations": [
+          "FAMILIAS"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "Promociones Sectoriales",
+      "count": 1101,
+      "percentage": 3.9194,
+      "mode": "none",
+      "semantics": {},
+      "hints": []
+    },
+    {
+      "source_value": "Naturalistas-Ecologistas",
+      "count": 934,
+      "percentage": 3.3249,
+      "mode": "candidate_set",
+      "semantics": {
+        "activities": [
+          "NATURALEZA",
+          "ECOLOGIA"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "Tiempo Libre",
+      "count": 915,
+      "percentage": 3.2573,
+      "mode": "source_assertion",
+      "semantics": {
+        "activities": [
+          "TIEMPO_LIBRE"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "Gastronómicas",
+      "count": 864,
+      "percentage": 3.0757,
+      "mode": "source_assertion",
+      "semantics": {
+        "activities": [
+          "GASTRONOMIA"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "Estudios",
+      "count": 835,
+      "percentage": 2.9725,
+      "mode": "none",
+      "semantics": {},
+      "hints": []
+    },
+    {
+      "source_value": "Solidaridad Internacional",
+      "count": 657,
+      "percentage": 2.3388,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "international_solidarity"
+      ]
+    },
+    {
+      "source_value": "Teatro",
+      "count": 609,
+      "percentage": 2.168,
+      "mode": "source_assertion",
+      "semantics": {
+        "activities": [
+          "TEATRO"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "Ayuda a Otros Colectivos",
+      "count": 588,
+      "percentage": 2.0932,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "social_support_resource"
+      ]
+    },
+    {
+      "source_value": "Promoción de la Mujer",
+      "count": 480,
+      "percentage": 1.7087,
+      "mode": "source_assertion",
+      "semantics": {
+        "populations": [
+          "MUJERES"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "Promoción del Euskera",
+      "count": 449,
+      "percentage": 1.5984,
+      "mode": "none",
+      "semantics": {},
+      "hints": []
+    },
+    {
+      "source_value": "Corales",
+      "count": 437,
+      "percentage": 1.5557,
+      "mode": "source_assertion",
+      "semantics": {
+        "activities": [
+          "CANTO"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "Tercera Edad",
+      "count": 424,
+      "percentage": 1.5094,
+      "mode": "strong_candidate",
+      "semantics": {
+        "populations": [
+          "PERSONAS_MAYORES"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "Juveniles",
+      "count": 402,
+      "percentage": 1.4311,
+      "mode": "source_assertion",
+      "semantics": {
+        "populations": [
+          "JUVENTUD"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "Humanistas",
+      "count": 392,
+      "percentage": 1.3955,
+      "mode": "none",
+      "semantics": {},
+      "hints": []
+    },
+    {
+      "source_value": "Ayuda a Grupos Marginados",
+      "count": 363,
+      "percentage": 1.2922,
+      "mode": "candidate_set",
+      "semantics": {
+        "needs": [
+          "EXCLUSION_SOCIAL",
+          "POBREZA_NECESIDADES_BASICAS",
+          "SIN_HOGAR",
+          "INMIGRACION_REFUGIO"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "Bellas Artes",
+      "count": 348,
+      "percentage": 1.2388,
+      "mode": "candidate_set",
+      "semantics": {
+        "activities": [
+          "ARTES_PLASTICAS"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "Ayuda a Enfermos",
+      "count": 319,
+      "percentage": 1.1356,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "health_or_condition_resource"
+      ]
+    },
+    {
+      "source_value": "Científicas",
+      "count": 307,
+      "percentage": 1.0929,
+      "mode": "none",
+      "semantics": {},
+      "hints": []
+    },
+    {
+      "source_value": "De Estudiantes",
+      "count": 246,
+      "percentage": 0.8757,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "student_association"
+      ]
+    },
+    {
+      "source_value": "Cinematografía",
+      "count": 218,
+      "percentage": 0.776,
+      "mode": "source_assertion",
+      "semantics": {
+        "activities": [
+          "CINE"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "Yoga y Artes Marciales",
+      "count": 193,
+      "percentage": 0.6871,
+      "mode": "candidate_set",
+      "semantics": {
+        "activities": [
+          "ACTIVIDAD_FISICA",
+          "DEPORTE"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "Círculos de Opinión",
+      "count": 180,
+      "percentage": 0.6408,
+      "mode": "none",
+      "semantics": {},
+      "hints": []
+    },
+    {
+      "source_value": "De Tiempo Libre",
+      "count": 178,
+      "percentage": 0.6337,
+      "mode": "source_assertion",
+      "semantics": {
+        "activities": [
+          "TIEMPO_LIBRE"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "De Padres de Familia",
+      "count": 172,
+      "percentage": 0.6123,
+      "mode": "source_assertion",
+      "semantics": {
+        "populations": [
+          "FAMILIAS"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "Técnicas",
+      "count": 170,
+      "percentage": 0.6052,
+      "mode": "none",
+      "semantics": {},
+      "hints": []
+    },
+    {
+      "source_value": "Grupos Feministas",
+      "count": 165,
+      "percentage": 0.5874,
+      "mode": "source_assertion",
+      "semantics": {
+        "populations": [
+          "MUJERES"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "Literarias",
+      "count": 164,
+      "percentage": 0.5838,
+      "mode": "candidate_set",
+      "semantics": {
+        "activities": [
+          "LECTURA",
+          "ESCRITURA"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "Radio",
+      "count": 155,
+      "percentage": 0.5518,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "radio_activity"
+      ]
+    },
+    {
+      "source_value": "Amigos de ...",
+      "count": 150,
+      "percentage": 0.534,
+      "mode": "none",
+      "semantics": {},
+      "hints": []
+    },
+    {
+      "source_value": "De Antiguos Alumnos",
+      "count": 142,
+      "percentage": 0.5055,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "alumni_association"
+      ]
+    },
+    {
+      "source_value": "Promoción del Menor",
+      "count": 137,
+      "percentage": 0.4877,
+      "mode": "candidate_set",
+      "semantics": {
+        "populations": [
+          "INFANCIA",
+          "ADOLESCENCIA"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "Promoción de Empleo",
+      "count": 135,
+      "percentage": 0.4806,
+      "mode": "strong_candidate",
+      "semantics": {
+        "needs": [
+          "INSERCION_LABORAL"
+        ],
+        "functions": [
+          "EMPLEO_INSERCION"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "Ayuda a Minusválidos",
+      "count": 124,
+      "percentage": 0.4414,
+      "mode": "candidate_set",
+      "semantics": {
+        "needs": [
+          "DISCAPACIDAD",
+          "DISCAPACIDAD_FISICA",
+          "DISCAPACIDAD_INTELECTUAL",
+          "DISCAPACIDAD_AUDITIVA"
+        ],
+        "populations": [
+          "PERSONAS_CON_DISCAPACIDAD"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "Casas Regionales",
+      "count": 119,
+      "percentage": 0.4236,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "regional_cultural_association"
+      ]
+    },
+    {
+      "source_value": "Fotografía",
+      "count": 111,
+      "percentage": 0.3951,
+      "mode": "source_assertion",
+      "semantics": {
+        "activities": [
+          "FOTOGRAFIA"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "Promoción de la Juventud",
+      "count": 111,
+      "percentage": 0.3951,
+      "mode": "source_assertion",
+      "semantics": {
+        "populations": [
+          "JUVENTUD"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "Taurinas",
+      "count": 92,
+      "percentage": 0.3275,
+      "mode": "none",
+      "semantics": {},
+      "hints": []
+    },
+    {
+      "source_value": "De Propietarios",
+      "count": 85,
+      "percentage": 0.3026,
+      "mode": "none",
+      "semantics": {},
+      "hints": []
+    },
+    {
+      "source_value": "Pacifistas, Objetores",
+      "count": 67,
+      "percentage": 0.2385,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "rights_or_advocacy"
+      ]
+    },
+    {
+      "source_value": "Ayuda a Ancianos",
+      "count": 64,
+      "percentage": 0.2278,
+      "mode": "strong_candidate",
+      "semantics": {
+        "needs": [
+          "PERSONAS_MAYORES"
+        ],
+        "populations": [
+          "PERSONAS_MAYORES"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "Micológicas",
+      "count": 55,
+      "percentage": 0.1958,
+      "mode": "source_assertion",
+      "semantics": {
+        "activities": [
+          "MICOLOGIA"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "Consumidores",
+      "count": 49,
+      "percentage": 0.1744,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "consumer_association"
+      ]
+    },
+    {
+      "source_value": "Ayuda a Drogadictos",
+      "count": 47,
+      "percentage": 0.1673,
+      "mode": "source_assertion",
+      "semantics": {
+        "needs": [
+          "ADICCIONES_DROGAS"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "Ayuda a Accid/Gru. Rescate",
+      "count": 44,
+      "percentage": 0.1566,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "emergency_or_rescue",
+        "accident_support"
+      ]
+    },
+    {
+      "source_value": "De Padres de Enfermos",
+      "count": 33,
+      "percentage": 0.1175,
+      "mode": "candidate_set",
+      "semantics": {
+        "populations": [
+          "FAMILIAS",
+          "CUIDADORES"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "Ayuda a Disminuídos Psíquicos",
+      "count": 33,
+      "percentage": 0.1175,
+      "mode": "strong_candidate",
+      "semantics": {
+        "needs": [
+          "DISCAPACIDAD_INTELECTUAL"
+        ],
+        "populations": [
+          "PERSONAS_CON_DISCAPACIDAD"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "Filatélicas/Numismáticas",
+      "count": 31,
+      "percentage": 0.1104,
+      "mode": "candidate_set",
+      "semantics": {
+        "activities": [
+          "FILATELIA",
+          "COLECCIONISMO"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "De Viudos-as",
+      "count": 31,
+      "percentage": 0.1104,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "widowhood_support"
+      ]
+    },
+    {
+      "source_value": "De Divorciados-as",
+      "count": 25,
+      "percentage": 0.089,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "family_support"
+      ]
+    },
+    {
+      "source_value": "Ayuda a Alcohólicos",
+      "count": 23,
+      "percentage": 0.0819,
+      "mode": "source_assertion",
+      "semantics": {
+        "needs": [
+          "ALCOHOLISMO"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "De Alumnos (LODE)",
+      "count": 22,
+      "percentage": 0.0783,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "student_association"
+      ]
+    },
+    {
+      "source_value": "Amas de Casa",
+      "count": 13,
+      "percentage": 0.0463,
+      "mode": "none",
+      "semantics": {},
+      "hints": []
+    },
+    {
+      "source_value": "Madres Solteras",
+      "count": 4,
+      "percentage": 0.0142,
+      "mode": "candidate_set",
+      "semantics": {
+        "populations": [
+          "MUJERES",
+          "FAMILIAS"
+        ]
+      },
+      "hints": []
+    }
+  ],
+  "summary": {
+    "values_by_mode": {
+      "source_assertion": 16,
+      "strong_candidate": 5,
+      "candidate_set": 12,
+      "context": 14,
+      "none": 13
+    },
+    "records_by_mode": {
+      "source_assertion": {
+        "count": 5922,
+        "percentage": 21.08
+      },
+      "strong_candidate": {
+        "count": 1884,
+        "percentage": 6.71
+      },
+      "candidate_set": {
+        "count": 8034,
+        "percentage": 28.6
+      },
+      "context": {
+        "count": 3611,
+        "percentage": 12.85
+      },
+      "none": {
+        "count": 8639,
+        "percentage": 30.75
+      }
+    }
+  }
+}
