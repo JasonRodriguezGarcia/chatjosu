@@ -78,6 +78,9 @@ import {
   resolveConversationRecoveryV1,
 } from "./helpchat/conversation-recovery-v1.js";
 import {
+  enforceConversationRecoveryV1,
+} from "./helpchat/conversation-recovery-enforcement-v1.js";
+import {
   isClearlyInsufficient,
 } from "./helpchat/semantic-fast-gates.js";
 import {
@@ -1620,6 +1623,50 @@ app.post(
                     matches:
                         conversationRecovery
                             .matches,
+                }
+            );
+        }
+
+        const recoveryEnforcement =
+            enforceConversationRecoveryV1({
+                relationalContext,
+                personId:
+                    runtimeContext.personId,
+                understanding,
+                recovery:
+                    conversationRecovery,
+            });
+
+        if (
+            recoveryEnforcement.status ===
+                "enforced"
+        ) {
+            relationalContext =
+                recoveryEnforcement.context;
+
+            understanding =
+                recoveryEnforcement
+                    .understanding;
+
+            console.log(
+                "Helpchat conversation recovery enforcement:",
+                {
+                    status:
+                        recoveryEnforcement
+                            .status,
+                    reason:
+                        recoveryEnforcement
+                            .reason,
+                    provider:
+                        understanding
+                            .provider,
+                    resolvedNeeds:
+                        understanding
+                            .resolvedNeeds,
+                    pendingClarification:
+                        relationalContext
+                            ?.pendingClarification ||
+                        null,
                 }
             );
         }
