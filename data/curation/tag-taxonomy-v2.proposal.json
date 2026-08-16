@@ -1,0 +1,380 @@
+{
+  "format_version": 1,
+  "taxonomy_version": "2.0-proposal",
+  "status": "proposal",
+  "principles": {
+    "primary_axis": "need",
+    "multi_tag": true,
+    "numeric_ids_assigned": false,
+    "legacy_tags_unchanged": true
+  },
+  "needs": [
+    {
+      "key": "ALZHEIMER",
+      "label": "Alzheimer y demencias",
+      "parent": "NEUROLOGIA"
+    },
+    {
+      "key": "PARKINSON",
+      "label": "Parkinson",
+      "parent": "NEUROLOGIA"
+    },
+    {
+      "key": "ELA",
+      "label": "Esclerosis lateral amiotrófica (ELA)",
+      "parent": "NEUROLOGIA"
+    },
+    {
+      "key": "ESCLEROSIS_MULTIPLE",
+      "label": "Esclerosis múltiple",
+      "parent": "NEUROLOGIA"
+    },
+    {
+      "key": "ENFERMEDADES_NEUROMUSCULARES",
+      "label": "Enfermedades neuromusculares",
+      "parent": "NEUROLOGIA"
+    },
+    {
+      "key": "DANO_CEREBRAL_ADQUIRIDO",
+      "label": "Daño cerebral adquirido",
+      "parent": "NEUROLOGIA"
+    },
+    {
+      "key": "NEUROFIBROMATOSIS",
+      "label": "Neurofibromatosis",
+      "parent": "NEUROLOGIA"
+    },
+    {
+      "key": "CANCER",
+      "label": "Cáncer",
+      "parent": "SALUD"
+    },
+    {
+      "key": "CANCER_INFANTIL",
+      "label": "Cáncer infantil",
+      "parent": "CANCER"
+    },
+    {
+      "key": "DIABETES",
+      "label": "Diabetes",
+      "parent": "SALUD"
+    },
+    {
+      "key": "ENFERMEDAD_RENAL",
+      "label": "Enfermedad renal",
+      "parent": "SALUD"
+    },
+    {
+      "key": "FIBROSIS_QUISTICA",
+      "label": "Fibrosis quística",
+      "parent": "SALUD"
+    },
+    {
+      "key": "CELIAQUIA",
+      "label": "Celiaquía",
+      "parent": "SALUD"
+    },
+    {
+      "key": "HEMOFILIA",
+      "label": "Hemofilia y coagulopatías",
+      "parent": "SALUD"
+    },
+    {
+      "key": "LINFEDEMA_LIPEDEMA",
+      "label": "Linfedema y lipedema",
+      "parent": "SALUD"
+    },
+    {
+      "key": "ARTRITIS_ESPONDILITIS",
+      "label": "Artritis y espondilitis",
+      "parent": "SALUD"
+    },
+    {
+      "key": "PSORIASIS",
+      "label": "Psoriasis y artritis psoriásica",
+      "parent": "SALUD"
+    },
+    {
+      "key": "LUPUS",
+      "label": "Lupus",
+      "parent": "SALUD"
+    },
+    {
+      "key": "FIBROMIALGIA_FATIGA_CRONICA",
+      "label": "Fibromialgia y fatiga crónica",
+      "parent": "SALUD"
+    },
+    {
+      "key": "CROHN_COLITIS",
+      "label": "Crohn y colitis ulcerosa",
+      "parent": "SALUD"
+    },
+    {
+      "key": "ESPINA_BIFIDA_HIDROCEFALIA",
+      "label": "Espina bífida e hidrocefalia",
+      "parent": "SALUD"
+    },
+    {
+      "key": "SENSIBILIDAD_QUIMICA",
+      "label": "Sensibilidad química múltiple",
+      "parent": "SALUD"
+    },
+    {
+      "key": "HEPATITIS",
+      "label": "Hepatitis",
+      "parent": "SALUD"
+    },
+    {
+      "key": "RETINOSIS_PIGMENTARIA",
+      "label": "Retinosis pigmentaria",
+      "parent": "SALUD"
+    },
+    {
+      "key": "AUTISMO",
+      "label": "Autismo",
+      "parent": "NEURODESARROLLO"
+    },
+    {
+      "key": "TDAH",
+      "label": "TDAH",
+      "parent": "NEURODESARROLLO"
+    },
+    {
+      "key": "DISLEXIA",
+      "label": "Dislexia y dificultades de lectoescritura",
+      "parent": "NEURODESARROLLO"
+    },
+    {
+      "key": "DISCAPACIDAD",
+      "label": "Discapacidad",
+      "parent": "DISCAPACIDAD_GENERAL"
+    },
+    {
+      "key": "DISCAPACIDAD_INTELECTUAL",
+      "label": "Discapacidad intelectual",
+      "parent": "DISCAPACIDAD_GENERAL"
+    },
+    {
+      "key": "DISCAPACIDAD_AUDITIVA",
+      "label": "Discapacidad auditiva y sordera",
+      "parent": "DISCAPACIDAD_GENERAL"
+    },
+    {
+      "key": "PARALISIS_CEREBRAL",
+      "label": "Parálisis cerebral",
+      "parent": "DISCAPACIDAD_GENERAL"
+    },
+    {
+      "key": "SALUD_MENTAL",
+      "label": "Salud mental",
+      "parent": "SALUD"
+    },
+    {
+      "key": "TRASTORNOS_ALIMENTARIOS",
+      "label": "Trastornos de la conducta alimentaria",
+      "parent": "SALUD_MENTAL"
+    },
+    {
+      "key": "TRASTORNO_BIPOLAR",
+      "label": "Trastorno bipolar",
+      "parent": "SALUD_MENTAL"
+    },
+    {
+      "key": "ALCOHOLISMO",
+      "label": "Alcoholismo",
+      "parent": "ADICCIONES"
+    },
+    {
+      "key": "ADICCIONES_DROGAS",
+      "label": "Adicciones a sustancias",
+      "parent": "ADICCIONES"
+    },
+    {
+      "key": "LUDOPATIA",
+      "label": "Ludopatía y adicción al juego",
+      "parent": "ADICCIONES"
+    },
+    {
+      "key": "EXCLUSION_SOCIAL",
+      "label": "Exclusión social",
+      "parent": "SOCIAL"
+    },
+    {
+      "key": "POBREZA_NECESIDADES_BASICAS",
+      "label": "Pobreza y necesidades básicas",
+      "parent": "SOCIAL"
+    },
+    {
+      "key": "SIN_HOGAR",
+      "label": "Personas sin hogar",
+      "parent": "EXCLUSION_SOCIAL"
+    },
+    {
+      "key": "INSERCION_LABORAL",
+      "label": "Inserción laboral",
+      "parent": "SOCIAL"
+    },
+    {
+      "key": "INMIGRACION_REFUGIO",
+      "label": "Inmigración, refugio y asilo",
+      "parent": "SOCIAL"
+    },
+    {
+      "key": "VIOLENCIA_GENERO",
+      "label": "Violencia de género",
+      "parent": "SOCIAL"
+    },
+    {
+      "key": "ACOSO_LABORAL",
+      "label": "Acoso laboral",
+      "parent": "SOCIAL"
+    },
+    {
+      "key": "ACOSO_ESCOLAR",
+      "label": "Acoso escolar",
+      "parent": "SOCIAL"
+    },
+    {
+      "key": "SOLEDAD_NO_DESEADA",
+      "label": "Soledad no deseada",
+      "parent": "SOCIAL"
+    },
+    {
+      "key": "DEPENDENCIA",
+      "label": "Dependencia y apoyo a la autonomía",
+      "parent": "SOCIAL"
+    },
+    {
+      "key": "PERSONAS_PRESAS",
+      "label": "Personas presas y reinserción",
+      "parent": "SOCIAL"
+    },
+    {
+      "key": "ACOGIMIENTO_FAMILIAR",
+      "label": "Acogimiento familiar",
+      "parent": "FAMILIA"
+    },
+    {
+      "key": "ADOPCION",
+      "label": "Adopción y familias adoptivas",
+      "parent": "FAMILIA"
+    },
+    {
+      "key": "MEDIACION_FAMILIAR",
+      "label": "Mediación y crisis familiar",
+      "parent": "FAMILIA"
+    },
+    {
+      "key": "PERSONAS_MAYORES",
+      "label": "Personas mayores",
+      "parent": "SOCIAL"
+    },
+    {
+      "key": "DISCAPACIDAD_FISICA",
+      "label": "Discapacidad física",
+      "parent": "DISCAPACIDAD_GENERAL"
+    },
+    {
+      "key": "ADICCIONES_COMPORTAMENTALES",
+      "label": "Adicciones comportamentales",
+      "parent": "ADICCIONES"
+    }
+  ],
+  "legacy_mapping": {
+    "1": [
+      "ACOGIMIENTO_FAMILIAR"
+    ],
+    "2": [
+      "ALCOHOLISMO"
+    ],
+    "3": [
+      "AUTISMO"
+    ],
+    "4": [
+      "ALZHEIMER"
+    ],
+    "6": [
+      "MEDIACION_FAMILIAR"
+    ],
+    "9": [
+      "CANCER"
+    ],
+    "10": [
+      "CANCER_INFANTIL"
+    ],
+    "12": [
+      "DANO_CEREBRAL_ADQUIRIDO"
+    ],
+    "13": [
+      "DIABETES"
+    ],
+    "14": [
+      "CROHN_COLITIS"
+    ],
+    "15": [
+      "PARKINSON",
+      "ALZHEIMER"
+    ],
+    "16": [
+      "PARKINSON"
+    ],
+    "17": [
+      "SALUD_MENTAL"
+    ],
+    "18": [
+      "ENFERMEDAD_RENAL"
+    ],
+    "19": [
+      "ESPINA_BIFIDA_HIDROCEFALIA"
+    ],
+    "20": [
+      "EXCLUSION_SOCIAL"
+    ],
+    "21": [
+      "ADOPCION"
+    ],
+    "22": [
+      "FIBROMIALGIA_FATIGA_CRONICA"
+    ],
+    "23": [
+      "FIBROMIALGIA_FATIGA_CRONICA"
+    ],
+    "24": [
+      "INMIGRACION_REFUGIO"
+    ],
+    "25": [
+      "INSERCION_LABORAL"
+    ],
+    "27": [
+      "EXCLUSION_SOCIAL",
+      "INSERCION_LABORAL"
+    ],
+    "28": [
+      "LUPUS"
+    ],
+    "29": [
+      "PARALISIS_CEREBRAL"
+    ],
+    "30": [
+      "INMIGRACION_REFUGIO",
+      "INSERCION_LABORAL"
+    ],
+    "31": [
+      "SALUD_MENTAL"
+    ],
+    "32": [
+      "TRASTORNOS_ALIMENTARIOS"
+    ],
+    "33": [
+      "TRASTORNO_BIPOLAR"
+    ],
+    "34": [
+      "DISCAPACIDAD_AUDITIVA"
+    ]
+  },
+  "legacy_provider_tags": {
+    "5": "ASOCIACION DE COLOMBIA",
+    "8": "CÁRITAS BIENESTAR SOCIAL",
+    "11": "CRUZ ROJA BIENESTAR SOCIAL"
+  }
+}

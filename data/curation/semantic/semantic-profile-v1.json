@@ -1,0 +1,164 @@
+{
+  "format_version": 1,
+  "semantic_profile_version": "1.0",
+  "relevance_classes": [
+    "direct",
+    "supportive",
+    "community_activity",
+    "incidental",
+    "out_of_scope",
+    "uncertain"
+  ],
+  "relation_roles": [
+    "direct",
+    "supportive",
+    "incidental",
+    "uncertain"
+  ],
+  "confidence_levels": [
+    "high",
+    "medium",
+    "low"
+  ],
+  "dimensions": {
+    "needs": {
+      "description": "Problema, necesidad o condición por la que una persona podría buscar ayuda.",
+      "closed_vocabulary_in_census": true,
+      "allow_discovery_proposals": true,
+      "relation_role_required": true
+    },
+    "populations": {
+      "description": "Colectivos o perfiles de personas a los que la entidad dirige explícitamente su actividad.",
+      "closed_vocabulary_in_census": true,
+      "allow_discovery_proposals": true
+    },
+    "functions": {
+      "description": "Servicios, prestaciones o funciones concretas que realiza la entidad.",
+      "closed_vocabulary_in_census": true,
+      "allow_discovery_proposals": true
+    },
+    "organization_type": {
+      "description": "Tipo funcional de organización.",
+      "closed_vocabulary_in_census": true,
+      "single_primary_value": true
+    },
+    "service_modes": {
+      "description": "Modo de prestación explícitamente indicado por la fuente.",
+      "closed_vocabulary_in_census": true,
+      "allow_unknown": true
+    },
+    "activities": {
+      "description": "Actividades, aficiones, intereses o formas de participación social que ofrece o desarrolla la entidad. No deben convertirse por sí solas en necesidades asistenciales.",
+      "closed_vocabulary_in_census": true,
+      "allow_discovery_proposals": true
+    }
+  },
+  "organization_types": [
+    "patient_association",
+    "family_association",
+    "social_entity",
+    "federation",
+    "foundation",
+    "advocacy_group",
+    "research_entity",
+    "professional_association",
+    "cultural_association",
+    "sports_association",
+    "community_association",
+    "other",
+    "uncertain"
+  ],
+  "service_modes": [
+    "presencial",
+    "telefonico",
+    "online",
+    "domiciliario",
+    "residencial",
+    "grupal",
+    "individual",
+    "unknown"
+  ],
+  "initial_functions": [
+    "INFORMACION",
+    "ORIENTACION",
+    "ASESORAMIENTO",
+    "ASESORAMIENTO_JURIDICO",
+    "APOYO_PSICOLOGICO",
+    "APOYO_SOCIAL",
+    "ACOMPANAMIENTO",
+    "ACOGIDA",
+    "ALOJAMIENTO",
+    "ALIMENTACION",
+    "AYUDA_ECONOMICA",
+    "NECESIDADES_BASICAS",
+    "REHABILITACION",
+    "TERAPIA",
+    "ATENCION_SANITARIA",
+    "ATENCION_DOMICILIARIA",
+    "RESPIRO_FAMILIAR",
+    "FORMACION",
+    "EMPLEO_INSERCION",
+    "MEDIACION",
+    "OCIO_INCLUSIVO",
+    "TRANSPORTE",
+    "DEFENSA_DERECHOS",
+    "REPRESENTACION",
+    "SENSIBILIZACION",
+    "INVESTIGACION",
+    "RECAUDACION_FONDOS",
+    "VOLUNTARIADO"
+  ],
+  "initial_populations": [
+    "INFANCIA",
+    "ADOLESCENCIA",
+    "JUVENTUD",
+    "PERSONAS_MAYORES",
+    "FAMILIAS",
+    "CUIDADORES",
+    "MUJERES",
+    "MIGRANTES",
+    "REFUGIADOS",
+    "PERSONAS_PRESAS",
+    "PERSONAS_SIN_HOGAR",
+    "PERSONAS_CON_DISCAPACIDAD"
+  ],
+  "governance": {
+    "llm_may_create_canonical_concepts": false,
+    "llm_may_propose_concepts": true,
+    "llm_may_decide_database_promotion": false,
+    "llm_may_decide_deduplication": false,
+    "promotion_is_downstream": true,
+    "master_write_is_downstream": true,
+    "database_write_is_downstream": true,
+    "activities_do_not_imply_direct_support": true
+  },
+  "initial_activities": [
+    "MUSICA",
+    "CANTO",
+    "DANZA",
+    "TEATRO",
+    "CINE",
+    "LECTURA",
+    "ESCRITURA",
+    "ARTES_PLASTICAS",
+    "FOTOGRAFIA",
+    "GASTRONOMIA",
+    "MICOLOGIA",
+    "NATURALEZA",
+    "ECOLOGIA",
+    "SENDERISMO",
+    "DEPORTE",
+    "ACTIVIDAD_FISICA",
+    "JUEGOS",
+    "COLECCIONISMO",
+    "FILATELIA",
+    "OCIO",
+    "TIEMPO_LIBRE",
+    "CULTURA_TRADICIONAL",
+    "FOLKLORE",
+    "ACTIVIDAD_VECINAL",
+    "ACTIVIDAD_COMUNITARIA",
+    "VOLUNTARIADO",
+    "ACTIVIDAD_INTERGENERACIONAL"
+  ]
+}
