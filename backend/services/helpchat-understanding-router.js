@@ -26,6 +26,7 @@ import {
 
 import {
   getOpenClarificationPolicyV1,
+  resolveOpenClarificationInsufficientV1,
 } from "../helpchat/open-clarification-policy-v1.js";
 
 import {
@@ -494,6 +495,90 @@ export function createHelpchatUnderstandingRouter({
         : null;
 
     if (openPolicy) {
+      const pendingPersonId =
+        typeof pendingClarification
+          ?.personId === "string"
+          ? pendingClarification
+              .personId
+          : null;
+
+      const pendingPerson =
+        pendingPersonId &&
+        Array.isArray(
+          relationalContext?.people
+        )
+          ? relationalContext.people.find(
+              (person) =>
+                person?.id ===
+                pendingPersonId
+            ) || null
+          : null;
+
+      const openInputInsufficient =
+        isClearlyInsufficient(
+          inputMessage
+        );
+
+      if (openInputInsufficient) {
+        const insufficientResolution =
+          resolveOpenClarificationInsufficientV1({
+            nodeId:
+              openNodeId,
+            person:
+              pendingPerson,
+          });
+
+        if (
+          insufficientResolution
+            .status ===
+            "resolved" &&
+          insufficientResolution.need
+        ) {
+          const retainedNeed =
+            insufficientResolution.need;
+
+          return resolvedResult({
+            tag: {
+              tag_id:
+                retainedNeed.tag_id,
+              descripcion:
+                retainedNeed.descripcion,
+            },
+            context,
+            provider:
+              "conversation_policy",
+            model:
+              "conversation-policy-v1",
+            durationMs:
+              Math.round(
+                (
+                  performance.now() -
+                    startedAt
+                ) * 10
+              ) / 10,
+            diagnostics: {
+              bounded: true,
+              reason:
+                insufficientResolution
+                  .reason,
+            },
+            clarificationTransition: {
+              sourceNode:
+                openNodeId,
+              action: {
+                type:
+                  "resolve_need",
+                resolvedNeeds: [
+                  structuredClone(
+                    retainedNeed,
+                  ),
+                ],
+              },
+            },
+          });
+        }
+      }
+
       const openCandidates =
         buildOpenClarificationCandidatesV1(
           openNodeId,
@@ -705,86 +790,51 @@ export function createHelpchatUnderstandingRouter({
 
       if (
         openNodeId ===
-          "mental_behavior_detail"
+          "mental_behavior_detail" &&
+        !openInputInsufficient &&
+        openPolicy.baseNeed
       ) {
-        const behaviorDetailInsufficient =
-          isClearlyInsufficient(
-            inputMessage
-          );
+        const baseNeed =
+          openPolicy.baseNeed;
 
-        const pendingPersonId =
-          typeof pendingClarification
-            ?.personId === "string"
-            ? pendingClarification
-                .personId
-            : null;
-
-        const pendingPerson =
-          pendingPersonId &&
-          Array.isArray(
-            relationalContext?.people
-          )
-            ? relationalContext.people.find(
-                (person) =>
-                  person?.id ===
-                  pendingPersonId
-              ) || null
-            : null;
-
-        const hasBroadMentalHealthNeed =
-          Array.isArray(
-            pendingPerson?.needs
-          ) &&
-          pendingPerson.needs.includes(
-            "SALUD MENTAL"
-          );
-
-        if (
-          !behaviorDetailInsufficient ||
-          hasBroadMentalHealthNeed
-        ) {
-          return resolvedResult({
-            tag: {
-              tag_id: 31,
-              descripcion:
-                "SALUD MENTAL",
+        return resolvedResult({
+          tag: {
+            tag_id:
+              baseNeed.tag_id,
+            descripcion:
+              baseNeed.descripcion,
+          },
+          context,
+          provider:
+            "conversation_policy",
+          model:
+            "conversation-policy-v1",
+          durationMs:
+            Math.round(
+              (
+                performance.now() -
+                  startedAt
+              ) * 10
+            ) / 10,
+          diagnostics: {
+            bounded: true,
+            reason:
+              "behavior_detail_material_answer",
+          },
+          clarificationTransition: {
+            sourceNode:
+              openNodeId,
+            action: {
+              type:
+                "resolve_need",
+              resolvedNeeds: [
+                structuredClone(
+                  baseNeed,
+                ),
+              ],
             },
-            context,
-            provider:
-              "conversation_policy",
-            model:
-              "conversation-policy-v1",
-            durationMs:
-              Math.round(
-                (
-                  performance.now() -
-                    startedAt
-                ) * 10
-              ) / 10,
-            diagnostics: {
-              bounded: true,
-              reason:
-                behaviorDetailInsufficient
-                  ? "optional_detail_unavailable"
-                  : "behavior_detail_material_answer",
-            },
-            clarificationTransition: {
-              sourceNode:
-                openNodeId,
-              action: {
-                type:
-                  "resolve_need",
-                resolvedNeeds: [
-                  {
-                    tag_id: 31,
-                    descripcion:
-                      "SALUD MENTAL",
-                  },
-                ],
-              },
-            },
-          });
-        }
+          },
+        });
       }
 
       const semantic =

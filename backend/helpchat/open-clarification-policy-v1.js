@@ -36,6 +36,15 @@ const OPEN_CLARIFICATION_POLICIES =
         "mental_behavior_detail",
       domain:
         "mental_health",
+      purpose:
+        "optional_refinement",
+      baseNeed: {
+        tag_id: 31,
+        descripcion:
+          "SALUD MENTAL",
+      },
+      insufficientStrategy:
+        "retain_existing_base_need",
       catalogStrategy:
         "bounded_semantic_catalog",
       canResolveDirectly:
@@ -116,6 +125,63 @@ export function isAllowedOpenClarificationTagV1({
       Number(tagId),
     )
   );
+}
+
+export function resolveOpenClarificationInsufficientV1({
+  nodeId,
+  person = null,
+} = {}) {
+  const policy =
+    getOpenClarificationPolicyV1(
+      nodeId,
+    );
+
+  if (
+    !policy ||
+    policy.purpose !==
+      "optional_refinement" ||
+    policy.insufficientStrategy !==
+      "retain_existing_base_need" ||
+    !policy.baseNeed
+  ) {
+    return {
+      status:
+        "unresolved",
+      reason:
+        "strategy_not_applicable",
+      need: null,
+    };
+  }
+
+  const baseNeed =
+    policy.baseNeed;
+
+  const hasBaseNeed =
+    Array.isArray(
+      person?.needs,
+    ) &&
+    person.needs.includes(
+      baseNeed.descripcion,
+    );
+
+  if (!hasBaseNeed) {
+    return {
+      status:
+        "unresolved",
+      reason:
+        "base_need_not_established",
+      need: null,
+    };
+  }
+
+  return {
+    status:
+      "resolved",
+    reason:
+      "optional_detail_unavailable",
+    need:
+      clone(baseNeed),
+  };
 }
 
 export function listOpenClarificationPoliciesV1() {
