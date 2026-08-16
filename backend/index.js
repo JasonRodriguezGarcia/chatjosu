@@ -64,6 +64,10 @@ import {
   mergeLegacyGlobalsIntoRuntimeContextV2,
   prepareHelpchatRuntimeContextV2,
 } from "./helpchat/conversation-runtime-v2.js";
+
+import {
+  assessConversationProgressV1,
+} from "./helpchat/conversation-progress-v1.js";
 import {
 createHelpchatLocationResolver,
 helpchatClientIp,
@@ -1407,6 +1411,11 @@ app.post(
             performance.now() -
             classificationStartedAt;
 
+        const relationalContextBeforeClarification =
+            structuredClone(
+                relationalContext
+            );
+
         if (
             understanding
                 .clarificationTransition
@@ -1442,6 +1451,46 @@ app.post(
                         understanding
                             .clarificationState,
                 });
+        }
+
+        const conversationProgress =
+            assessConversationProgressV1({
+                beforeContext:
+                    relationalContextBeforeClarification,
+                afterContext:
+                    relationalContext,
+            });
+
+        if (
+            understanding
+                .clarificationTransition ||
+            understanding
+                .clarificationState
+        ) {
+            console.log(
+                "Helpchat conversation progress:",
+                {
+                    progressed:
+                        conversationProgress
+                            .progressed,
+                    reasons:
+                        conversationProgress
+                            .reasons,
+                    sourceNode:
+                        understanding
+                            .clarificationTransition
+                            ?.sourceNode ||
+                        relationalContextBeforeClarification
+                            ?.pendingClarification
+                            ?.node ||
+                        null,
+                    targetNode:
+                        relationalContext
+                            ?.pendingClarification
+                            ?.node ||
+                        null,
+                }
+            );
         }
 
         if (
