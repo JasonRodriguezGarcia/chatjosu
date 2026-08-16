@@ -75,6 +75,9 @@ import {
   assessNoRepeatV1,
 } from "./helpchat/conversation-no-repeat-v1.js";
 import {
+  resolveConversationRecoveryV1,
+} from "./helpchat/conversation-recovery-v1.js";
+import {
   isClearlyInsufficient,
 } from "./helpchat/semantic-fast-gates.js";
 import {
@@ -1537,6 +1540,16 @@ app.post(
                         .dimensionResolved,
             });
 
+        const conversationRecovery =
+            resolveConversationRecoveryV1({
+                inputMessage,
+                pendingClarification:
+                    relationalContextBeforeClarification
+                        ?.pendingClarification ||
+                    null,
+                noRepeatDecision,
+            });
+
         if (
             relationalContextBeforeClarification
                 ?.pendingClarification ||
@@ -1576,6 +1589,37 @@ app.post(
                             ?.pendingClarification
                             ?.node ||
                         null,
+                }
+            );
+        }
+
+        if (
+            conversationRecovery.status !==
+                "not_applicable"
+        ) {
+            console.log(
+                "Helpchat conversation recovery:",
+                {
+                    status:
+                        conversationRecovery
+                            .status,
+                    reason:
+                        conversationRecovery
+                            .reason,
+                    sourceNode:
+                        conversationRecovery
+                            .sourcePending
+                            ?.node ||
+                        null,
+                    path:
+                        conversationRecovery
+                            .path,
+                    action:
+                        conversationRecovery
+                            .action,
+                    matches:
+                        conversationRecovery
+                            .matches,
                 }
             );
         }
