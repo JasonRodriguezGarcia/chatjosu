@@ -797,9 +797,16 @@ describe(
             ],
           });
 
+        const brother =
+          result.people.find(
+            person =>
+              person.id ===
+              "person_1",
+          );
+
         expect(
-          result.people[0]
-            .resolvedDimensions,
+          brother
+            ?.resolvedDimensions,
         ).toEqual({
           age: "72",
         });
@@ -824,9 +831,16 @@ describe(
             ],
           });
 
+        const brother =
+          result.people.find(
+            person =>
+              person.id ===
+              "person_1",
+          );
+
         expect(
-          result.people[0]
-            .resolvedDimensions,
+          brother
+            ?.resolvedDimensions,
         ).toBeUndefined();
       },
     );
@@ -857,16 +871,30 @@ describe(
             ],
           });
 
+        const brother =
+          result.people.find(
+            person =>
+              person.id ===
+              "person_1",
+          );
+
+        const daughter =
+          result.people.find(
+            person =>
+              person.id ===
+              "person_2",
+          );
+
         expect(
-          result.people[0]
-            .resolvedDimensions
-            .age,
+          brother
+            ?.resolvedDimensions
+            ?.age,
         ).toBe("42");
 
         expect(
-          result.people[1]
-            .resolvedDimensions
-            .age,
+          daughter
+            ?.resolvedDimensions
+            ?.age,
         ).toBe("13");
       },
     );
