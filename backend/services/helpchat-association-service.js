@@ -107,6 +107,19 @@ function unwrapMarkdownLink(value) {
   return label || target || null;
 }
 
+const CONTACT_PLACEHOLDERS =
+  new Set([
+    "CONSULTAR EN WEB",
+    "CONSULTAR EN WEB SEDE",
+    "CONSULTAR WEB SEDE",
+    "CONSULTAR EN SEDE",
+    "NO DISPONIBLE",
+    "CONTACTO POR EMAIL TELEFONO",
+    "CONTACTO POR TELEFONO EMAIL",
+    "CONTACTO POR EMAIL",
+    "CONTACTO POR TELEFONO",
+  ]);
+
 function cleanPlaceholder(value) {
   const cleaned = unwrapMarkdownLink(value);
 
@@ -114,27 +127,65 @@ function cleanPlaceholder(value) {
     return null;
   }
 
-  const normalized = normalizeLookup(cleaned);
+  const normalized =
+    normalizeLookup(cleaned);
 
-  const placeholders = new Set([
-    "CONSULTAR EN WEB",
-    "CONSULTAR EN WEB SEDE",
-    "CONSULTAR WEB SEDE",
-    "CONSULTAR EN SEDE",
-  ]);
-
-  return placeholders.has(normalized)
+  return CONTACT_PLACEHOLDERS.has(
+    normalized
+  )
     ? null
     : cleaned;
+}
+
+function cleanWebsite(value) {
+  const cleaned =
+    cleanPlaceholder(value);
+
+  if (!cleaned) {
+    return null;
+  }
+
+  /*
+   * La columna website puede contener notas humanas.
+   * Sólo exponemos valores que tengan forma de web.
+   *
+   * Admitimos:
+   *   https://example.org
+   *   http://example.org
+   *   www.example.org
+   *   example.org
+   */
+  if (
+    /^https?:\/\//i.test(cleaned) ||
+    /^www\./i.test(cleaned) ||
+    /^[A-Za-z0-9][A-Za-z0-9.-]*\.[A-Za-z]{2,}(?:[\/:?#].*)?$/.test(
+      cleaned
+    )
+  ) {
+    return cleaned;
+  }
+
+  return null;
 }
 
 function normalizeAssociationRow(row) {
   return {
     ...row,
-    phone: cleanPlaceholder(row.phone),
-    email: cleanPlaceholder(row.email),
-    website: cleanPlaceholder(row.website),
+    phone:
+      cleanPlaceholder(row.phone),
+    email:
+      cleanPlaceholder(row.email),
+    website:
+      cleanWebsite(row.website),
   };
+}
+
+export function normalizeAssociationContactFieldsV1(
+  row,
+) {
+  return normalizeAssociationRow(
+    row
+  );
 }
 
 export async function resolveProvince(
@@ -399,15 +450,9 @@ export async function findAssociationsForHelpchat({
       return null;
     }
 
-    const placeholders = new Set([
-      "CONSULTAR EN WEB",
-      "CONSULTAR EN WEB SEDE",
-      "CONSULTAR WEB SEDE",
-      "CONSULTAR EN SEDE",
-      "NO DISPONIBLE",
-    ]);
-
-    return placeholders.has(normalized)
+    return CONTACT_PLACEHOLDERS.has(
+      normalized
+    )
       ? null
       : normalized;
   }
