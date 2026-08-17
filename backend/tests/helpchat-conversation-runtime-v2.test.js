@@ -1145,3 +1145,73 @@ it(
     });
   },
 );
+
+describe(
+  "generic age clarification",
+  () => {
+    it(
+      "persists age on the target person and clears pending",
+      () => {
+        const result =
+          applyClarificationTransitionV2({
+            relationalContext: {
+              version: 2,
+              people: [
+                {
+                  id: "self",
+                  relationship:
+                    "self",
+                },
+                {
+                  id: "person_1",
+                  relationship:
+                    "hermano",
+                },
+              ],
+              currentFocus:
+                "person_1",
+              pendingClarification: {
+                node:
+                  "age",
+                personId:
+                  "person_1",
+                mode:
+                  "free_text",
+                dimension:
+                  "age",
+              },
+            },
+            personId:
+              "person_1",
+            sourceNode:
+              "age",
+            action: {
+              type:
+                "resolve_dimension",
+              dimension:
+                "age",
+              value:
+                "42",
+            },
+          });
+
+        const brother =
+          result.people.find(
+            (person) =>
+              person.id ===
+              "person_1",
+          );
+
+        expect(
+          brother.resolvedDimensions,
+        ).toEqual({
+          age: "42",
+        });
+
+        expect(
+          result.pendingClarification,
+        ).toBeNull();
+      },
+    );
+  },
+);

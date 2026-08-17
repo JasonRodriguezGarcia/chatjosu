@@ -137,6 +137,13 @@ export function applyClarificationTransitionV2({
         node: action.node,
         personId,
         mode,
+        ...(typeof action.dimension ===
+          "string"
+          ? {
+              dimension:
+                action.dimension,
+            }
+          : {}),
       },
     );
   }

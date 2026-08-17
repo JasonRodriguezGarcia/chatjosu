@@ -9,7 +9,7 @@ function normalizeText(value) {
     .trim();
 }
 
-export function interpretCancerAgeAnswerV1(
+export function interpretAgeAnswerV1(
   inputMessage,
 ) {
   const text =
@@ -19,7 +19,6 @@ export function interpretCancerAgeAnswerV1(
     return {
       status: "unresolved",
       age: null,
-      resolvedNeeds: [],
     };
   }
 
@@ -32,7 +31,6 @@ export function interpretCancerAgeAnswerV1(
     return {
       status: "unresolved",
       age: null,
-      resolvedNeeds: [],
     };
   }
 
@@ -47,33 +45,11 @@ export function interpretCancerAgeAnswerV1(
     return {
       status: "unresolved",
       age: null,
-      resolvedNeeds: [],
-    };
-  }
-
-  if (age < 18) {
-    return {
-      status: "resolved",
-      age,
-      resolvedNeeds: [
-        {
-          tag_id: 10,
-          descripcion:
-            "CÁNCER INFANTIL",
-        },
-      ],
     };
   }
 
   return {
     status: "resolved",
     age,
-    resolvedNeeds: [
-      {
-        tag_id: 9,
-        descripcion:
-          "CÁNCER",
-      },
-    ],
   };
 }

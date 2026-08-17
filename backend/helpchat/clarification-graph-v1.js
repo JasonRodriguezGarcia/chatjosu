@@ -84,10 +84,10 @@ const NODES = Object.freeze({
     choices: [],
   },
 
-  cancer_age: {
-    id: "cancer_age",
+  age: {
+    id: "age",
     question:
-      "¿Qué edad tiene la persona con cáncer?",
+      "¿Qué edad tiene la persona de la que me hablas?",
     choices: [],
   },
 

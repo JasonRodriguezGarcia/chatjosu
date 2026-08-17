@@ -49,9 +49,6 @@ import {
   buildOpenClarificationTaskContext,
 } from "../helpchat/task-context-v1.js";
 
-import {
-  interpretCancerAgeAnswerV1,
-} from "../helpchat/cancer-age-answer-v1.js";
 
 
 const COGNITIVE_TAGS = new Set([
@@ -192,7 +189,7 @@ function hasExplicitCancerMention(
   );
 }
 
-function isCancerAgeAmbiguity(
+function isCancerAudienceVariantAmbiguity(
   candidates,
 ) {
   if (
@@ -216,30 +213,24 @@ function isCancerAgeAmbiguity(
   );
 }
 
-function cancerAgeClarificationResult({
+function generalCancerResult({
   context,
   durationMs,
   diagnostics,
 } = {}) {
-  return clarificationResult({
+  return resolvedResult({
+    tag: {
+      tag_id: 9,
+      descripcion:
+        "CÁNCER",
+    },
     context,
-    missingDimension:
-      "cancer_age",
     provider:
       "conversation_policy",
     model:
       "conversation-policy-v1",
     durationMs,
     diagnostics,
-    clarificationTransition: {
-      sourceNode:
-        "health_detail",
-      action: {
-        type: "goto",
-        node:
-          "cancer_age",
-      },
-    },
   });
 }
 
@@ -566,7 +557,7 @@ export function createHelpchatUnderstandingRouter({
         inputMessage,
       )
     ) {
-      return cancerAgeClarificationResult({
+      return generalCancerResult({
         context,
         durationMs:
           Math.round(
@@ -578,85 +569,7 @@ export function createHelpchatUnderstandingRouter({
         diagnostics: {
           bounded: true,
           reason:
-            "explicit_cancer_requires_age",
-        },
-      });
-    }
-
-    if (
-      openNodeId ===
-        "cancer_age"
-    ) {
-      const cancerAgeAnswer =
-        interpretCancerAgeAnswerV1(
-          inputMessage,
-        );
-
-      if (
-        cancerAgeAnswer.status ===
-          "resolved" &&
-        cancerAgeAnswer
-          .resolvedNeeds
-          .length > 0
-      ) {
-        return resolvedResult({
-          tag:
-            cancerAgeAnswer
-              .resolvedNeeds[0],
-          context,
-          provider:
-            "conversation_policy",
-          model:
-            "cancer-age-answer-v1",
-          durationMs:
-            Math.round(
-              (
-                performance.now() -
-                  startedAt
-              ) * 10
-            ) / 10,
-          diagnostics: {
-            bounded: true,
-            reason:
-              "cancer_age_resolved",
-            age:
-              cancerAgeAnswer.age,
-          },
-          clarificationTransition: {
-            sourceNode:
-              "cancer_age",
-            action: {
-              type:
-                "resolve_need",
-              resolvedNeeds:
-                structuredClone(
-                  cancerAgeAnswer
-                    .resolvedNeeds,
-                ),
-            },
-          },
-        });
-      }
-
-      return clarificationResult({
-        context,
-        missingDimension:
-          "cancer_age",
-        provider:
-          "conversation_policy",
-        model:
-          "cancer-age-answer-v1",
-        durationMs:
-          Math.round(
-            (
-              performance.now() -
-                startedAt
-            ) * 10
-          ) / 10,
-        diagnostics: {
-          bounded: true,
-          reason:
-            "cancer_age_unresolved",
+            "explicit_cancer_resolved_general",
         },
       });
     }
@@ -1115,11 +1028,11 @@ export function createHelpchatUnderstandingRouter({
           if (
             openNodeId ===
               "health_detail" &&
-            isCancerAgeAmbiguity(
+            isCancerAudienceVariantAmbiguity(
               semanticShortlist,
             )
           ) {
-            return cancerAgeClarificationResult({
+            return generalCancerResult({
               context:
                 semantic.context,
               durationMs:
@@ -1129,8 +1042,12 @@ export function createHelpchatUnderstandingRouter({
                       startedAt
                   ) * 10
                 ) / 10,
-              diagnostics:
-                localLlmErrorDiagnostics,
+              diagnostics: {
+                ...localLlmErrorDiagnostics,
+                bounded: true,
+                reason:
+                  "cancer_audience_variant_collapsed",
+              },
             });
           }
 
@@ -1211,11 +1128,11 @@ export function createHelpchatUnderstandingRouter({
         if (
           openNodeId ===
             "health_detail" &&
-          isCancerAgeAmbiguity(
+          isCancerAudienceVariantAmbiguity(
             semanticShortlist,
           )
         ) {
-          return cancerAgeClarificationResult({
+          return generalCancerResult({
             context:
               semantic.context,
             durationMs:
@@ -1234,6 +1151,9 @@ export function createHelpchatUnderstandingRouter({
                 durationMs:
                   localLlm.durationMs,
               },
+              bounded: true,
+              reason:
+                "cancer_audience_variant_collapsed",
             },
           });
         }

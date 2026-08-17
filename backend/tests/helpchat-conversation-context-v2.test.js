@@ -775,3 +775,142 @@ describe(
     );
   },
 );
+
+describe(
+  "generic age dimension",
+  () => {
+    it(
+      "normalizes age as a reusable person dimension",
+      () => {
+        const result =
+          normalizeConversationContextV2({
+            version: 2,
+            people: [
+              {
+                id: "person_1",
+                relationship:
+                  "hermano",
+                resolvedDimensions: {
+                  age: "72",
+                },
+              },
+            ],
+          });
+
+        expect(
+          result.people[0]
+            .resolvedDimensions,
+        ).toEqual({
+          age: "72",
+        });
+      },
+    );
+
+    it(
+      "rejects invalid ages",
+      () => {
+        const result =
+          normalizeConversationContextV2({
+            version: 2,
+            people: [
+              {
+                id: "person_1",
+                relationship:
+                  "hermano",
+                resolvedDimensions: {
+                  age: "200",
+                },
+              },
+            ],
+          });
+
+        expect(
+          result.people[0]
+            .resolvedDimensions,
+        ).toBeUndefined();
+      },
+    );
+
+    it(
+      "keeps age isolated between people",
+      () => {
+        const result =
+          normalizeConversationContextV2({
+            version: 2,
+            people: [
+              {
+                id: "person_1",
+                relationship:
+                  "hermano",
+                resolvedDimensions: {
+                  age: "42",
+                },
+              },
+              {
+                id: "person_2",
+                relationship:
+                  "hija",
+                resolvedDimensions: {
+                  age: "13",
+                },
+              },
+            ],
+          });
+
+        expect(
+          result.people[0]
+            .resolvedDimensions
+            .age,
+        ).toBe("42");
+
+        expect(
+          result.people[1]
+            .resolvedDimensions
+            .age,
+        ).toBe("13");
+      },
+    );
+
+    it(
+      "preserves age clarification metadata",
+      () => {
+        const result =
+          normalizeConversationContextV2({
+            version: 2,
+            people: [
+              {
+                id: "self",
+                relationship:
+                  "self",
+              },
+            ],
+            currentFocus:
+              "self",
+            pendingClarification: {
+              node:
+                "age",
+              personId:
+                "self",
+              mode:
+                "free_text",
+              dimension:
+                "age",
+            },
+          });
+
+        expect(
+          result.pendingClarification,
+        ).toEqual({
+          node:
+            "age",
+          personId:
+            "self",
+          mode:
+            "free_text",
+          dimension:
+            "age",
+        });
+      },
+    );
+  },
+);

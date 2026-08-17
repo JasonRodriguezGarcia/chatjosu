@@ -42,6 +42,36 @@ function cleanString(
   return cleaned.slice(0, maxLength);
 }
 
+function normalizeAgeDimension(
+  value,
+) {
+  const cleaned =
+    cleanString(
+      value,
+      3,
+    );
+
+  if (
+    !cleaned ||
+    !/^\d{1,3}$/.test(cleaned)
+  ) {
+    return null;
+  }
+
+  const age =
+    Number(cleaned);
+
+  if (
+    !Number.isInteger(age) ||
+    age < 0 ||
+    age > 120
+  ) {
+    return null;
+  }
+
+  return String(age);
+}
+
 function cleanStringArray(
   value,
   {
@@ -104,6 +134,7 @@ const PENDING_CLARIFICATION_DIMENSIONS =
   new Set([
     "diagnosis_status",
     "goal",
+    "age",
   ]);
 
 function normalizePendingClarification(
@@ -182,6 +213,15 @@ function normalizeResolvedDimensions(
   }
 
   const output = {};
+
+  const age =
+    normalizeAgeDimension(
+      value.age,
+    );
+
+  if (age !== null) {
+    output.age = age;
+  }
 
   for (
     const [
