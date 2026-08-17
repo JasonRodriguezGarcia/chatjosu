@@ -2236,7 +2236,7 @@ test(
     const result =
       await router.understand({
         inputMessage:
-          "Le han detectado cáncer",
+          "Le han diagnosticado diabetes",
         conversationContext:
           null,
         relationalContext: {
@@ -2334,8 +2334,119 @@ test(
   },
 );
 
+
 test(
-  "local llm may preserve clarification instead of guessing",
+  "explicit cancer in health detail asks age without embedding or local llm",
+  async () => {
+    for (
+      const inputMessage of [
+        "Cancer",
+        "Me han detectado un cancer",
+        "Me han detectado un cáncer",
+      ]
+    ) {
+      let semanticCalls = 0;
+      let localCalls = 0;
+
+      const router =
+        createHelpchatUnderstandingRouter({
+          semanticClassifier: {
+            async classify() {
+              semanticCalls += 1;
+
+              const error =
+                new Error(
+                  "semantic must not run",
+                );
+
+              error.code =
+                "LOCAL_EMBEDDING_TIMEOUT";
+
+              throw error;
+            },
+          },
+
+          localLlmService: {
+            async classify() {
+              localCalls += 1;
+
+              throw new Error(
+                "local llm must not run",
+              );
+            },
+          },
+        });
+
+      const result =
+        await router.understand({
+          inputMessage,
+          conversationContext:
+            null,
+          pendingClarification: {
+            node:
+              "health_detail",
+            personId:
+              "self",
+            mode:
+              "free_text",
+          },
+        });
+
+      assert.equal(
+        semanticCalls,
+        0,
+      );
+
+      assert.equal(
+        localCalls,
+        0,
+      );
+
+      assert.equal(
+        result.status,
+        "needs_clarification",
+      );
+
+      assert.equal(
+        result.missingDimension,
+        "cancer_age",
+      );
+
+      assert.equal(
+        result.provider,
+        "conversation_policy",
+      );
+
+      assert.match(
+        result.clarificationQuestion,
+        /edad/i,
+      );
+
+      assert.deepEqual(
+        result.clarificationTransition,
+        {
+          sourceNode:
+            "health_detail",
+          action: {
+            type:
+              "goto",
+            node:
+              "cancer_age",
+          },
+        },
+      );
+
+      assert.equal(
+        result.diagnostics
+          ?.reason,
+        "explicit_cancer_requires_age",
+      );
+    }
+  },
+);
+
+test(
+  "cancer ambiguity asks age when local llm declines to guess",
   async () => {
     const router =
       createHelpchatUnderstandingRouter({
@@ -2359,13 +2470,15 @@ test(
                     tagId: 10,
                     tag:
                       "CÁNCER INFANTIL",
-                    score: 0.7594,
+                    score:
+                      0.7594,
                   },
                   {
                     tagId: 9,
                     tag:
                       "CÁNCER",
-                    score: 0.7429,
+                    score:
+                      0.7429,
                   },
                 ],
               },
@@ -2386,7 +2499,8 @@ test(
                 "ollama",
               model:
                 "qwen3:8b",
-              durationMs: 20,
+              durationMs:
+                25,
             };
           },
         },
@@ -2395,10 +2509,8 @@ test(
     const result =
       await router.understand({
         inputMessage:
-          "Le han detectado cáncer",
+          "Le han diagnosticado diabetes",
         conversationContext:
-          null,
-        relationalContext:
           null,
         pendingClarification: {
           node:
@@ -2417,12 +2529,41 @@ test(
 
     assert.equal(
       result.provider,
-      "ollama",
+      "conversation_policy",
     );
 
     assert.equal(
       result.missingDimension,
+      "cancer_age",
+    );
+
+    assert.match(
+      result.clarificationQuestion,
+      /edad/i,
+    );
+
+    assert.equal(
+      result.clarificationTransition
+        ?.sourceNode,
       "health_detail",
+    );
+
+    assert.deepEqual(
+      result.clarificationTransition
+        ?.action,
+      {
+        type:
+          "goto",
+        node:
+          "cancer_age",
+      },
+    );
+
+    assert.equal(
+      result.diagnostics
+        ?.localLlm
+        ?.status,
+      "needs_clarification",
     );
   },
 );
@@ -2560,6 +2701,342 @@ test(
     assert.equal(
       result.diagnostics.reason,
       "no_operational_catalog",
+    );
+  },
+);
+
+
+
+test(
+  "cancer age resolves adult cancer without semantic classification",
+  async () => {
+    let semanticCalls = 0;
+    let localCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+
+            throw new Error(
+              "semantic should not run",
+            );
+          },
+        },
+
+        localLlmService: {
+          async classify() {
+            localCalls += 1;
+
+            throw new Error(
+              "local llm should not run",
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Tiene 72 años",
+        conversationContext:
+          null,
+        pendingClarification: {
+          node:
+            "cancer_age",
+          personId:
+            "self",
+          mode:
+            "free_text",
+        },
+      });
+
+    assert.equal(
+      semanticCalls,
+      0,
+    );
+
+    assert.equal(
+      localCalls,
+      0,
+    );
+
+    assert.equal(
+      result.status,
+      "resolved",
+    );
+
+    assert.equal(
+      result.tag.tag_id,
+      9,
+    );
+
+    assert.equal(
+      result.tag.descripcion,
+      "CÁNCER",
+    );
+
+    assert.equal(
+      result.provider,
+      "conversation_policy",
+    );
+
+    assert.equal(
+      result.diagnostics.age,
+      72,
+    );
+
+    assert.deepEqual(
+      result.clarificationTransition,
+      {
+        sourceNode:
+          "cancer_age",
+        action: {
+          type:
+            "resolve_need",
+          resolvedNeeds: [
+            {
+              tag_id: 9,
+              descripcion:
+                "CÁNCER",
+            },
+          ],
+        },
+      },
+    );
+  },
+);
+
+test(
+  "cancer age resolves childhood cancer without semantic classification",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+
+            throw new Error(
+              "semantic should not run",
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Tiene 12 años",
+        conversationContext:
+          null,
+        pendingClarification: {
+          node:
+            "cancer_age",
+          personId:
+            "self",
+          mode:
+            "free_text",
+        },
+      });
+
+    assert.equal(
+      semanticCalls,
+      0,
+    );
+
+    assert.equal(
+      result.status,
+      "resolved",
+    );
+
+    assert.equal(
+      result.tag.tag_id,
+      10,
+    );
+
+    assert.equal(
+      result.tag.descripcion,
+      "CÁNCER INFANTIL",
+    );
+
+    assert.equal(
+      result.diagnostics.age,
+      12,
+    );
+  },
+);
+
+test(
+  "invalid cancer age keeps the age clarification open",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+
+            throw new Error(
+              "semantic should not run",
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "No lo sé",
+        conversationContext:
+          null,
+        pendingClarification: {
+          node:
+            "cancer_age",
+          personId:
+            "self",
+          mode:
+            "free_text",
+        },
+      });
+
+    assert.equal(
+      semanticCalls,
+      0,
+    );
+
+    assert.equal(
+      result.status,
+      "needs_clarification",
+    );
+
+    assert.equal(
+      result.missingDimension,
+      "cancer_age",
+    );
+  },
+);
+
+test(
+  "cancer ambiguity advances to age clarification when local llm fails",
+  async () => {
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify({
+            conversationContext,
+          }) {
+            return {
+              status:
+                "needs_clarification",
+              tag: null,
+              context:
+                conversationContext,
+              provider:
+                "embedding",
+              model:
+                "fake",
+              diagnostics: {
+                candidates: [
+                  {
+                    tagId: 10,
+                    tag:
+                      "CÁNCER INFANTIL",
+                    score:
+                      0.7594,
+                  },
+                  {
+                    tagId: 9,
+                    tag:
+                      "CÁNCER",
+                    score:
+                      0.7429,
+                  },
+                ],
+              },
+            };
+          },
+        },
+
+        localLlmService: {
+          model:
+            "qwen3:8b",
+
+          async classify() {
+            const error =
+              new Error(
+                "timeout",
+              );
+
+            error.code =
+              "LOCAL_LLM_TIMEOUT";
+
+            throw error;
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Le han diagnosticado diabetes",
+        conversationContext:
+          null,
+        pendingClarification: {
+          node:
+            "health_detail",
+          personId:
+            "self",
+          mode:
+            "free_text",
+        },
+      });
+
+    assert.equal(
+      result.status,
+      "needs_clarification",
+    );
+
+    assert.equal(
+      result.provider,
+      "conversation_policy",
+    );
+
+    assert.equal(
+      result.missingDimension,
+      "cancer_age",
+    );
+
+    assert.match(
+      result.clarificationQuestion,
+      /edad/i,
+    );
+
+    assert.equal(
+      result.clarificationTransition
+        ?.sourceNode,
+      "health_detail",
+    );
+
+    assert.deepEqual(
+      result.clarificationTransition
+        ?.action,
+      {
+        type:
+          "goto",
+        node:
+          "cancer_age",
+      },
+    );
+
+    assert.equal(
+      result.diagnostics
+        ?.localLlm
+        ?.code,
+      "LOCAL_LLM_TIMEOUT",
     );
   },
 );
