@@ -57,6 +57,9 @@ import {
   resolveHelpchatLocationRequirement,
 } from "./helpchat/location-requirement-v1.js";
 import {
+  buildHelpchatResourceResponseV1,
+} from "./helpchat/resource-response-v1.js";
+import {
   createTesterCaptureRepositoryV1,
 } from "./helpchat/tester-capture-repository-v1.js";
 import {
@@ -2068,76 +2071,19 @@ app.post(
         const associations =
             searchResult.associations;
 
-        const resolvedNeedText =
-            understanding.resolvedNeeds
-                .map(
-                    (need) =>
-                        need.descripcion
-                )
-                .join(", ");
-
-        let message;
-
-        if (associations.length === 0) {
-            message =
-                `He identificado tu consulta como **${resolvedNeedText}**, ` +
-                `pero no he encontrado asociaciones en el catálogo disponible ` +
-                `para **${effectiveProvince}** ni recursos nacionales registrados ` +
-                `con esta categoría.`;
-        } else {
-            let localText;
-
-            if (searchResult.localCount > 0) {
-                localText =
-                    `He encontrado ${searchResult.localCount} opción` +
-                    `${searchResult.localCount === 1 ? "" : "es"} ` +
-                    `relacionada${searchResult.localCount === 1 ? "" : "s"} ` +
-                    `con **${resolvedNeedText}** en **${searchResult.resolvedProvince}**.`;
-            } else if (searchResult.fallbackType === "neighbor_province") {
-                localText =
-                    `No he encontrado opciones registradas en **${effectiveProvince}**, ` +
-                    `pero sí recursos relacionados con **${resolvedNeedText}** ` +
-                    `en provincias limítrofes disponibles en el catálogo.`;
-            } else if (searchResult.fallbackType === "national") {
-                localText =
-                    `No he encontrado opciones registradas en **${effectiveProvince}**, ` +
-                    `pero sí recursos de ámbito nacional relacionados con ` +
-                    `**${resolvedNeedText}**.`;
-            } else {
-                localText =
-                    `He encontrado recursos relacionados con **${resolvedNeedText}**.`;
-            }
-
-            const lines = associations.map((association, index) => {
-                const details = [];
-
-                if (association.municipality) {
-                    details.push(association.municipality);
-                }
-
-                if (association.phone) {
-                    details.push(`Tel.: ${association.phone}`);
-                }
-
-                if (association.email) {
-                    details.push(`Email: ${association.email}`);
-                }
-
-                if (association.website) {
-                    details.push(`Web: ${association.website}`);
-                }
-
-                return (
-                    `${index + 1}. **${association.name}**` +
-                    (details.length > 0
-                        ? ` — ${details.join(" · ")}`
-                        : "")
-                );
+        const message =
+            buildHelpchatResourceResponseV1({
+                associations,
+                resolvedNeeds:
+                    understanding.resolvedNeeds,
+                effectiveProvince,
+                resolvedProvince:
+                    searchResult.resolvedProvince,
+                localCount:
+                    searchResult.localCount,
+                fallbackType:
+                    searchResult.fallbackType,
             });
-
-            message =
-                `${localText}\n\n${lines.join("\n")}`;
-        }
 
         const durationMs = Date.now() - startedAt;
 
