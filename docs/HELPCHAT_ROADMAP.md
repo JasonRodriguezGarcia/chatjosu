@@ -515,6 +515,38 @@ Principios:
 - antes de integrar cambios antiguos/paralelos se revisan intención, tests y compatibilidad;
 - la documentación del repositorio debe ser la fuente canónica del estado del proyecto, no el historial de chats.
 
+## Estado de revalidación de defectos
+
+La siguiente fase no consiste en añadir nuevas heurísticas generales,
+sino en revalidar los defectos reales almacenados por Tester Capture.
+
+Fuente canónica:
+
+    copilot_ong.helpchat_test_feedback
+    copilot_ong.helpchat_test_feedback_analysis
+
+Feedbacks presentes en la auditoría actual:
+
+    3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 15
+
+Qwen analizó correctamente a nivel de infraestructura:
+
+    3, 4, 5, 6, 9, 10, 11, 12, 13, 14
+
+El análisis de:
+
+    15
+
+agotó tres intentos con:
+
+    FEEDBACK_ANALYST_TIMEOUT
+
+El output de Qwen es una hipótesis de triage y nunca constituye por sí
+mismo el cierre de una incidencia.
+
+La revalidación utilizará reproducción real + tests + runtime como
+fuente de verdad.
+
 ## 17. Hitos recientes
 
 - `12e5fa8` — tester capture repository.
@@ -525,5 +557,16 @@ Principios:
 - `b5b913c` — reentrada del grafo desde respuestas incompatibles.
 - `f490cd4` — sólo la aclaración activa muestra botones.
 - `6a7da40` — evita contaminación por cláusulas genéricas multi-need.
+- `9f49c23` — avanza tras detalle conductual opcional.
+- `1dd46f0` — generaliza la política de aclaración opcional.
+- `45e3a8a` — detector de progreso conversacional.
+- `2165730` — guardia contra repetición de aclaraciones.
+- `c7c2774` — contexto para resolución no-repeat.
+- `e1c4937` — enforcement de recovery conversacional legal.
+- `7285bc9` — edad como dimensión genérica por persona.
+- `093aa8b` — ranking y balance multi-necesidad.
+- `3e6c4c7` — preservación de matches multi-tag.
+- `f6b8976` — presentación pública multi-necesidad.
+- `162b55d` — saneamiento de websites públicos inválidos.
 
 Este listado es orientativo; Git sigue siendo la fuente de verdad para el historial exacto.

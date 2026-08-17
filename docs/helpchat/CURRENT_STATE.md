@@ -311,6 +311,95 @@ y debe conservarse como histórico/inactivo.
 La ampliación del catálogo y sus fuentes deja de ser responsabilidad
 de este workstream.
 
+## Estado operativo validado — 2026-08-18
+
+Revision Git desplegada y validada:
+
+    162b55d
+    fix(helpchat): reject invalid public website values
+
+Cadena funcional reciente incluida en este runtime:
+
+    093aa8b feat(helpchat): rank and balance multi-need resources
+    3e6c4c7 feat(helpchat): preserve multi-tag resource matches
+    f6b8976 feat(helpchat): present multi-need resource matches
+    162b55d fix(helpchat): reject invalid public website values
+
+Capacidades validadas conjuntamente:
+
+- clasificación de varias necesidades explícitas en una misma conversación;
+- búsqueda independiente por necesidad;
+- ranking territorial y de contactabilidad;
+- reparto round-robin entre necesidades;
+- deduplicación global;
+- conservación de `matchedNeeds[]` y `matchedTagIds[]`;
+- presentación pública de la relación recurso-necesidad;
+- rechazo de placeholders o notas humanas alojadas erróneamente en `website`.
+
+E2E operativo de referencia:
+
+    "Soy alcohólico y además tengo depresión.
+     Busco ayuda para ambas cosas."
+
+Provincia:
+
+    Bizkaia
+
+Resultado:
+
+    status = resolved
+    resolvedNeeds = ALCOHOLISMO + SALUD MENTAL
+    associations = 5
+    fallbackType = neighbor_province
+    HTTP = 200
+
+Última ejecución sobre la imagen limpia promovida:
+
+    classificationMs = 27.7
+    searchMs = 206.7
+    historyMs = 40.4
+    totalMs = 284
+
+Imagen Docker reproducible construida desde worktree limpio del commit
+`162b55d`:
+
+    copilot-ong-helpchat:dev
+    sha256:967b2e6ef3bcddd8b15b44bef365eddb720e6f8d9c4670b5bbdc449e7dd71738
+
+El contenedor operativo fue recreado explícitamente con esa imagen y se
+verificó:
+
+    container image == image tag
+    health = healthy
+    TRUE_POSTDEPLOY_162B55D = PASS
+
+La primera reconstrucción realizada desde el working tree principal no
+se considera artefacto reproducible porque dicho worktree contiene
+cambios de otros workstreams. Fue sustituida posteriormente por la
+imagen construida desde un worktree Git limpio.
+
+### Deuda DATA observada durante el E2E
+
+La asociación:
+
+    association_id = 273
+    AA Cantabria
+
+presenta actualmente datos estructuralmente desplazados, entre otros:
+
+    municipality = aasantander.org
+    website = gmail.com
+
+El problema ya existe en los artefactos DATA/master y no es generado
+por HelpChat.
+
+Por tanto:
+
+- HelpChat no debe inventar una reparación del registro;
+- la corrección pertenece al pipeline DATA/normalización;
+- el runtime HelpChat mantiene únicamente defensas para evitar exponer
+  valores que inequívocamente no son websites.
+
 ## Feedback / defectos conocidos
 
 ### Cerrados
@@ -341,13 +430,20 @@ Fix:
     9101fda
     fix(helpchat): advance after unresolved diagnosis status
 
-### Feedback #12 — mental_behavior_detail
+### Tester feedback DB #11 — mental_behavior_detail
+
+Nota de identificación:
+
+El número `11` es el `feedback_id` canónico de PostgreSQL. Versiones
+anteriores de esta documentación lo denominaron conceptualmente
+"Feedback #12"; esa numeración no debe seguir utilizándose porque
+colisiona con el feedback_id 12 real, que corresponde a ubicación.
 
 Estado:
 
     CODE / REGRESSION: CLOSED
-    WORKING-TREE HTTP E2E: PASS
-    DEPLOYMENT DOCKER: PENDING REBUILD + SMOKE
+    DEPLOYMENT DOCKER: CLOSED
+    DEPLOYED HTTP E2E: PASS
 
 El flujo se ha corregido para que la elección:
 
@@ -394,13 +490,20 @@ Validación dirigida:
 
 El warm-up de Qwen ocurrió en background y no bloqueó este flujo.
 
-Pendiente únicamente:
+Validación final:
 
-1. reconstruir el contenedor backend;
-2. repetir smoke sobre runtime desplegado;
-3. verificar que no reaparece `mental_behavior_detail`.
+- el backend fue reconstruido y promovido mediante imagen reproducible;
+- el runtime desplegado fue validado tras la promoción;
+- la política opcional conserva SALUD MENTAL sin inventar detalle;
+- una respuesta insuficiente como `"no sé"` no debe reabrir la misma
+  aclaración;
+- No-repeat / Progress / Recovery disponen además de componentes y
+  regresiones posteriores.
 
-### Abierto/bloqueado: Feedback #13 — persona mayor y soledad
+El caso debe volver a ejecutarse durante la revisión sistemática de
+feedbacks, pero ya no está pendiente de despliegue.
+
+### Abierto/bloqueado: Tester feedback DB #13 — persona mayor y soledad
 
 Reporte conceptual:
 
@@ -421,6 +524,83 @@ catálogo de asociaciones del DATA WORKSTREAM.
 Puede avanzarse la comprensión semántica sin acoplarla a la cobertura
 incompleta actual, pero no debe cerrarse el defecto E2E hasta probar
 contra el nuevo catálogo.
+
+### Feedback Analyst — fuente de verdad y estado de cola
+
+Los identificadores canónicos de incidencias son los `feedback_id`
+persistidos en:
+
+    copilot_ong.helpchat_test_feedback
+
+Los resultados automáticos del analista se persisten en:
+
+    copilot_ong.helpchat_test_feedback_analysis
+
+No utilizar numeraciones informales del historial de chats para
+identificar una incidencia cuando exista un `feedback_id` de base de
+datos.
+
+Estado auditado el 2026-08-18:
+
+    analyzed:
+      3, 4, 5, 6, 9, 10, 11, 12, 13, 14
+
+    failed:
+      15
+
+Feedback 15:
+
+    attempts = 3
+    error = FEEDBACK_ANALYST_TIMEOUT
+
+Qwen3 8B es un analista auxiliar, no la fuente de verdad del estado de
+un defecto.
+
+Un resultado `status=analyzed` significa únicamente que existe una
+hipótesis automática. No significa que:
+
+- la causa raíz sea correcta;
+- los módulos sugeridos existan con esos nombres;
+- el defecto esté arreglado;
+- el expected propuesto sea canónico;
+- la incidencia pueda cerrarse.
+
+Se han observado ejemplos donde el análisis automático clasifica de
+forma demasiado amplia o mezcla defectos independientes. Por ejemplo:
+
+- feedback 12 fue reportado explícitamente como un problema de ubicación,
+  aunque el análisis principal lo describe como `invalid_transition`;
+- feedback 13 contiene ubicación + soledad + cobertura de recursos,
+  mientras Qwen asigna como categoría principal `repeated_question`.
+
+Proceso obligatorio de cierre:
+
+    feedback persistido
+        ↓
+    análisis Qwen
+        ↓
+    reconstrucción de conversación real
+        ↓
+    reproducción contra runtime actual
+        ↓
+    diagnóstico técnico
+        ↓
+    regression si procede
+        ↓
+    fix
+        ↓
+    replay
+        ↓
+    cierre humano
+
+Estados de revisión que usaremos durante la auditoría:
+
+    RESUELTO
+    PERSISTE
+    PARCIAL
+    BLOQUEADO_POR_DATA
+    NO_REPRODUCIBLE
+    PENDIENTE_REVALIDACION
 
 ## Conversation Policy V1 — deuda prioritaria
 
@@ -678,19 +858,33 @@ comprobarse siempre con Git antes de trabajar.
 
 ## Próximo paso exacto
 
-No trabajar todavía el E2E de soledad/personas mayores mientras el
-DATA WORKSTREAM amplía el catálogo.
+Realizar una auditoría sistemática de todos los feedbacks persistidos
+que hayan sido analizados por Qwen o hayan fallado durante el análisis.
 
-Próximo trabajo:
+Orden inicial:
 
-1. reproducir Feedback #12 en runtime real;
-2. probar respuesta concreta con descripción de cambios de conducta;
-3. probar `"no sé"`;
-4. demostrar no-repeat + progress;
-5. añadir/corregir regression si es necesario;
-6. validar latencia;
-7. desplegar/smoke;
-8. después generalizar No-repeat/Progress en Conversation Policy V1.
+    3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 15
+
+Para cada feedback:
+
+1. reconstruir la conversación capturada hasta
+   `snapshot_through_turn_id`;
+2. separar el problema reportado por el tester de las hipótesis Qwen;
+3. identificar defectos adicionales independientes;
+4. localizar fixes y regressions posteriores potencialmente relacionados;
+5. reproducir el flujo contra el runtime desplegado actual;
+6. clasificarlo como RESUELTO, PERSISTE, PARCIAL,
+   BLOQUEADO_POR_DATA, NO_REPRODUCIBLE o PENDIENTE_REVALIDACION;
+7. añadir una regression si el defecto confirmado aún no está cubierto;
+8. no modificar código hasta contar con una reproducción concreta.
+
+El feedback 13 de persona mayor/soledad continúa bloqueado para cierre
+E2E por cobertura DATA, aunque pueden auditarse independientemente sus
+otros defectos, como la ubicación.
+
+El feedback 15 requiere primero obtener un análisis válido o revisar
+manualmente su captura porque el Analyst agotó tres intentos por
+`FEEDBACK_ANALYST_TIMEOUT`.
 
 ## Handoff
 

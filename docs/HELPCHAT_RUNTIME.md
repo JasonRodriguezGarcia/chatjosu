@@ -126,6 +126,40 @@ Models used by HelpChat include:
 
 Ollama lifecycle is independent from backend and Analyst lifecycle.
 
+## Current validated application image
+
+Validated deployment checkpoint as of 2026-08-18:
+
+    Git revision:
+      162b55d
+
+    Image:
+      copilot-ong-helpchat:dev
+
+    Image ID:
+      sha256:967b2e6ef3bcddd8b15b44bef365eddb720e6f8d9c4670b5bbdc449e7dd71738
+
+The image was built from a detached clean Git worktree at exactly
+`162b55d`, then promoted with `--no-build` from the main deployment
+Compose so that host-side Docker environment configuration remained
+available.
+
+After promotion:
+
+    backend health = healthy
+    HTTP E2E = PASS
+
+Reference E2E backend duration:
+
+    284 ms
+
+Operational lesson:
+
+Do not rely on `docker compose build` from a dirty integration working
+tree when exact Git-to-image reproducibility matters. Build the image
+from a clean worktree/checkout and use the deployment Compose only to
+supply runtime configuration and recreate the service.
+
 ## Persistence model
 
 Canonical persistence is divided by responsibility:
