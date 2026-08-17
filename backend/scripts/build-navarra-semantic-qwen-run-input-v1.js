@@ -72,10 +72,10 @@ const workload =
 
 if (
   !Array.isArray(workload)
-  || workload.length !== 3702
+  || workload.length === 0
 ) {
   throw new Error(
-    "UNEXPECTED_NAVARRA_CANDIDATE_WORKLOAD:"
+    "INVALID_NAVARRA_CANDIDATE_WORKLOAD:"
     + (
       Array.isArray(workload)
         ? workload.length
@@ -319,11 +319,15 @@ const records =
             null,
 
           /*
-           * Official Navarra registry class.
+           * Official Navarra registry class is
+           * provenance/context only.
+           *
+           * It may constrain candidates through
+           * source_mapping, but it is not citeable
+           * semantic evidence.
            */
           C3:
-            sourceTaxonomy.class
-            ?? null,
+            null,
 
           S1:
             sourceTaxonomy.scope

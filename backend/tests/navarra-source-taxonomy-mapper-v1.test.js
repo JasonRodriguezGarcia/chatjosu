@@ -81,7 +81,6 @@ assert.equal(
     {
       populations: [
         "MIGRANTES",
-        "REFUGIADOS",
       ],
     }
   );
@@ -116,6 +115,69 @@ assert.equal(
       .includes(
         "OCIO"
       )
+  );
+}
+
+/*
+ * APYMA/alumnado is broad family/education context.
+ * It must not manufacture INFANCIA or JUVENTUD.
+ */
+{
+  const result =
+    mapNavarraSourceTaxonomyV1({
+      sourceClass:
+        "Apymas y Alumnos",
+    });
+
+  assert.equal(
+    result.mode,
+    "candidate_set"
+  );
+
+  assert.deepEqual(
+    result.assertions,
+    {}
+  );
+
+  assert.deepEqual(
+    result.candidates,
+    {
+      populations: [
+        "FAMILIAS",
+      ],
+    }
+  );
+}
+
+/*
+ * The official disability/social-health class
+ * is disjunctive, therefore disability remains
+ * a candidate rather than a strong assertion.
+ */
+{
+  const result =
+    mapNavarraSourceTaxonomyV1({
+      sourceClass:
+        "Discapacidad y Asistencia Socio-Sanitaria",
+    });
+
+  assert.equal(
+    result.mode,
+    "candidate_set"
+  );
+
+  assert.deepEqual(
+    result.assertions,
+    {}
+  );
+
+  assert.deepEqual(
+    result.candidates,
+    {
+      populations: [
+        "PERSONAS_CON_DISCAPACIDAD",
+      ],
+    }
   );
 }
 

@@ -189,25 +189,13 @@ for (const row of rows) {
   );
 }
 
-if (
-  candidateResolution.length
-  !== 3702
-) {
-  throw new Error(
-    "UNEXPECTED_CANDIDATE_RESOLUTION:"
-    + candidateResolution.length
-  );
-}
-
-if (
-  contextOnly.length
-  !== 5002
-) {
-  throw new Error(
-    "UNEXPECTED_CONTEXT_ONLY:"
-    + contextOnly.length
-  );
-}
+/*
+ * Route cardinalities are policy outputs, not
+ * immutable invariants.
+ *
+ * Integrity is enforced below through uniqueness,
+ * route exclusivity and complete input coverage.
+ */
 
 const candidateIds =
   new Set(

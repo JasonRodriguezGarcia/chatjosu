@@ -214,20 +214,20 @@ for (
   }
 
   /*
-   * Generic relevance deliberately uses
-   * description + official category as
-   * semantic evidence.
+   * Navarra source class is provenance/context,
+   * not generic semantic evidence.
    *
-   * name is metadata but classifyAssociationRelevance
-   * does not mix it into semantic evidence.
+   * Generic gates may inspect the association
+   * name and FINES/description only.
+   *
+   * Official CLASE semantics are handled solely
+   * through mapNavarraSourceTaxonomyV1().
    */
   const relevance =
     classifyAssociationRelevance({
       name,
 
-      categories: [
-        sourceClass,
-      ].filter(Boolean),
+      categories: [],
 
       text: [
         description,
@@ -253,7 +253,7 @@ for (
       description,
 
       originalCategory:
-        sourceClass,
+        null,
     });
 
   const semanticResult =
@@ -262,10 +262,10 @@ for (
       description,
 
       originalCategory:
-        sourceClass,
+        null,
 
       categoryGoal:
-        sourceClass,
+        null,
     });
 
   const functionResult =
@@ -274,7 +274,7 @@ for (
       description,
 
       categoryGoal:
-        sourceClass,
+        null,
     });
 
   const needs =
