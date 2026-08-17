@@ -231,6 +231,119 @@ test(
       merged.associations.length,
       1
     );
+
+    assert.deepEqual(
+      merged.associations[0]
+        .matchedNeeds,
+      [
+        "ALCOHOLISMO",
+        "SALUD MENTAL",
+      ]
+    );
+
+    assert.deepEqual(
+      merged.associations[0]
+        .matchedTagIds,
+      [
+        2,
+        31,
+      ]
+    );
+
+    /*
+     * Compatibilidad V1:
+     * conserva también el primer match.
+     */
+    assert.equal(
+      merged.associations[0]
+        .matchedNeed,
+      "ALCOHOLISMO"
+    );
+
+    assert.equal(
+      merged.associations[0]
+        .matchedTagId,
+      2
+    );
+  }
+);
+
+test(
+  "merge multi-tag conserva todos los matches al deduplicar por contacto",
+  () => {
+    const merged =
+      mergeMultiNeedSearchResults({
+        resolvedNeeds: [
+          ALCOHOL,
+          MENTAL,
+        ],
+        searchResults: [
+          {
+            localCount: 1,
+            neighborCount: 0,
+            nationalCount: 0,
+            associations: [
+              {
+                id: 501,
+                name:
+                  "Entidad duplicada A",
+                province_key:
+                  "BI",
+                phone:
+                  "944000000",
+                website:
+                  null,
+                resultScope:
+                  "local",
+              },
+            ],
+          },
+          {
+            localCount: 1,
+            neighborCount: 0,
+            nationalCount: 0,
+            associations: [
+              {
+                id: 777,
+                name:
+                  "Entidad duplicada B",
+                province_key:
+                  "BI",
+                phone:
+                  "944000000",
+                website:
+                  null,
+                resultScope:
+                  "local",
+              },
+            ],
+          },
+        ],
+        limit: 5,
+      });
+
+    assert.equal(
+      merged.associations.length,
+      1
+    );
+
+    assert.deepEqual(
+      merged.associations[0]
+        .matchedNeeds,
+      [
+        "ALCOHOLISMO",
+        "SALUD MENTAL",
+      ]
+    );
+
+    assert.deepEqual(
+      merged.associations[0]
+        .matchedTagIds,
+      [
+        2,
+        31,
+      ]
+    );
   }
 );
 

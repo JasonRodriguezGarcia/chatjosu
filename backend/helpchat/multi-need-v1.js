@@ -285,6 +285,41 @@ function contactKey(
   ].join("|");
 }
 
+function appendUniqueMatch(
+  target,
+  source,
+) {
+  const need =
+    source?.matchedNeed ??
+    null;
+
+  const tagId =
+    source?.matchedTagId ??
+    null;
+
+  if (
+    need &&
+    !target.matchedNeeds.includes(
+      need
+    )
+  ) {
+    target.matchedNeeds.push(
+      need
+    );
+  }
+
+  if (
+    tagId !== null &&
+    !target.matchedTagIds.includes(
+      tagId
+    )
+  ) {
+    target.matchedTagIds.push(
+      tagId
+    );
+  }
+}
+
 export function mergeMultiNeedSearchResults({
   resolvedNeeds = [],
   searchResults = [],
@@ -298,6 +333,12 @@ export function mergeMultiNeedSearchResults({
 
   const seenContacts =
     new Set();
+
+  const associationById =
+    new Map();
+
+  const associationByContact =
+    new Map();
 
   const associations = [];
 
@@ -345,15 +386,36 @@ export function mergeMultiNeedSearchResults({
             searchResult?.associations ??
             []
           ).map(
-            association => ({
-              ...association,
-              matchedNeed:
+            association => {
+              const matchedNeed =
                 need?.descripcion ??
-                null,
-              matchedTagId:
+                null;
+
+              const matchedTagId =
                 need?.tag_id ??
-                null,
-            })
+                null;
+
+              return {
+                ...association,
+                matchedNeed,
+                matchedTagId,
+                matchedNeeds:
+                  matchedNeed
+                    ? [
+                        matchedNeed,
+                      ]
+                    : [],
+                matchedTagIds:
+                  matchedTagId !==
+                    null &&
+                  matchedTagId !==
+                    undefined
+                    ? [
+                        matchedTagId,
+                      ]
+                    : [],
+              };
+            }
           );
 
         return (
@@ -404,20 +466,39 @@ export function mergeMultiNeedSearchResults({
             association
           );
 
-        if (
-          seenIds.has(id) ||
+        const existing =
+          associationById.get(id) ||
           (
-            key &&
-            seenContacts.has(key)
-          )
-        ) {
+            key
+              ? associationByContact.get(
+                  key
+                )
+              : null
+          );
+
+        if (existing) {
+          appendUniqueMatch(
+            existing,
+            association
+          );
+
           continue;
         }
 
         seenIds.add(id);
 
+        associationById.set(
+          id,
+          association
+        );
+
         if (key) {
           seenContacts.add(key);
+
+          associationByContact.set(
+            key,
+            association
+          );
         }
 
         associations.push(
