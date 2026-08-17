@@ -1,3 +1,7 @@
+import {
+  rankHelpchatResourcesV1,
+} from "./resource-ranking-v1.js";
+
 function cleanText(value) {
   return typeof value === "string"
     ? value.trim()
@@ -301,71 +305,129 @@ export function mergeMultiNeedSearchResults({
   let neighborCount = 0;
   let nationalCount = 0;
 
-  for (
-    let index = 0;
-    index < searchResults.length;
-    index += 1
+  /*
+   * Cada necesidad conserva su propio ranking.
+   *
+   * Después intercalamos los grupos para impedir
+   * que la primera necesidad monopolice el límite.
+   *
+   * A1 A2 A3...
+   * B1 B2 B3...
+   *
+   * => A1 B1 A2 B2...
+   *
+   * Si un grupo se agota, los demás utilizan
+   * las plazas restantes.
+   */
+  const rankedGroups =
+    searchResults.map(
+      (searchResult, index) => {
+        const need =
+          needByIndex[index];
+
+        localCount +=
+          Number(
+            searchResult?.localCount
+          ) || 0;
+
+        neighborCount +=
+          Number(
+            searchResult?.neighborCount
+          ) || 0;
+
+        nationalCount +=
+          Number(
+            searchResult?.nationalCount
+          ) || 0;
+
+        const enriched =
+          (
+            searchResult?.associations ??
+            []
+          ).map(
+            association => ({
+              ...association,
+              matchedNeed:
+                need?.descripcion ??
+                null,
+              matchedTagId:
+                need?.tag_id ??
+                null,
+            })
+          );
+
+        return (
+          rankHelpchatResourcesV1(
+            enriched
+          )
+        );
+      }
+    );
+
+  const cursors =
+    rankedGroups.map(
+      () => 0
+    );
+
+  while (
+    associations.length < limit
   ) {
-    const searchResult =
-      searchResults[index];
-
-    const need =
-      needByIndex[index];
-
-    localCount +=
-      Number(
-        searchResult?.localCount
-      ) || 0;
-
-    neighborCount +=
-      Number(
-        searchResult?.neighborCount
-      ) || 0;
-
-    nationalCount +=
-      Number(
-        searchResult?.nationalCount
-      ) || 0;
+    let progressed = false;
 
     for (
-      const association
-      of searchResult?.associations ?? []
+      let groupIndex = 0;
+      groupIndex <
+        rankedGroups.length;
+      groupIndex += 1
     ) {
-      const id =
-        String(
-          association.id
-        );
+      const group =
+        rankedGroups[groupIndex];
 
-      const key =
-        contactKey(
+      while (
+        cursors[groupIndex] <
+        group.length
+      ) {
+        const association =
+          group[
+            cursors[groupIndex]
+          ];
+
+        cursors[groupIndex] += 1;
+
+        const id =
+          String(
+            association.id
+          );
+
+        const key =
+          contactKey(
+            association
+          );
+
+        if (
+          seenIds.has(id) ||
+          (
+            key &&
+            seenContacts.has(key)
+          )
+        ) {
+          continue;
+        }
+
+        seenIds.add(id);
+
+        if (key) {
+          seenContacts.add(key);
+        }
+
+        associations.push(
           association
         );
 
-      if (
-        seenIds.has(id) ||
-        (
-          key &&
-          seenContacts.has(key)
-        )
-      ) {
-        continue;
+        progressed = true;
+
+        break;
       }
-
-      seenIds.add(id);
-
-      if (key) {
-        seenContacts.add(key);
-      }
-
-      associations.push({
-        ...association,
-        matchedNeed:
-          need?.descripcion ??
-          null,
-        matchedTagId:
-          need?.tag_id ??
-          null,
-      });
 
       if (
         associations.length >=
@@ -375,10 +437,7 @@ export function mergeMultiNeedSearchResults({
       }
     }
 
-    if (
-      associations.length >=
-      limit
-    ) {
+    if (!progressed) {
       break;
     }
   }

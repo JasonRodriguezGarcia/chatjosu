@@ -235,6 +235,260 @@ test(
 );
 
 test(
+  "merge reparte plazas entre necesidades con recursos",
+  () => {
+    const merged =
+      mergeMultiNeedSearchResults({
+        resolvedNeeds: [
+          ALCOHOL,
+          MENTAL,
+        ],
+        searchResults: [
+          {
+            localCount: 5,
+            neighborCount: 0,
+            nationalCount: 0,
+            associations: [
+              {
+                id: 1,
+                name: "Alcohol 1",
+                resultScope:
+                  "local",
+              },
+              {
+                id: 2,
+                name: "Alcohol 2",
+                resultScope:
+                  "local",
+              },
+              {
+                id: 3,
+                name: "Alcohol 3",
+                resultScope:
+                  "local",
+              },
+              {
+                id: 4,
+                name: "Alcohol 4",
+                resultScope:
+                  "local",
+              },
+              {
+                id: 5,
+                name: "Alcohol 5",
+                resultScope:
+                  "local",
+              },
+            ],
+          },
+          {
+            localCount: 5,
+            neighborCount: 0,
+            nationalCount: 0,
+            associations: [
+              {
+                id: 11,
+                name: "Mental 1",
+                resultScope:
+                  "local",
+              },
+              {
+                id: 12,
+                name: "Mental 2",
+                resultScope:
+                  "local",
+              },
+              {
+                id: 13,
+                name: "Mental 3",
+                resultScope:
+                  "local",
+              },
+              {
+                id: 14,
+                name: "Mental 4",
+                resultScope:
+                  "local",
+              },
+              {
+                id: 15,
+                name: "Mental 5",
+                resultScope:
+                  "local",
+              },
+            ],
+          },
+        ],
+        limit: 5,
+      });
+
+    assert.deepEqual(
+      merged.associations.map(
+        row => row.id
+      ),
+      [
+        1,
+        11,
+        2,
+        12,
+        3,
+      ]
+    );
+
+    assert.deepEqual(
+      merged.associations.map(
+        row =>
+          row.matchedNeed
+      ),
+      [
+        "ALCOHOLISMO",
+        "SALUD MENTAL",
+        "ALCOHOLISMO",
+        "SALUD MENTAL",
+        "ALCOHOLISMO",
+      ]
+    );
+  }
+);
+
+test(
+  "merge rellena plazas cuando una necesidad se agota",
+  () => {
+    const merged =
+      mergeMultiNeedSearchResults({
+        resolvedNeeds: [
+          ALCOHOL,
+          MENTAL,
+        ],
+        searchResults: [
+          {
+            localCount: 4,
+            neighborCount: 0,
+            nationalCount: 0,
+            associations: [
+              {
+                id: 1,
+                name: "Alcohol 1",
+                resultScope:
+                  "local",
+              },
+              {
+                id: 2,
+                name: "Alcohol 2",
+                resultScope:
+                  "local",
+              },
+              {
+                id: 3,
+                name: "Alcohol 3",
+                resultScope:
+                  "local",
+              },
+              {
+                id: 4,
+                name: "Alcohol 4",
+                resultScope:
+                  "local",
+              },
+            ],
+          },
+          {
+            localCount: 1,
+            neighborCount: 0,
+            nationalCount: 0,
+            associations: [
+              {
+                id: 10,
+                name: "Mental 1",
+                resultScope:
+                  "local",
+              },
+            ],
+          },
+        ],
+        limit: 5,
+      });
+
+    assert.deepEqual(
+      merged.associations.map(
+        row => row.id
+      ),
+      [
+        1,
+        10,
+        2,
+        3,
+        4,
+      ]
+    );
+  }
+);
+
+test(
+  "merge aplica ranking dentro de cada necesidad antes de intercalar",
+  () => {
+    const merged =
+      mergeMultiNeedSearchResults({
+        resolvedNeeds: [
+          ALCOHOL,
+          MENTAL,
+        ],
+        searchResults: [
+          {
+            localCount: 1,
+            neighborCount: 0,
+            nationalCount: 1,
+            associations: [
+              {
+                id: 1,
+                name:
+                  "Alcohol nacional",
+                resultScope:
+                  "national",
+                phone:
+                  "900000001",
+              },
+              {
+                id: 2,
+                name:
+                  "Alcohol local",
+                resultScope:
+                  "local",
+              },
+            ],
+          },
+          {
+            localCount: 1,
+            neighborCount: 0,
+            nationalCount: 0,
+            associations: [
+              {
+                id: 10,
+                name:
+                  "Mental local",
+                resultScope:
+                  "local",
+              },
+            ],
+          },
+        ],
+        limit: 3,
+      });
+
+    assert.deepEqual(
+      merged.associations.map(
+        row => row.id
+      ),
+      [
+        2,
+        10,
+        1,
+      ]
+    );
+  }
+);
+
+test(
   "multi-anchor previo evita reclasificar cláusulas",
   async () => {
     let calls = 0;
