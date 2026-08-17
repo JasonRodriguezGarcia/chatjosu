@@ -23,6 +23,12 @@ import {
   createHelpchatLocalLlmService,
 } from "./services/helpchat-local-llm-service.js";
 import {
+  createHelpchatClarificationRendererV1,
+} from "./services/helpchat-clarification-renderer-v1.js";
+import {
+  buildClarificationQuestionIntentV1,
+} from "./helpchat/clarification-question-intent-v1.js";
+import {
   createHelpchatOllamaReadiness,
 } from "./services/helpchat-ollama-readiness.js";
 import {
@@ -203,6 +209,24 @@ const HELPCHAT_LOCAL_LLM_WARMUP_TIMEOUT_MS =
         "HELPCHAT_LOCAL_LLM_WARMUP_TIMEOUT_MS",
         60000
     );
+
+const HELPCHAT_CLARIFICATION_RENDERER_MODEL =
+    process.env
+        .HELPCHAT_CLARIFICATION_RENDERER_MODEL
+        ?.trim() ||
+    HELPCHAT_LOCAL_LLM_MODEL;
+
+const HELPCHAT_CLARIFICATION_RENDERER_TIMEOUT_MS =
+    positiveIntegerEnv(
+        "HELPCHAT_CLARIFICATION_RENDERER_TIMEOUT_MS",
+        1800
+    );
+
+const HELPCHAT_CLARIFICATION_RENDERER_KEEP_ALIVE =
+    process.env
+        .HELPCHAT_CLARIFICATION_RENDERER_KEEP_ALIVE
+        ?.trim() ||
+    HELPCHAT_LOCAL_LLM_KEEP_ALIVE;
 
 const HELPCHAT_SEMANTIC_MIN_SCORE =
     Number(
@@ -444,6 +468,21 @@ const helpchatLocalLlmService =
         keepAlive:
             HELPCHAT_LOCAL_LLM_KEEP_ALIVE,
     });
+
+const helpchatClarificationRenderer =
+    createHelpchatClarificationRendererV1({
+        baseUrl:
+            HELPCHAT_EMBEDDING_BASE_URL,
+        model:
+            HELPCHAT_CLARIFICATION_RENDERER_MODEL,
+        timeoutMs:
+            HELPCHAT_CLARIFICATION_RENDERER_TIMEOUT_MS,
+        keepAlive:
+            HELPCHAT_CLARIFICATION_RENDERER_KEEP_ALIVE,
+    });
+
+app.locals.renderHelpchatClarification =
+    helpchatClarificationRenderer.render;
 
 const helpchatUnderstandingRouter =
     createHelpchatUnderstandingRouter({
@@ -1676,6 +1715,80 @@ app.post(
                 "needs_clarification" ||
             understanding.needsClarification === true
         ) {
+            const canonicalClarificationQuestion =
+                understanding.clarificationQuestion;
+
+            let publicClarificationQuestion =
+                canonicalClarificationQuestion;
+
+            const questionIntent =
+                buildClarificationQuestionIntentV1({
+                    understanding,
+                    relationalContext,
+                });
+
+            let clarificationRender =
+                null;
+
+            if (questionIntent) {
+                try {
+                    clarificationRender =
+                        await app.locals
+                            .renderHelpchatClarification({
+                                intent:
+                                    questionIntent,
+                            });
+
+                    if (
+                        clarificationRender
+                            ?.question
+                    ) {
+                        publicClarificationQuestion =
+                            clarificationRender.question;
+                    }
+                } catch (renderError) {
+                    clarificationRender = {
+                        rendered:
+                            false,
+                        reason:
+                            "unexpected_renderer_error",
+                        model:
+                            HELPCHAT_CLARIFICATION_RENDERER_MODEL,
+                        durationMs:
+                            null,
+                    };
+
+                    publicClarificationQuestion =
+                        canonicalClarificationQuestion;
+                }
+            }
+
+            if (questionIntent) {
+                console.log(
+                    "Helpchat clarification renderer:",
+                    {
+                        askFor:
+                            questionIntent.askFor,
+                        rendered:
+                            clarificationRender
+                                ?.rendered ===
+                                true,
+                        reason:
+                            clarificationRender
+                                ?.reason ||
+                            "not_rendered",
+                        model:
+                            clarificationRender
+                                ?.model ||
+                            HELPCHAT_CLARIFICATION_RENDERER_MODEL,
+                        durationMs:
+                            clarificationRender
+                                ?.durationMs ??
+                            null,
+                    }
+                );
+            }
+
             const durationMs =
                 Date.now() - startedAt;
 
@@ -1707,13 +1820,13 @@ app.post(
                 status:
                     "needs_clarification",
                 message:
-                    understanding.clarificationQuestion,
+                    publicClarificationQuestion,
                 tag: null,
                 context:
                     relationalContext,
                 needsClarification: true,
                 clarificationQuestion:
-                    understanding.clarificationQuestion,
+                    publicClarificationQuestion,
                 quickReplies:
                     Array.isArray(
                         understanding.quickReplies
