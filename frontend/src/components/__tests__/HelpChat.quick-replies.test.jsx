@@ -147,7 +147,7 @@ describe(
             "button",
             {
               name:
-                "Busco orientación social",
+                "Necesito ayuda para un familiar",
             },
           ),
         );
@@ -432,7 +432,7 @@ describe(
             "button",
             {
               name:
-                "Busco orientación social",
+                "Necesito ayuda para un familiar",
             },
           ),
         );
@@ -579,7 +579,7 @@ it(
         "button",
         {
           name:
-            "Busco orientación social",
+            "Necesito ayuda para un familiar",
         },
       ),
     );
@@ -843,7 +843,7 @@ it(
         "button",
         {
           name:
-            "Busco orientación social",
+            "Necesito ayuda para un familiar",
         },
       ),
     );

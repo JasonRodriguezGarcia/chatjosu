@@ -35,9 +35,42 @@ import {
 } from "@mui/material";
 
 const STARTER_SUGGESTIONS = [
-  "Necesito ayuda para un familiar",
-  "Busco orientación social",
-  "Necesito apoyo relacionado con una enfermedad",
+  {
+    id: "family",
+    label: "Necesito ayuda para un familiar",
+    message: "Necesito ayuda para un familiar",
+    controlledReply: null,
+  },
+  {
+    id: "health",
+    label: "Un problema de salud",
+    message: "Un problema de salud",
+    controlledReply: {
+      type: "clarification_choice",
+      node: "need_type",
+      choice: "health",
+    },
+  },
+  {
+    id: "employment",
+    label: "Trabajo o empleo",
+    message: "Trabajo o empleo",
+    controlledReply: {
+      type: "clarification_choice",
+      node: "need_type",
+      choice: "employment",
+    },
+  },
+  {
+    id: "emotional_health",
+    label: "Me preocupa cómo me siento",
+    message: "Me preocupa cómo me siento",
+    controlledReply: {
+      type: "clarification_choice",
+      node: "need_type",
+      choice: "emotional_health",
+    },
+  },
 ];
 
 const createMessage = (role, content, extra = {}) => ({
@@ -760,7 +793,13 @@ const HelpChat = () => {
   };
 
   const handleSuggestion = (suggestion) => {
-    submitMessage(suggestion);
+    submitMessage(
+      suggestion.message,
+      {
+        controlledReply:
+          suggestion.controlledReply,
+      },
+    );
   };
 
   const showInitialState =
@@ -951,7 +990,7 @@ const HelpChat = () => {
               >
                 {STARTER_SUGGESTIONS.map((suggestion) => (
                   <Button
-                    key={suggestion}
+                    key={suggestion.id}
                     type="button"
                     variant="outlined"
                     onClick={() => handleSuggestion(suggestion)}
@@ -974,7 +1013,7 @@ const HelpChat = () => {
                       },
                     }}
                   >
-                    {suggestion}
+                    {suggestion.label}
                   </Button>
                 ))}
               </Stack>

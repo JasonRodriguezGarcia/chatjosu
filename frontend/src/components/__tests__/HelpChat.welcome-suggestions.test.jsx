@@ -21,9 +21,48 @@ import {
 } from "../../test/helpchatTestUtils";
 
 const STARTERS = [
-  "Necesito ayuda para un familiar",
-  "Busco orientación social",
-  "Necesito apoyo relacionado con una enfermedad",
+  {
+    label:
+      "Necesito ayuda para un familiar",
+    controlledReply:
+      null,
+  },
+  {
+    label:
+      "Un problema de salud",
+    controlledReply: {
+      type:
+        "clarification_choice",
+      node:
+        "need_type",
+      choice:
+        "health",
+    },
+  },
+  {
+    label:
+      "Trabajo o empleo",
+    controlledReply: {
+      type:
+        "clarification_choice",
+      node:
+        "need_type",
+      choice:
+        "employment",
+    },
+  },
+  {
+    label:
+      "Me preocupa cómo me siento",
+    controlledReply: {
+      type:
+        "clarification_choice",
+      node:
+        "need_type",
+      choice:
+        "emotional_health",
+    },
+  },
 ];
 
 function gipuzkoaProvincesResponse() {
@@ -86,9 +125,9 @@ function usefulClarificationResponse(
 describe(
   "HelpChat welcome suggestions",
   () => {
-    for (const suggestion of STARTERS) {
+    for (const starter of STARTERS) {
       it(
-        `sends starter immediately: ${suggestion}`,
+        `sends typed starter immediately: ${starter.label}`,
         { timeout: 10000 },
         async () => {
           const requestBodies = [];
@@ -143,7 +182,7 @@ describe(
               "button",
               {
                 name:
-                  suggestion,
+                  starter.label,
               },
             ),
           );
@@ -158,20 +197,29 @@ describe(
             requestBodies[0],
           ).toMatchObject({
             inputMessage:
-              suggestion,
+              starter.label,
             selectedProvincia:
               "Gipuzkoa",
           });
 
-          expect(
-            await screen.findByText(
-              suggestion,
-            ),
-          ).toBeInTheDocument();
+          if (starter.controlledReply) {
+            expect(
+              requestBodies[0]
+                .controlledReply,
+            ).toEqual(
+              starter.controlledReply,
+            );
+          } else {
+            expect(
+              requestBodies[0],
+            ).not.toHaveProperty(
+              "controlledReply",
+            );
+          }
 
           expect(
             await screen.findByText(
-              /puedes contarme un poco más/i,
+              starter.label,
             ),
           ).toBeInTheDocument();
         },
@@ -179,8 +227,7 @@ describe(
     }
 
     it(
-      "never leaves a starter interaction without a useful assistant outcome",
-      { timeout: 10000 },
+      "does not expose the redundant generic social-orientation starter",
       async () => {
         globalThis.fetch =
           vi.fn(
@@ -206,9 +253,7 @@ describe(
                 });
               }
 
-              return usefulClarificationResponse(
-                "¿Buscas apoyo para ti o para otra persona?",
-              );
+              return usefulClarificationResponse();
             },
           );
 
@@ -222,25 +267,13 @@ describe(
           },
         );
 
-        fireEvent.click(
-          screen.getByRole(
+        expect(
+          screen.queryByRole(
             "button",
             {
               name:
                 "Busco orientación social",
             },
-          ),
-        );
-
-        expect(
-          await screen.findByText(
-            "¿Buscas apoyo para ti o para otra persona?",
-          ),
-        ).toBeInTheDocument();
-
-        expect(
-          screen.queryByText(
-            /ALCOHOLISMO|SALUD MENTAL|INSERCIÓN LABORAL/,
           ),
         ).not.toBeInTheDocument();
       },
