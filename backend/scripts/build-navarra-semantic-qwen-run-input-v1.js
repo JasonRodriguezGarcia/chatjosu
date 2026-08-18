@@ -329,17 +329,21 @@ const records =
           C3:
             null,
 
+          /*
+           * Source scope and territorial fields are
+           * provenance/geographic context only.
+           *
+           * They must never justify semantic needs,
+           * functions, populations or activities.
+           */
           S1:
-            sourceTaxonomy.scope
-            ?? null,
+            null,
 
           T1:
-            row.fields?.province_key
-            ?? null,
+            null,
 
           M1:
-            row.fields?.municipality_name
-            ?? null,
+            null,
 
           D1:
             row.fields?.description
