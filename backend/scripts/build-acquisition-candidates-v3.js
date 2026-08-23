@@ -823,6 +823,21 @@ const preflight = {
 
   candidate_rows: 0,
 
+  /*
+   * Normalization is lossless with respect
+   * to source rows. Product/support eligibility
+   * is accounted separately below.
+   */
+  coverage: {
+    normalized_rows: 0,
+    omitted_from_normalization: 0,
+  },
+
+  support_scope: {
+    eligible: 0,
+    excluded: 0,
+  },
+
   relevance: {},
   resource_role: {},
 
@@ -1080,11 +1095,18 @@ for (
       );
     }
   } else {
+    /*
+     * A utility drop means this record is not
+     * currently eligible for the primary
+     * HelpChat support-resource lane.
+     *
+     * It MUST NOT remove the source record from
+     * normalization: cultural/community records
+     * can still be valid for community_wellbeing.
+     */
     preflight
       .utility
       .dropped += 1;
-
-    continue;
   }
 
   const territory =
@@ -1594,8 +1616,49 @@ for (
 preflight.candidate_rows =
   output.length;
 
-preflight.excluded_out_of_scope =
+preflight.coverage.normalized_rows =
+  output.length;
+
+preflight.coverage
+  .omitted_from_normalization =
+  preflight.source_rows -
+  output.length;
+
+preflight.support_scope.excluded =
   preflight.utility.dropped;
+
+preflight.support_scope.eligible =
+  preflight.source_rows -
+  preflight.support_scope.excluded;
+
+/*
+ * Backward-compatible field.
+ *
+ * No source record is now excluded from the
+ * normalized dataset merely because it is
+ * outside the primary support-resource scope.
+ */
+preflight.excluded_out_of_scope = 0;
+
+if (
+  preflight.coverage
+    .omitted_from_normalization !== 0
+) {
+  throw new Error(
+    "LOSSLESS_NORMALIZATION_INVARIANT_FAILED"
+  );
+}
+
+if (
+  (
+    preflight.support_scope.eligible +
+    preflight.support_scope.excluded
+  ) !== preflight.source_rows
+) {
+  throw new Error(
+    "SUPPORT_SCOPE_ACCOUNTING_INVARIANT_FAILED"
+  );
+}
 
 preflight.master_rows_checked =
   masterRows.length;
@@ -1643,7 +1706,15 @@ console.log(
 );
 
 console.log(
-  `OUT_OF_SCOPE=${preflight.excluded_out_of_scope}`
+  `NORMALIZATION_OMITTED=${preflight.coverage.omitted_from_normalization}`
+);
+
+console.log(
+  `SUPPORT_SCOPE_ELIGIBLE=${preflight.support_scope.eligible}`
+);
+
+console.log(
+  `SUPPORT_SCOPE_EXCLUDED=${preflight.support_scope.excluded}`
 );
 
 console.log(
