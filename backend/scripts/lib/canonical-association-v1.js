@@ -358,7 +358,9 @@ export function buildCanonicalAssociationV1({
     clean(
       normalized.source_record_id ??
       normalized.source
-        ?.source_record_id
+        ?.source_record_id ??
+      normalized.source
+        ?.record_id
     );
 
   if (!sourceId) {

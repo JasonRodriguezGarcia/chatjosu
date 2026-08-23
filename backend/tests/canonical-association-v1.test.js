@@ -349,3 +349,36 @@ test(
     );
   }
 );
+
+test(
+  "accepts source-backed nested record_id when top-level source_record_id is absent",
+  () => {
+    const result =
+      buildCanonicalAssociationV1({
+        normalized: {
+          source: {
+            source_id:
+              "euskadi_registro_asociaciones",
+
+            record_id:
+              "A/NESTED/1",
+          },
+
+          name:
+            "Entidad con identidad fuente anidada",
+        },
+      });
+
+    assert.equal(
+      result.identity
+        .source_record_id,
+      "A/NESTED/1"
+    );
+
+    assert.equal(
+      result.identity
+        .canonical_id,
+      "euskadi_registro_asociaciones:A/NESTED/1"
+    );
+  }
+);
