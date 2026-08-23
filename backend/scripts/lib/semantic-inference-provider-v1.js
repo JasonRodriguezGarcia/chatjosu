@@ -354,6 +354,8 @@ createLlamaCppSemanticInferenceProviderV1({
     schema,
     temperature = 0,
     maxTokens = 1536,
+    reasoningEffort = "none",
+    enableThinking = false,
   } = {}) {
     const promptText =
       requiredString(
@@ -392,6 +394,14 @@ createLlamaCppSemanticInferenceProviderV1({
 
       stream:
         false,
+
+      reasoning_effort:
+        reasoningEffort,
+
+      chat_template_kwargs: {
+        enable_thinking:
+          enableThinking,
+      },
 
       response_format: {
         type:

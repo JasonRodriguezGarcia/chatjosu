@@ -715,3 +715,92 @@ test(
     );
   }
 );
+
+test(
+  "structured llama.cpp inference disables reasoning by default",
+  async () => {
+    let body = null;
+
+    const provider =
+      createLlamaCppSemanticInferenceProviderV1({
+        baseUrl:
+          "http://127.0.0.1:8080",
+
+        model:
+          "example/model",
+
+        fetchImpl:
+          async (
+            url,
+            init
+          ) => {
+            body =
+              JSON.parse(
+                init.body
+              );
+
+            return jsonResponse({
+              choices: [
+                {
+                  message: {
+                    content:
+                      "{\"status\":\"ok\"}",
+                  },
+
+                  finish_reason:
+                    "stop",
+                },
+              ],
+
+              usage: {
+                prompt_tokens:
+                  10,
+
+                completion_tokens:
+                  3,
+
+                total_tokens:
+                  13,
+              },
+            });
+          },
+      });
+
+    await provider
+      .generateStructured({
+        prompt:
+          "Return JSON.",
+
+        schema: {
+          type:
+            "object",
+
+          additionalProperties:
+            false,
+
+          required: [
+            "status",
+          ],
+
+          properties: {
+            status: {
+              const:
+                "ok",
+            },
+          },
+        },
+      });
+
+    assert.equal(
+      body.reasoning_effort,
+      "none"
+    );
+
+    assert.equal(
+      body
+        .chat_template_kwargs
+        .enable_thinking,
+      false
+    );
+  }
+);
