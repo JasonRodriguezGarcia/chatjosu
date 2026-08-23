@@ -10,6 +10,10 @@ import {
   buildAssociationFunctionEvidenceGateV1,
 } from "./lib/association-function-evidence-gate-v1.js";
 
+import {
+  createLlamaCppSemanticInferenceProviderV1,
+} from "./lib/semantic-inference-provider-v1.js";
+
 const ROOT = process.cwd();
 
 const PROMPT_PATH = path.join(
@@ -39,6 +43,15 @@ function parseCliArgs(argv) {
       0,
 
     limit:
+      null,
+
+    provider:
+      "ollama",
+
+    model:
+      null,
+
+    baseUrl:
       null,
   };
 
@@ -121,6 +134,48 @@ function parseCliArgs(argv) {
       continue;
     }
 
+    if (key === "--provider") {
+      if (!value) {
+        throw new Error(
+          "MISSING_VALUE:--provider"
+        );
+      }
+
+      args.provider =
+        value;
+
+      i += 1;
+      continue;
+    }
+
+    if (key === "--model") {
+      if (!value) {
+        throw new Error(
+          "MISSING_VALUE:--model"
+        );
+      }
+
+      args.model =
+        value;
+
+      i += 1;
+      continue;
+    }
+
+    if (key === "--base-url") {
+      if (!value) {
+        throw new Error(
+          "MISSING_VALUE:--base-url"
+        );
+      }
+
+      args.baseUrl =
+        value;
+
+      i += 1;
+      continue;
+    }
+
     throw new Error(
       `UNKNOWN_ARGUMENT:${key}`
     );
@@ -151,6 +206,19 @@ function parseCliArgs(argv) {
     );
   }
 
+  if (
+    ![
+      "ollama",
+      "llama.cpp",
+    ].includes(
+      args.provider
+    )
+  ) {
+    throw new Error(
+      `INVALID_PROVIDER:${args.provider}`
+    );
+  }
+
   return args;
 }
 
@@ -165,18 +233,42 @@ const INPUT_PATH =
 const OUTPUT_DIR =
   CLI.output;
 
-const MODEL = "qwen3:8b";
+const PROVIDER =
+  CLI.provider;
 
-const NUM_CTX = 8192;
-const NUM_PREDICT = 1536;
+const MODEL =
+  CLI.model
+  ?? (
+    PROVIDER === "llama.cpp"
+      ? "ggml-org/Qwen3.8-27B-GGUF:Q4_K_M"
+      : "qwen3:8b"
+  );
 
-const WORKERS = [
+const BASE_URL =
+  CLI.baseUrl
+  ?? (
+    PROVIDER === "llama.cpp"
+      ? "http://127.0.0.1:8080"
+      : null
+  );
+
+const NUM_CTX =
+  PROVIDER === "llama.cpp"
+    ? 32768
+    : 8192;
+
+const NUM_PREDICT =
+  1536;
+
+const OLLAMA_WORKERS = [
   {
     id: "gpu0-3060ti",
+    provider: "ollama",
     url: "http://127.0.0.1:11436",
   },
   {
     id: "gpu1-3080",
+    provider: "ollama",
     url: "http://127.0.0.1:11437",
   },
 ];
@@ -880,7 +972,7 @@ function validateResult(
   }
 }
 
-async function getModelInfo(
+async function getOllamaModelInfo(
   worker
 ) {
   const response =
@@ -910,6 +1002,176 @@ async function getModelInfo(
   }
 
   return model;
+}
+
+async function
+buildInferenceRuntime() {
+  if (
+    PROVIDER === "ollama"
+  ) {
+    const modelInfos =
+      await Promise.all(
+        OLLAMA_WORKERS.map(
+          getOllamaModelInfo
+        )
+      );
+
+    const digests =
+      new Set(
+        modelInfos.map(
+          row =>
+            row.digest
+        )
+      );
+
+    if (
+      digests.size !== 1
+    ) {
+      throw new Error(
+        "MODEL_DIGEST_MISMATCH"
+      );
+    }
+
+    return {
+      provider:
+        "ollama",
+
+      model:
+        MODEL,
+
+      workers:
+        OLLAMA_WORKERS,
+
+      modelInfos,
+
+      readiness:
+        null,
+
+      modelProvenance: {
+        name:
+          MODEL,
+
+        digest:
+          modelInfos[0]
+            .digest,
+
+        source:
+          "ollama:/api/tags",
+
+        meta:
+          modelInfos[0]
+            .details
+          ?? null,
+      },
+    };
+  }
+
+  if (
+    PROVIDER === "llama.cpp"
+  ) {
+    if (!BASE_URL) {
+      throw new Error(
+        "LLAMACPP_BASE_URL_REQUIRED"
+      );
+    }
+
+    const client =
+      createLlamaCppSemanticInferenceProviderV1({
+        baseUrl:
+          BASE_URL,
+
+        model:
+          MODEL,
+      });
+
+    const readiness =
+      await client
+        .ensureModelReady({
+          timeoutMs:
+            900_000,
+
+          pollIntervalMs:
+            10_000,
+        });
+
+    const info =
+      readiness.model_info;
+
+    if (
+      info.model !== MODEL
+    ) {
+      throw new Error(
+        `LLAMACPP_MODEL_ID_MISMATCH:${info.model}:${MODEL}`
+      );
+    }
+
+    return {
+      provider:
+        "llama.cpp",
+
+      model:
+        MODEL,
+
+      workers: [
+        {
+          id:
+            "llama.cpp-router",
+
+          provider:
+            "llama.cpp",
+
+          url:
+            BASE_URL,
+
+          client,
+        },
+      ],
+
+      modelInfos: [
+        {
+          name:
+            info.model,
+
+          digest:
+            null,
+
+          details:
+            info.meta
+            ?? null,
+
+          source:
+            info.source
+            ?? null,
+
+          status:
+            info.status
+            ?? null,
+        },
+      ],
+
+      readiness,
+
+      modelProvenance: {
+        name:
+          info.model,
+
+        digest:
+          null,
+
+        source:
+          info.source
+          ?? null,
+
+        meta:
+          info.meta
+          ?? null,
+      },
+    };
+  }
+
+  throw new Error(
+    `UNSUPPORTED_PROVIDER:${PROVIDER}`
+  );
 }
 
 async function runOne({
@@ -1230,35 +1492,107 @@ async function runOne({
     ].join("\n"),
   };
 
-  const response =
-    await fetch(
-      `${worker.url}/api/generate`,
-      {
-        method: "POST",
-        headers: {
-          "content-type":
-            "application/json",
-        },
-        body:
-          JSON.stringify(body),
-      }
+  let api;
+  let providerRaw = null;
+
+  if (
+    worker.provider === "ollama"
+  ) {
+    const response =
+      await fetch(
+        `${worker.url}/api/generate`,
+        {
+          method: "POST",
+          headers: {
+            "content-type":
+              "application/json",
+          },
+          body:
+            JSON.stringify(body),
+        }
+      );
+
+    if (!response.ok) {
+      const text =
+        await response.text();
+
+      throw new Error(
+        `${job.run_id}:HTTP_${response.status}:${text.slice(0, 300)}`
+      );
+    }
+
+    api =
+      await response.json();
+
+    providerRaw =
+      api;
+  } else if (
+    worker.provider === "llama.cpp"
+  ) {
+    const generation =
+      await worker.client
+        .generateStructured({
+          prompt:
+            body.prompt,
+
+          schema,
+
+          temperature:
+            body.options
+              .temperature,
+
+          maxTokens:
+            body.options
+              .num_predict,
+        });
+
+    providerRaw =
+      generation.raw_api;
+
+    api = {
+      response:
+        generation.response_text,
+
+      thinking:
+        null,
+
+      done:
+        true,
+
+      done_reason:
+        generation.finish_reason,
+
+      total_duration:
+        null,
+
+      load_duration:
+        null,
+
+      prompt_eval_count:
+        generation
+          .usage
+          .prompt_tokens,
+
+      prompt_eval_duration:
+        null,
+
+      eval_count:
+        generation
+          .usage
+          .completion_tokens,
+
+      eval_duration:
+        null,
+    };
+  } else {
+    throw new Error(
+      `${job.run_id}:UNSUPPORTED_WORKER_PROVIDER:${worker.provider}`
     );
+  }
 
   const elapsedMs =
     Date.now() -
     started;
-
-  if (!response.ok) {
-    const text =
-      await response.text();
-
-    throw new Error(
-      `${job.run_id}:HTTP_${response.status}:${text.slice(0, 300)}`
-    );
-  }
-
-  const api =
-    await response.json();
 
   fs.mkdirSync(
     OUTPUT_DIR,
@@ -1287,6 +1621,9 @@ async function runOne({
 
         worker:
           worker.id,
+
+        provider:
+          worker.provider,
 
         think:
           job.think,
@@ -1319,6 +1656,9 @@ async function runOne({
 
         response:
           api.response,
+
+        provider_raw:
+          providerRaw,
 
         thinking:
           api.thinking ?? null,
@@ -1442,6 +1782,9 @@ async function runOne({
     worker:
       worker.id,
 
+    provider:
+      worker.provider,
+
     result:
       materializedResult,
   };
@@ -1474,6 +1817,9 @@ async function runOne({
 
     worker:
       worker.id,
+
+    provider:
+      worker.provider,
 
     elapsed_ms:
       elapsedMs,
@@ -1510,6 +1856,7 @@ async function runQueue({
   jobs,
   prompt,
   allowed,
+  workers,
   modelInfos,
 }) {
   const queue =
@@ -1607,7 +1954,7 @@ async function runQueue({
   }
 
   await Promise.all(
-    WORKERS.map(
+    workers.map(
       (worker, index) =>
         loop(
           worker,
@@ -1685,26 +2032,36 @@ async function main() {
   }
 
 
-  const modelInfos =
-    await Promise.all(
-      WORKERS.map(
-        getModelInfo
-      )
-    );
+  const runtime =
+    await buildInferenceRuntime();
 
-  const digests =
-    new Set(
-      modelInfos.map(
-        row =>
-          row.digest
-      )
-    );
+  const modelInfos =
+    runtime.modelInfos;
+
+  const workers =
+    runtime.workers;
+
+  console.log(
+    `PROVIDER=${runtime.provider}`
+  );
+
+  console.log(
+    `MODEL=${runtime.model}`
+  );
+
+  console.log(
+    `WORKERS=${workers.length}`
+  );
 
   if (
-    digests.size !== 1
+    runtime.readiness
   ) {
-    throw new Error(
-      "MODEL_DIGEST_MISMATCH"
+    console.log(
+      `MODEL_READY=${runtime.readiness.status}`
+    );
+
+    console.log(
+      `MODEL_LOAD_REQUESTED=${runtime.readiness.load_requested}`
     );
   }
 
@@ -1737,6 +2094,7 @@ async function main() {
       prompt,
       allowed:
         input.allowed,
+      workers,
       modelInfos,
     });
 
@@ -1752,13 +2110,45 @@ async function main() {
       2,
 
     benchmark_version:
-      "8.0",
+      "8.1-provider-aware",
+
+    provider:
+      runtime.provider,
 
     model:
-      MODEL,
+      runtime.model,
 
     model_digest:
-      modelInfos[0].digest,
+      runtime
+        .modelProvenance
+        .digest,
+
+    model_source:
+      runtime
+        .modelProvenance
+        .source,
+
+    model_meta:
+      runtime
+        .modelProvenance
+        .meta,
+
+    readiness:
+      runtime.readiness,
+
+    workers:
+      runtime.workers.map(
+        worker => ({
+          id:
+            worker.id,
+
+          provider:
+            worker.provider,
+
+          url:
+            worker.url,
+        })
+      ),
 
     num_ctx:
       NUM_CTX,
