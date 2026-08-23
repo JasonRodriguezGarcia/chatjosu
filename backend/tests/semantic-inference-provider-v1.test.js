@@ -262,3 +262,177 @@ test(
     );
   }
 );
+
+test(
+  "readiness returns immediately when model is already loaded",
+  async () => {
+    let calls = 0;
+
+    const provider =
+      createLlamaCppSemanticInferenceProviderV1({
+        baseUrl:
+          "http://127.0.0.1:8080",
+
+        model:
+          "example/model",
+
+        fetchImpl:
+          async () => {
+            calls += 1;
+
+            return jsonResponse({
+              data: [
+                {
+                  id:
+                    "example/model",
+
+                  status: {
+                    value:
+                      "loaded",
+                  },
+
+                  source:
+                    "preset",
+                },
+              ],
+            });
+          },
+      });
+
+    const ready =
+      await provider
+        .waitUntilReady({
+          timeoutMs:
+            1000,
+
+          pollIntervalMs:
+            1,
+        });
+
+    assert.equal(
+      ready.ready,
+      true
+    );
+
+    assert.equal(
+      ready.status,
+      "loaded"
+    );
+
+    assert.equal(
+      ready.polls,
+      1
+    );
+
+    assert.equal(
+      calls,
+      1
+    );
+  }
+);
+
+test(
+  "readiness polls until model becomes loaded",
+  async () => {
+    let calls = 0;
+
+    const provider =
+      createLlamaCppSemanticInferenceProviderV1({
+        baseUrl:
+          "http://127.0.0.1:8080",
+
+        model:
+          "example/model",
+
+        fetchImpl:
+          async () => {
+            calls += 1;
+
+            return jsonResponse({
+              data: [
+                {
+                  id:
+                    "example/model",
+
+                  status: {
+                    value:
+                      calls >= 3
+                        ? "loaded"
+                        : "loading",
+                  },
+                },
+              ],
+            });
+          },
+      });
+
+    const ready =
+      await provider
+        .waitUntilReady({
+          timeoutMs:
+            1000,
+
+          pollIntervalMs:
+            1,
+        });
+
+    assert.equal(
+      ready.ready,
+      true
+    );
+
+    assert.equal(
+      ready.status,
+      "loaded"
+    );
+
+    assert.equal(
+      ready.polls,
+      3
+    );
+  }
+);
+
+test(
+  "readiness fails closed on timeout",
+  async () => {
+    const provider =
+      createLlamaCppSemanticInferenceProviderV1({
+        baseUrl:
+          "http://127.0.0.1:8080",
+
+        model:
+          "example/model",
+
+        fetchImpl:
+          async () =>
+            jsonResponse({
+              data: [
+                {
+                  id:
+                    "example/model",
+
+                  status: {
+                    value:
+                      "loading",
+                  },
+                },
+              ],
+            }),
+      });
+
+    await assert.rejects(
+      () =>
+        provider
+          .waitUntilReady({
+            timeoutMs:
+              10,
+
+            pollIntervalMs:
+              1,
+          }),
+
+      /LLAMACPP_MODEL_READY_TIMEOUT/
+    );
+  }
+);

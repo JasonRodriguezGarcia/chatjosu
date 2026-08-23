@@ -127,6 +127,99 @@ createLlamaCppSemanticInferenceProviderV1({
   }
 
   async function
+  waitUntilReady({
+    timeoutMs = 900_000,
+    pollIntervalMs = 10_000,
+  } = {}) {
+    if (
+      !Number.isFinite(timeoutMs)
+      || timeoutMs < 1
+    ) {
+      throw new TypeError(
+        "timeoutMs must be positive"
+      );
+    }
+
+    if (
+      !Number.isFinite(
+        pollIntervalMs
+      )
+      || pollIntervalMs < 1
+    ) {
+      throw new TypeError(
+        "pollIntervalMs must be positive"
+      );
+    }
+
+    const started =
+      Date.now();
+
+    let polls = 0;
+    let lastInfo = null;
+
+    while (true) {
+      lastInfo =
+        await getModelInfo();
+
+      polls += 1;
+
+      if (
+        lastInfo.status === "loaded"
+        || lastInfo.status === "ready"
+      ) {
+        return {
+          ready:
+            true,
+
+          provider:
+            "llama.cpp",
+
+          model:
+            modelId,
+
+          status:
+            lastInfo.status,
+
+          elapsed_ms:
+            Date.now()
+            - started,
+
+          polls,
+
+          model_info:
+            lastInfo,
+        };
+      }
+
+      const elapsed =
+        Date.now()
+        - started;
+
+      if (
+        elapsed >= timeoutMs
+      ) {
+        throw new Error(
+          `LLAMACPP_MODEL_READY_TIMEOUT:${modelId}:${lastInfo.status ?? "unknown"}`
+        );
+      }
+
+      await new Promise(
+        resolve =>
+          setTimeout(
+            resolve,
+            Math.min(
+              pollIntervalMs,
+              Math.max(
+                1,
+                timeoutMs - elapsed
+              )
+            )
+          )
+      );
+    }
+  }
+
+  async function
   generateStructured({
     prompt,
     schema,
@@ -312,6 +405,7 @@ createLlamaCppSemanticInferenceProviderV1({
       normalizedBaseUrl,
 
     getModelInfo,
+    waitUntilReady,
     generateStructured,
   };
 }
