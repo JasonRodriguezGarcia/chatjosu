@@ -127,6 +127,46 @@ createLlamaCppSemanticInferenceProviderV1({
   }
 
   async function
+  requestModelLoad() {
+    const response =
+      await fetchImpl(
+        `${normalizedBaseUrl}/models/load`,
+        {
+          method:
+            "POST",
+
+          headers: {
+            "content-type":
+              "application/json",
+          },
+
+          body:
+            JSON.stringify({
+              model:
+                modelId,
+            }),
+        }
+      );
+
+    const data =
+      await readJsonResponse(
+        response,
+        "LLAMACPP_MODEL_LOAD"
+      );
+
+    return {
+      provider:
+        "llama.cpp",
+
+      model:
+        modelId,
+
+      response:
+        data,
+    };
+  }
+
+  async function
   waitUntilReady({
     timeoutMs = 900_000,
     pollIntervalMs = 10_000,
@@ -217,6 +257,95 @@ createLlamaCppSemanticInferenceProviderV1({
           )
       );
     }
+  }
+
+  async function
+  ensureModelReady({
+    timeoutMs = 900_000,
+    pollIntervalMs = 10_000,
+  } = {}) {
+    const initial =
+      await getModelInfo();
+
+    if (
+      initial.status === "loaded"
+      || initial.status === "ready"
+    ) {
+      return {
+        ready:
+          true,
+
+        provider:
+          "llama.cpp",
+
+        model:
+          modelId,
+
+        status:
+          initial.status,
+
+        load_requested:
+          false,
+
+        elapsed_ms:
+          0,
+
+        polls:
+          1,
+
+        initial_model_info:
+          initial,
+
+        model_info:
+          initial,
+      };
+    }
+
+    if (
+      initial.status === "failed"
+    ) {
+      throw new Error(
+        `LLAMACPP_MODEL_FAILED:${modelId}`
+      );
+    }
+
+    const started =
+      Date.now();
+
+    const load =
+      await requestModelLoad();
+
+    const readiness =
+      await waitUntilReady({
+        timeoutMs,
+        pollIntervalMs,
+      });
+
+    if (
+      readiness.model !==
+      modelId
+    ) {
+      throw new Error(
+        `LLAMACPP_READY_MODEL_MISMATCH:${readiness.model}:${modelId}`
+      );
+    }
+
+    return {
+      ...readiness,
+
+      load_requested:
+        true,
+
+      load_response:
+        load.response,
+
+      initial_model_info:
+        initial,
+
+      elapsed_ms:
+        Date.now()
+        - started,
+    };
   }
 
   async function
@@ -405,7 +534,9 @@ createLlamaCppSemanticInferenceProviderV1({
       normalizedBaseUrl,
 
     getModelInfo,
+    requestModelLoad,
     waitUntilReady,
+    ensureModelReady,
     generateStructured,
   };
 }

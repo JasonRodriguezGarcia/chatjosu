@@ -436,3 +436,282 @@ test(
     );
   }
 );
+
+test(
+  "explicit model load uses llama.cpp router load endpoint",
+  async () => {
+    let request = null;
+
+    const provider =
+      createLlamaCppSemanticInferenceProviderV1({
+        baseUrl:
+          "http://127.0.0.1:8080",
+
+        model:
+          "example/model",
+
+        fetchImpl:
+          async (
+            url,
+            init
+          ) => {
+            request = {
+              url,
+              init,
+            };
+
+            return jsonResponse({
+              success:
+                true,
+            });
+          },
+      });
+
+    const result =
+      await provider
+        .requestModelLoad();
+
+    assert.equal(
+      request.url,
+      "http://127.0.0.1:8080/models/load"
+    );
+
+    assert.equal(
+      request.init.method,
+      "POST"
+    );
+
+    assert.deepEqual(
+      JSON.parse(
+        request.init.body
+      ),
+      {
+        model:
+          "example/model",
+      }
+    );
+
+    assert.equal(
+      result.provider,
+      "llama.cpp"
+    );
+
+    assert.equal(
+      result.model,
+      "example/model"
+    );
+  }
+);
+
+test(
+  "ensure readiness does not request load when already loaded",
+  async () => {
+    const calls = [];
+
+    const provider =
+      createLlamaCppSemanticInferenceProviderV1({
+        baseUrl:
+          "http://127.0.0.1:8080",
+
+        model:
+          "example/model",
+
+        fetchImpl:
+          async (
+            url,
+            init
+          ) => {
+            calls.push({
+              url,
+              init,
+            });
+
+            return jsonResponse({
+              data: [
+                {
+                  id:
+                    "example/model",
+
+                  status: {
+                    value:
+                      "loaded",
+                  },
+                },
+              ],
+            });
+          },
+      });
+
+    const result =
+      await provider
+        .ensureModelReady({
+          timeoutMs:
+            100,
+
+          pollIntervalMs:
+            1,
+        });
+
+    assert.equal(
+      result.ready,
+      true
+    );
+
+    assert.equal(
+      result.load_requested,
+      false
+    );
+
+    assert.equal(
+      calls.length,
+      1
+    );
+
+    assert.match(
+      calls[0].url,
+      /\/v1\/models$/
+    );
+  }
+);
+
+test(
+  "ensure readiness loads unloaded model then polls until loaded",
+  async () => {
+    let modelChecks = 0;
+    let loadCalls = 0;
+
+    const provider =
+      createLlamaCppSemanticInferenceProviderV1({
+        baseUrl:
+          "http://127.0.0.1:8080",
+
+        model:
+          "example/model",
+
+        fetchImpl:
+          async (
+            url,
+            init
+          ) => {
+            if (
+              url.endsWith(
+                "/models/load"
+              )
+            ) {
+              loadCalls += 1;
+
+              return jsonResponse({
+                success:
+                  true,
+              });
+            }
+
+            if (
+              url.endsWith(
+                "/v1/models"
+              )
+            ) {
+              modelChecks += 1;
+
+              const status =
+                modelChecks === 1
+                  ? "unloaded"
+                  : modelChecks >= 4
+                    ? "loaded"
+                    : "loading";
+
+              return jsonResponse({
+                data: [
+                  {
+                    id:
+                      "example/model",
+
+                    status: {
+                      value:
+                        status,
+                    },
+                  },
+                ],
+              });
+            }
+
+            throw new Error(
+              `UNEXPECTED_URL:${url}`
+            );
+          },
+      });
+
+    const result =
+      await provider
+        .ensureModelReady({
+          timeoutMs:
+            1000,
+
+          pollIntervalMs:
+            1,
+        });
+
+    assert.equal(
+      result.ready,
+      true
+    );
+
+    assert.equal(
+      result.status,
+      "loaded"
+    );
+
+    assert.equal(
+      result.load_requested,
+      true
+    );
+
+    assert.equal(
+      loadCalls,
+      1
+    );
+
+    assert.equal(
+      modelChecks,
+      4
+    );
+  }
+);
+
+test(
+  "ensure readiness fails closed when initial model state is failed",
+  async () => {
+    const provider =
+      createLlamaCppSemanticInferenceProviderV1({
+        baseUrl:
+          "http://127.0.0.1:8080",
+
+        model:
+          "example/model",
+
+        fetchImpl:
+          async () =>
+            jsonResponse({
+              data: [
+                {
+                  id:
+                    "example/model",
+
+                  status: {
+                    value:
+                      "failed",
+                  },
+                },
+              ],
+            }),
+      });
+
+    await assert.rejects(
+      () =>
+        provider
+          .ensureModelReady(),
+
+      /LLAMACPP_MODEL_FAILED/
+    );
+  }
+);
