@@ -382,3 +382,92 @@ test(
     );
   }
 );
+
+
+test(
+  "accepts stable source locator when registry record id is absent",
+  () => {
+    const result =
+      buildCanonicalAssociationV1({
+        normalized: {
+          source: {
+            source_id:
+              "euskadi_registro_asociaciones",
+
+            source_locator:
+              "asg140102008",
+          },
+
+          name:
+            "Entidad sin número registral",
+        },
+      });
+
+    assert.equal(
+      result.identity.source_record_id,
+      null
+    );
+
+    assert.equal(
+      result.identity.source_locator,
+      "asg140102008"
+    );
+
+    assert.equal(
+      result.identity.method,
+      "source_locator"
+    );
+
+    assert.equal(
+      result.identity.canonical_id,
+      "euskadi_registro_asociaciones:locator:asg140102008"
+    );
+  }
+);
+
+test(
+  "prefers registry record id over source locator",
+  () => {
+    const result =
+      buildCanonicalAssociationV1({
+        normalized: {
+          source_record_id:
+            "AS/B/12345",
+
+          source: {
+            source_id:
+              "euskadi_registro_asociaciones",
+
+            source_locator:
+              "asg-example",
+          },
+
+          tax_id:
+            "G12345678",
+
+          name:
+            "Entidad identificada",
+        },
+      });
+
+    assert.equal(
+      result.identity.method,
+      "source_record_id"
+    );
+
+    assert.equal(
+      result.identity.canonical_id,
+      "euskadi_registro_asociaciones:AS/B/12345"
+    );
+
+    assert.equal(
+      result.identity.source_locator,
+      "asg-example"
+    );
+
+    assert.equal(
+      result.identity.tax_id,
+      "G12345678"
+    );
+  }
+);

@@ -363,17 +363,37 @@ export function buildCanonicalAssociationV1({
         ?.record_id
     );
 
+  const sourceLocator =
+    clean(
+      normalized.source_locator ??
+      normalized.source
+        ?.source_locator
+    );
+
   if (!sourceId) {
     throw new Error(
       "MISSING_SOURCE_ID"
     );
   }
 
-  if (!sourceRecordId) {
+  if (
+    !sourceRecordId &&
+    !sourceLocator
+  ) {
     throw new Error(
-      "MISSING_SOURCE_RECORD_ID"
+      "MISSING_STABLE_SOURCE_IDENTITY"
     );
   }
+
+  const identityMethod =
+    sourceRecordId
+      ? "source_record_id"
+      : "source_locator";
+
+  const identityValue =
+    sourceRecordId
+      ? sourceRecordId
+      : `locator:${sourceLocator}`;
 
   const deterministic =
     semantic?.deterministic ??
@@ -418,13 +438,19 @@ export function buildCanonicalAssociationV1({
 
     identity: {
       canonical_id:
-        `${sourceId}:${sourceRecordId}`,
+        `${sourceId}:${identityValue}`,
 
       source_id:
         sourceId,
 
       source_record_id:
         sourceRecordId,
+
+      source_locator:
+        sourceLocator,
+
+      method:
+        identityMethod,
 
       tax_id:
         clean(
