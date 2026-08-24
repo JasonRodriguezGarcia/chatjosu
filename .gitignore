@@ -31,3 +31,6 @@ node_modules/
 .env
 backend/.env
 frontend/.env
+
+# Serena local overrides
+.serena/project.local.yml
