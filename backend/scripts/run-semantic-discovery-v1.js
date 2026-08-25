@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 
 import {
   buildAssociationSemanticCandidateGateV1,
@@ -1174,6 +1175,96 @@ buildInferenceRuntime() {
   );
 }
 
+export function buildSemanticGatedAllowedV1({
+  route,
+  routeAllowed,
+  allowed,
+  candidateNeedKeys,
+  candidatePopulationKeys,
+  candidateActivityKeys,
+  functionEvidenceKeys,
+}) {
+  if (route === "constrained") {
+    return {
+      ...allowed,
+
+      needs:
+        routeAllowed?.needs ?? [],
+
+      populations:
+        routeAllowed?.populations ?? [],
+
+      activities:
+        routeAllowed?.activities ?? [],
+
+      functions:
+        routeAllowed?.functions ?? [],
+
+      organization_types:
+        routeAllowed?.organization_types
+        ?? allowed.organization_types,
+
+      service_modes:
+        routeAllowed?.service_modes
+        ?? allowed.service_modes,
+    };
+  }
+
+  if (route === "llm_open") {
+    return {
+      ...allowed,
+
+      needs:
+        allowed.needs,
+
+      populations:
+        allowed.populations,
+
+      functions:
+        allowed.functions,
+
+      activities:
+        allowed.activities,
+    };
+  }
+
+  return {
+    ...allowed,
+
+    needs:
+      allowed.needs.filter(
+        row =>
+          candidateNeedKeys.has(
+            row.key
+          )
+      ),
+
+    populations:
+      allowed.populations.filter(
+        key =>
+          candidatePopulationKeys.has(
+            key
+          )
+      ),
+
+    activities:
+      allowed.activities.filter(
+        key =>
+          candidateActivityKeys.has(
+            key
+          )
+      ),
+
+    functions:
+      allowed.functions.filter(
+        key =>
+          functionEvidenceKeys.has(
+            key
+          )
+      ),
+  };
+}
+
 async function runOne({
   worker,
   job,
@@ -1276,96 +1367,24 @@ async function runOne({
         )
     );
 
-  const isRouteAware =
-    record.route === "constrained"
-    || record.route === "llm_open";
-
   const gatedAllowed =
-    isRouteAware
-      ? {
-          ...allowed,
+    buildSemanticGatedAllowedV1({
+      route:
+        record.route,
 
-          needs:
-            record
-              .route_allowed
-              ?.needs
-            ?? [],
+      routeAllowed:
+        record.route_allowed,
 
-          populations:
-            record
-              .route_allowed
-              ?.populations
-            ?? [],
+      allowed,
 
-          activities:
-            record
-              .route_allowed
-              ?.activities
-            ?? [],
+      candidateNeedKeys,
 
-          functions:
-            record
-              .route_allowed
-              ?.functions
-            ?? [],
+      candidatePopulationKeys,
 
-          organization_types:
-            record
-              .route_allowed
-              ?.organization_types
-            ?? allowed
-              .organization_types,
+      candidateActivityKeys,
 
-          service_modes:
-            record
-              .route_allowed
-              ?.service_modes
-            ?? allowed
-              .service_modes,
-        }
-      : {
-          ...allowed,
-
-          needs:
-            allowed
-              .needs
-              .filter(
-                row =>
-                  candidateNeedKeys.has(
-                    row.key
-                  )
-              ),
-
-          populations:
-            allowed
-              .populations
-              .filter(
-                key =>
-                  candidatePopulationKeys.has(
-                    key
-                  )
-              ),
-
-          activities:
-            allowed
-              .activities
-              .filter(
-                key =>
-                  candidateActivityKeys.has(
-                    key
-                  )
-              ),
-
-          functions:
-            allowed
-              .functions
-              .filter(
-                key =>
-                  functionEvidenceKeys.has(
-                    key
-                  )
-              ),
-        };
+      functionEvidenceKeys,
+    });
 
   const schema =
     buildSchema(
@@ -2242,13 +2261,21 @@ async function main() {
   );
 }
 
-main().catch(
-  error => {
-    console.error(
-      error.stack ||
-      error.message
-    );
+if (
+  process.argv[1]
+  && import.meta.url
+  === pathToFileURL(
+    process.argv[1]
+  ).href
+) {
+  main().catch(
+    error => {
+      console.error(
+        error.stack ||
+        error.message
+      );
 
-    process.exitCode = 1;
-  }
-);
+      process.exitCode = 1;
+    }
+  );
+}
