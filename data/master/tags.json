@@ -1,0 +1,793 @@
+[
+  {
+    "tag_id": 1,
+    "tag_canonico": "ACOGIMIENTO FAMILIA",
+    "entidades": 2,
+    "alias/categorías observadas": "Acogimiento Familiar (1)",
+    "estado": "Activo"
+  },
+  {
+    "tag_id": 2,
+    "tag_canonico": "ALCOHOLISMO",
+    "entidades": 17,
+    "alias/categorías observadas": "Servicio Público de tratamiento de todo tipo de adicciones (alcohol, drogas, juego, etc.). (1) | Grupos de apoyo mutuo exclusivamente para familiares y amigos de alcohólicos. (1) | SALUD MENTAL ALCOHOLISMO (1)",
+    "estado": "Activo"
+  },
+  {
+    "tag_id": 3,
+    "tag_canonico": "AUTISMO",
+    "entidades": 10,
+    "alias/categorías observadas": "AUTISMO (4)",
+    "estado": "Activo"
+  },
+  {
+    "tag_id": 4,
+    "tag_canonico": "ALZHEIMER",
+    "entidades": 13,
+    "alias/categorías observadas": "ENFERMEDAD NEUROLÓGICA ALZHEIMER (1) | Alzheimer y otras Demencias (1) | Alzheimer (1)",
+    "estado": "Activo"
+  },
+  {
+    "tag_id": 5,
+    "tag_canonico": "ASOCIACION DE COLOMBIA",
+    "entidades": 1,
+    "alias/categorías observadas": "Diversidad Cultural (Comunidad Colombiana) (1)",
+    "estado": "Activo"
+  },
+  {
+    "tag_id": 6,
+    "tag_canonico": "ASOCIACION PADRES Y MADRES SEPARADOS, MEDIACIÓN FAMILIA",
+    "entidades": 0,
+    "alias/categorías observadas": null,
+    "estado": "Activo"
+  },
+  {
+    "tag_id": 7,
+    "tag_canonico": "BIENESTAR SOCIAL",
+    "entidades": 1,
+    "alias/categorías observadas": "BIENESTAR SOCIAL (1)",
+    "estado": "Activo"
+  },
+  {
+    "tag_id": 8,
+    "tag_canonico": "CÁRITAS BIENESTAR SOCIAL",
+    "entidades": 15,
+    "alias/categorías observadas": "CÁRITAS BIENESTAR SOCIAL (1) | Pobreza, Exclusión Social y Sin Hogar (1) | Lucha contra la pobreza y exclusión social (acogida, empleo, vivienda, asistencia). (1) | BIENESTAR SOCIAL CÁRITAS (1) | CARITAS BIENESTAR SOCIAL (1)",
+    "estado": "Activo"
+  },
+  {
+    "tag_id": 9,
+    "tag_canonico": "CÁNCER",
+    "entidades": 29,
+    "alias/categorías observadas": "Cáncer (3) | CÁNCER DE MAMAN (1) | CÁNCER DE PULMÓN (1) | CÁNCER GINECOLÓGICO, OVARIOS, ÚTERO (1) | CÁNCER INFANTIL (1) | CÁNCER DE TIROIDES (1) | CÁNCER DE PÁNCREAS (1) | Cáncer Infantil y Familiares (1)",
+    "estado": "Activo"
+  },
+  {
+    "tag_id": 10,
+    "tag_canonico": "CÁNCER INFANTIL",
+    "entidades": 0,
+    "alias/categorías observadas": null,
+    "estado": "Activo"
+  },
+  {
+    "tag_id": 11,
+    "tag_canonico": "CRUZ ROJA BIENESTAR SOCIAL",
+    "entidades": 15,
+    "alias/categorías observadas": "CRUZ ROJA BIENESTAR SOCIAL (2) | Ayuda Humanitaria y Asistencia Social (1) | Asistencia humanitaria, socorro, empleo, inclusión social, salud. (1) | BIENSTAR SOCIAL CRUZ ROJA (1)",
+    "estado": "Activo"
+  },
+  {
+    "tag_id": 12,
+    "tag_canonico": "DAÑO CEREBRAL ADQUIRIDO",
+    "entidades": 6,
+    "alias/categorías observadas": "Daño Cerebral Adquirido (1)",
+    "estado": "Activo"
+  },
+  {
+    "tag_id": 13,
+    "tag_canonico": "DIABETES",
+    "entidades": 14,
+    "alias/categorías observadas": "DIABETES (1) | Diabetes (1)",
+    "estado": "Activo"
+  },
+  {
+    "tag_id": 14,
+    "tag_canonico": "ENFERMDAD DE CROHN Y COLITIS ULCEROSA DIGESTIVO",
+    "entidades": 9,
+    "alias/categorías observadas": "Enfermedad de Crohn y Colitis Ulcerosa (2)",
+    "estado": "Activo"
+  },
+  {
+    "tag_id": 15,
+    "tag_canonico": "ENFERMEDAD NEUROLÓGICA PARCKINSON ALZHEIMER",
+    "entidades": 2,
+    "alias/categorías observadas": "Alzheimer / Parkinson (Aspe) (1) | ENFERMEDAD NEUROLÓGICA PARCKINSON ALZHEIMER (1)",
+    "estado": "Activo"
+  },
+  {
+    "tag_id": 16,
+    "tag_canonico": "ENFERMEDAD NEUROLÓGICA PARCKINSON",
+    "entidades": 10,
+    "alias/categorías observadas": "Parkinson (2) | Parkinson (La Roda) (1) | Parkinson (Villarrobledo) (1)",
+    "estado": "Activo"
+  },
+  {
+    "tag_id": 17,
+    "tag_canonico": "ENFERMEDAD MENTAL",
+    "entidades": 0,
+    "alias/categorías observadas": null,
+    "estado": "Activo"
+  },
+  {
+    "tag_id": 18,
+    "tag_canonico": "ENFERMEDAD RENAL",
+    "entidades": 8,
+    "alias/categorías observadas": "Enfermedades Renales (2)",
+    "estado": "Activo"
+  },
+  {
+    "tag_id": 19,
+    "tag_canonico": "ESPINA BÍFIDA E HIDROCEFALIA",
+    "entidades": 3,
+    "alias/categorías observadas": "Espina Bífida e Hidrocefalia (1)",
+    "estado": "Activo"
+  },
+  {
+    "tag_id": 20,
+    "tag_canonico": "EXCLUSIÓN SOCIAL",
+    "entidades": 4,
+    "alias/categorías observadas": "Personas en Exclusión Social (General) (1)",
+    "estado": "Activo"
+  },
+  {
+    "tag_id": 21,
+    "tag_canonico": "FAMILIAS ADOPTIVAS",
+    "entidades": 1,
+    "alias/categorías observadas": "Apoyo a Familias Adoptivas (1)",
+    "estado": "Activo"
+  },
+  {
+    "tag_id": 22,
+    "tag_canonico": "FIBROMIALGIA Y CANSANCIO CRÓNICO",
+    "entidades": 9,
+    "alias/categorías observadas": "Fibromialgia (1)",
+    "estado": "Activo"
+  },
+  {
+    "tag_id": 23,
+    "tag_canonico": "FIBROMIALGIA Y SINDRÍME DE FATIGA CRÓNICA",
+    "entidades": 6,
+    "alias/categorías observadas": "Fibromialgia y SFC (1) | FIBROMIALGIA SINDROME DEL CANSANCIO CRÓNICO (1)",
+    "estado": "Activo"
+  },
+  {
+    "tag_id": 24,
+    "tag_canonico": "INMIGRACIÓN Y REFUGIADOS",
+    "entidades": 3,
+    "alias/categorías observadas": "Personas Migrantes y Refugiadas (Coordinadora) (1) | Inmigrantes, Refugiados y Acogida (1)",
+    "estado": "Activo"
+  },
+  {
+    "tag_id": 25,
+    "tag_canonico": "INSERCIÓN LABORAL",
+    "entidades": 0,
+    "alias/categorías observadas": null,
+    "estado": "Activo"
+  },
+  {
+    "tag_id": 26,
+    "tag_canonico": "INVESTIGACIÓN CÁNCER",
+    "entidades": 0,
+    "alias/categorías observadas": null,
+    "estado": "Activo"
+  },
+  {
+    "tag_id": 27,
+    "tag_canonico": "LUCHA CONTRA EXCLUSIÓN SOCIAL FORMACIÓN Y EMPLEO",
+    "entidades": 0,
+    "alias/categorías observadas": null,
+    "estado": "Activo"
+  },
+  {
+    "tag_id": 28,
+    "tag_canonico": "LUPUS",
+    "entidades": 3,
+    "alias/categorías observadas": "Lupus (1) | Enfermedades Autoinmunes y Lupus (1)",
+    "estado": "Activo"
+  },
+  {
+    "tag_id": 29,
+    "tag_canonico": "PARALISIS CEREBRAL Y Afines",
+    "entidades": 6,
+    "alias/categorías observadas": "PARALISIS CEREBRAL DISCAPACIDAD (2) | Parálisis Cerebral (1)",
+    "estado": "Activo"
+  },
+  {
+    "tag_id": 30,
+    "tag_canonico": "PROFESIONALES EXTRANJEROS INSERCION",
+    "entidades": 0,
+    "alias/categorías observadas": null,
+    "estado": "Activo"
+  },
+  {
+    "tag_id": 31,
+    "tag_canonico": "SALUD MENTAL",
+    "entidades": 0,
+    "alias/categorías observadas": null,
+    "estado": "Activo"
+  },
+  {
+    "tag_id": 32,
+    "tag_canonico": "SALUD MENTAL ANOREXIA BULIMIA NERVIOSA TRASTORNO ALIMENTARIO",
+    "entidades": 1,
+    "alias/categorías observadas": "SALUD MENTAL ANOREXIA BULIMIA NERVIOSA TRASTORNO ALIMENTARIO (1)",
+    "estado": "Activo"
+  },
+  {
+    "tag_id": 33,
+    "tag_canonico": "SALUD MENTAL BIPOLAR",
+    "entidades": 3,
+    "alias/categorías observadas": "SALUD MENTAL BIPOLAR (1) | Trastornos Bipolares (1)",
+    "estado": "Activo"
+  },
+  {
+    "tag_id": 34,
+    "tag_canonico": "SORDOS",
+    "entidades": 0,
+    "alias/categorías observadas": null,
+    "estado": "Activo"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 3,
+    "alias/categorías observadas": "SALUD MENTAL ADICCIONES",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 2,
+    "alias/categorías observadas": "SALUD MENTAL",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 2,
+    "alias/categorías observadas": "DISCAPACIDAD MENTAL",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "CÁCER DE COLÓN",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "SALUD MENTAL PSICOSIS",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "SALUD MENTAL PREVENCIÓN SUICIDIO",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "TDAH TRASTORNO DEFICID DE ATENCIÓN E HIPERACTIVIDAD",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "ONCOLOGÍA",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "MEDICINA INTENSIVA, CRITICA Y CORONARIA",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "MEDICINA FAMILIA Y COMUNITARIA",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "MEDICINA ATENCIÓN PRIMARIA",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "MEDICINA CARDIOLOGIA",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "MEDICOS",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "MINISTERIO DE SANIDAD",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "CONSEJERIA DE SALUD EUSKADI",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "Salud Mental (General y Familiares)",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "Anorexia y Bulimia",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "Reinserción Social y Laboral",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "Inclusión Social / Exclusión",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "Inserción Sociolaboral de Inmigrantes",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "Apoyo a la Familia / Crisis Familiares",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "Personas Sordas",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "Salud Mental / Integración",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "Esclerosis Múltiple",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "Discapacidad Auditiva",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "Oncología Infantil",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "Hipertensión Intracraneal Idiopática",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "Atención en Crisis / Suicidio",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "Ludopatía y Adicciones Comportamentales",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "Migración e Integración Cultural",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "SERVICIOS SOCIALES IGUALDAD VIVIENDA",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "BIENESTAR SOCIAL",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "INTEGRACION PERSONAS CON DISCAPACIDAD",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "BIENESTAR SOCIAL INCLUSIÓN",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "SALUD MENTAL LUDOPATIA ADICCIONES",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "Salud Mental y Familiares",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "Enfermedades del Corazón",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "Inclusión Social, Interculturalidad y Familias",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "Refugiados y Derecho de Asilo",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "Discapacidad (Federación Provincial)",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "Juventud / Promoción de la Mujer con Discapacidad",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "Personas Mayores (Participación Activa I)",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "Personas Mayores (Participación Activa II)",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "Inclusión Social (Empleo/Formación)",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "Gestión de servicios sociales públicos, Renta Social Básica, Dependencia, Infancia, Vivienda.",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "Gestión y provisión de plazas en residencias y centros de día para personas mayores y dependientes.",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "Promoción de la autonomía, ocio, deporte y apoyo a personas con discapacidad y/o dependencia.",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "Atención Primaria (CEAS/UTS). Primer punto de contacto para cualquier necesidad social o ayuda.",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "Coordinación de entidades de personas con discapacidad física y orgánica. Defensora de sus derechos.",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "Promoción, formación y coordinación del voluntariado en la comunidad.",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "Inclusión laboral y social para colectivos desfavorecidos.",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "Tratamiento residencial y ambulatorio de adicciones, prevención y reinserción social.",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "Prevención, tratamiento y reinserción de personas con problemas de drogodependencia.",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "Ludopatía y adicciones sin sustancia. Apoyo a pacientes y familiares.",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "Adicciones en general, incluyendo sustancias y nuevas tecnologías.",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "Grupos de apoyo mutuo exclusivamente para familiares y amigos de drogodependientes.",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "ESCLEROSIS MÚLTIPLE",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "ENFERMEDADES RESPIRATORIAS",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "SÍNDROME DOWN DISCAPACIDAD",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "CELIAQUIA",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "SALUD MENTAL HIPERACITIVIDAD Y DEFICID DE ATENCIÓN",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "LESION MEDULAR DISCAPACIDAD FÍSICA",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "SINDROME DE DOWN DISCAPACIDAD",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "SALUD MENTAL FAMILIARES",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "VOLUNTARIADO MANOS UNIDAS",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "SALUD MENTAL DISCAPACIDAD",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "DISCAPACIDAD INTELECTUAL",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "DISCAPACIDAD FISICA",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "DISCAPCIDAD SINDROME DOWN",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "DISCPACIDAD INTELECTUAL",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "SORDERA",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "VOLUNTARIADO",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "VOLUNTARIDAO DERECHOS HUMANOS",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "Enfermedades Neurológicas y Raras",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "Salud Mental",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "Discapacidad Física/Orgánica",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "Discapacidad Visual",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "SIDA/VIH",
+    "estado": "Revisar"
+  },
+  {
+    "tag_id": null,
+    "tag_canonico": "(pendiente)",
+    "entidades": 1,
+    "alias/categorías observadas": "CAUSA / COLECTIVO APOYADO",
+    "estado": "Revisar"
+  }
+]

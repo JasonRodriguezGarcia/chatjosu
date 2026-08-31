@@ -1,0 +1,95 @@
+{
+  "format_version": 1,
+  "pipeline_version": 3,
+  "relevance_version": "1.3",
+  "source": {
+    "source_id": "euskadi_registro_asociaciones",
+    "publisher": "Gobierno Vasco",
+    "acquired_at": "2026-08-09T17:29:27Z",
+    "raw_file": "data/acquisition/euskadi_registro_asociaciones/raw/asociaciones.json",
+    "sha256": "245ec9cb412613692e92d1f3d92fdc0a20595f97c005c3438e99a5f8d841ee94",
+    "sha256_verified": true
+  },
+  "source_rows": 28091,
+  "candidate_rows": 28091,
+  "coverage": {
+    "normalized_rows": 28091,
+    "omitted_from_normalization": 0
+  },
+  "support_scope": {
+    "eligible": 20382,
+    "excluded": 7709
+  },
+  "relevance": {
+    "contextual_relevance": 7961,
+    "direct_relevance": 3542,
+    "out_of_scope": 8396,
+    "needs_review": 8192
+  },
+  "resource_role": {
+    "supportive_candidate": 24549,
+    "primary_candidate": 3542
+  },
+  "contacts": {
+    "source_phone_nonempty": 0,
+    "source_email_nonempty": 0,
+    "source_website_nonempty": 831,
+    "with_phone": 1,
+    "with_email": 16,
+    "with_website": 779,
+    "with_any_contact": 796,
+    "recovered_phone": 0,
+    "recovered_email": 1,
+    "recovered_website": 0,
+    "invalid_source_phone": 0,
+    "invalid_source_email": 0,
+    "invalid_source_website": 36,
+    "source_contact_loss": 0
+  },
+  "territory": {
+    "resolved": 28089,
+    "unresolved": 2,
+    "by_province": {
+      "VIZCAYA": 14416,
+      "GUIPUZCOA": 8792,
+      "ALAVA": 4881
+    },
+    "by_resolution_method": {
+      "source_ine_code": 28081,
+      "source_name_alias": 8
+    }
+  },
+  "coordinates": {
+    "structured_wgs84": 18213,
+    "fallback_combined": 9877,
+    "missing": 1,
+    "invalid": 0
+  },
+  "dedupe": {
+    "new_candidate": 28089,
+    "exact_duplicate": 0,
+    "probable_duplicate": 2,
+    "master_tax_id_available": false
+  },
+  "quality": {
+    "missing_source_record_id": 1,
+    "missing_name": 0,
+    "missing_address": 1,
+    "missing_postal_code": 536,
+    "missing_municipality": 14,
+    "missing_province": 2,
+    "missing_any_contact": 27295
+  },
+  "utility": {
+    "kept_non_drop": 19695,
+    "protected_from_relevance_drop": 687,
+    "dropped": 7709,
+    "protected_reasons": {
+      "assistive_function": 672,
+      "need": 16
+    }
+  },
+  "excluded_out_of_scope": 0,
+  "master_rows_checked": 469,
+  "generated_at": "2026-08-23T09:09:20.671Z"
+}

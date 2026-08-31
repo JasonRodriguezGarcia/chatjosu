@@ -1,0 +1,76 @@
+{
+  "format_version": 1,
+  "rows_total": 469,
+  "actionable_total": 466,
+  "needs_enrichment_total": 197,
+  "status_counts": {
+    "ready": 270,
+    "needs_enrichment": 197,
+    "needs_review": 1,
+    "duplicate": 1
+  },
+  "priority_counts": {
+    "10": 152,
+    "20": 141,
+    "30": 1,
+    "40": 55,
+    "50": 117,
+    "60": 2,
+    "90": 1
+  },
+  "missing_field_counts": {
+    "website": 107,
+    "postal_code": 260,
+    "canonical_tag": 197,
+    "source_category": 323,
+    "email": 240,
+    "address": 110,
+    "municipality": 181,
+    "description": 123,
+    "phone": 228
+  },
+  "invalid_field_counts": {
+    "phone": 63,
+    "email": 28,
+    "website": 29,
+    "municipality": 42,
+    "address": 27
+  },
+  "warning_counts": {
+    "no_contact": 18,
+    "needs_review": 1,
+    "duplicate": 1
+  },
+  "province_counts": {
+    "ALAVA": 21,
+    "ALBACETE": 18,
+    "ALICANTE": 24,
+    "ALMERIA": 17,
+    "ASTURIAS": 28,
+    "AVILA": 23,
+    "BARCELONA": 30,
+    "BURGOS": 28,
+    "CADIZ": 23,
+    "CANTABRIA": 27,
+    "CASTELLON": 20,
+    "CEUTA": 19,
+    "CIUDAD REAL": 19,
+    "CORDOBA": 7,
+    "ILLES BALEARS": 7,
+    "JAEN": 16,
+    "SALAMANCA": 5,
+    "SANTA CRUZ DE TENERIFE": 6,
+    "SORIA": 2,
+    "TARRAGONA": 5,
+    "TOLEDO": 8,
+    "ZAMORA": 5,
+    "ZARAGOZA": 4,
+    "NACIONAL": 28,
+    "BADAJOZ": 15,
+    "CUENCA": 21,
+    "MURCIA": 10,
+    "NAVARRA": 27,
+    "SEVILLA": 3,
+    "VALLADOLID": 3
+  }
+}

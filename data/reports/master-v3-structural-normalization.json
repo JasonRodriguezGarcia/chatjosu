@@ -1,0 +1,1858 @@
+{
+  "format_version": 1,
+  "rows_total": 469,
+  "changes_total": 307,
+  "field_change_counts": {
+    "website": 251,
+    "address": 8,
+    "phone": 2,
+    "email": 2,
+    "municipality_key": 8,
+    "municipality_name": 5,
+    "description": 31
+  },
+  "changes": [
+    {
+      "association_id": 24,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 25,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 26,
+      "field": "website",
+      "before": "https://www.contraelcancer.es",
+      "after": "https://www.contraelcancer.es/"
+    },
+    {
+      "association_id": 27,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 28,
+      "field": "website",
+      "before": "https://aspace.org",
+      "after": "https://aspace.org/"
+    },
+    {
+      "association_id": 29,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 30,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 31,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 32,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 33,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 34,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 35,
+      "field": "address",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 35,
+      "field": "phone",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 35,
+      "field": "email",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 35,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 36,
+      "field": "address",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 36,
+      "field": "phone",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 36,
+      "field": "email",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 36,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 37,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 38,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 39,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 40,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 41,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 42,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 43,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 44,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 45,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 46,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 56,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 64,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 65,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 66,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 67,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 68,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 69,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 70,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 71,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 72,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 73,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 74,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 75,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 76,
+      "field": "website",
+      "before": "serviciossociales.gva.es",
+      "after": "https://serviciossociales.gva.es/"
+    },
+    {
+      "association_id": 77,
+      "field": "website",
+      "before": "diputacionalicante.es",
+      "after": "https://diputacionalicante.es/"
+    },
+    {
+      "association_id": 78,
+      "field": "website",
+      "before": "alicante.es/es/area-tematica/servicios-sociales",
+      "after": "https://alicante.es/es/area-tematica/servicios-sociales"
+    },
+    {
+      "association_id": 79,
+      "field": "website",
+      "before": "www.asociacionapsa.com",
+      "after": "https://www.asociacionapsa.com/"
+    },
+    {
+      "association_id": 80,
+      "field": "website",
+      "before": "www.caritas.es/orihuela-alicante",
+      "after": "https://www.caritas.es/orihuela-alicante"
+    },
+    {
+      "association_id": 81,
+      "field": "website",
+      "before": "www.cruzroja.es",
+      "after": "https://www.cruzroja.es/"
+    },
+    {
+      "association_id": 82,
+      "field": "website",
+      "before": "www.cepaim.org/centro/alicante",
+      "after": "https://www.cepaim.org/centro/alicante"
+    },
+    {
+      "association_id": 83,
+      "field": "website",
+      "before": "www.vidalibre-alicante.org",
+      "after": "https://www.vidalibre-alicante.org/"
+    },
+    {
+      "association_id": 84,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 85,
+      "field": "website",
+      "before": "https://www.contraelcancer.es",
+      "after": "https://www.contraelcancer.es/"
+    },
+    {
+      "association_id": 86,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 87,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 88,
+      "field": "municipality_key",
+      "before": "NO ESPECIFICADO",
+      "after": null
+    },
+    {
+      "association_id": 88,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 90,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 91,
+      "field": "website",
+      "before": "https://www.cruzroja.es",
+      "after": "https://www.cruzroja.es/"
+    },
+    {
+      "association_id": 92,
+      "field": "address",
+      "before": "(Consultar sede)",
+      "after": null
+    },
+    {
+      "association_id": 92,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 93,
+      "field": "address",
+      "before": "(Consultar sede)",
+      "after": null
+    },
+    {
+      "association_id": 93,
+      "field": "website",
+      "before": "https://www.cepaim.org",
+      "after": "https://www.cepaim.org/"
+    },
+    {
+      "association_id": 94,
+      "field": "address",
+      "before": "(Consultar sede)",
+      "after": null
+    },
+    {
+      "association_id": 94,
+      "field": "website",
+      "before": "https://www.cear.es",
+      "after": "https://www.cear.es/"
+    },
+    {
+      "association_id": 95,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 96,
+      "field": "address",
+      "before": "(Consultar sede)",
+      "after": null
+    },
+    {
+      "association_id": 96,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 97,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 98,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 99,
+      "field": "municipality_key",
+      "before": "CONSULTAR SEDE",
+      "after": null
+    },
+    {
+      "association_id": 99,
+      "field": "municipality_name",
+      "before": "(Consultar sede)",
+      "after": null
+    },
+    {
+      "association_id": 99,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 128,
+      "field": "municipality_key",
+      "before": "SITIO WEB",
+      "after": null
+    },
+    {
+      "association_id": 128,
+      "field": "municipality_name",
+      "before": "Sitio Web",
+      "after": null
+    },
+    {
+      "association_id": 128,
+      "field": "website",
+      "before": "www.asociacionfaema.org",
+      "after": "https://www.asociacionfaema.org/"
+    },
+    {
+      "association_id": 128,
+      "field": "description",
+      "before": "Mejorar la calidad de vida de personas con discapacidad por enfermedad mental y sus familias. Ofrecen centro ocupacional, respiro familiar, psicoeducación, etc. | Web: www.asociacionfaema.org\n\nEmail: info@asociacionfaema.org",
+      "after": "Mejorar la calidad de vida de personas con discapacidad por enfermedad mental y sus familias. Ofrecen centro ocupacional, respiro familiar, psicoeducación, etc. | Web: www.asociacionfaema.org\nEmail: info@asociacionfaema.org"
+    },
+    {
+      "association_id": 129,
+      "field": "website",
+      "before": "www.alzheimeravila.com",
+      "after": "https://www.alzheimeravila.com/"
+    },
+    {
+      "association_id": 129,
+      "field": "description",
+      "before": "Apoyo a familiares y enfermos de Alzheimer. Servicios de neuropsicología y estimulación multisensorial (Snoezelen). | Ávila: 920 700 409\n\nArévalo: 920 303 158\n\nCebreros: 918 633 101 | Web: www.alzheimeravila.com\n\nEmail: presidenta@alzheimeravila.com",
+      "after": "Apoyo a familiares y enfermos de Alzheimer. Servicios de neuropsicología y estimulación multisensorial (Snoezelen). | Ávila: 920 700 409\nArévalo: 920 303 158\nCebreros: 918 633 101 | Web: www.alzheimeravila.com\nEmail: presidenta@alzheimeravila.com"
+    },
+    {
+      "association_id": 130,
+      "field": "website",
+      "before": "www.autismoavila.org",
+      "after": "https://www.autismoavila.org/"
+    },
+    {
+      "association_id": 131,
+      "field": "website",
+      "before": "www.avila.aecc.es",
+      "after": "https://www.avila.aecc.es/"
+    },
+    {
+      "association_id": 132,
+      "field": "website",
+      "before": "www.ademavila.com",
+      "after": "https://www.ademavila.com/"
+    },
+    {
+      "association_id": 133,
+      "field": "website",
+      "before": "yahoo.es",
+      "after": "https://yahoo.es/"
+    },
+    {
+      "association_id": 134,
+      "field": "website",
+      "before": "hotmail.com",
+      "after": "https://hotmail.com/"
+    },
+    {
+      "association_id": 135,
+      "field": "website",
+      "before": "www.respiravila.com",
+      "after": "https://www.respiravila.com/"
+    },
+    {
+      "association_id": 136,
+      "field": "website",
+      "before": "www.aspaceavila.org",
+      "after": "https://www.aspaceavila.org/"
+    },
+    {
+      "association_id": 137,
+      "field": "website",
+      "before": "www.downavila.com",
+      "after": "https://www.downavila.com/"
+    },
+    {
+      "association_id": 138,
+      "field": "website",
+      "before": "acecale.org",
+      "after": "https://acecale.org/"
+    },
+    {
+      "association_id": 139,
+      "field": "municipality_key",
+      "before": "NO SE ENCONTRO TELEFONO DIRECTO EN LA LISTA",
+      "after": null
+    },
+    {
+      "association_id": 139,
+      "field": "municipality_name",
+      "before": "No se encontró teléfono directo en la lista.",
+      "after": null
+    },
+    {
+      "association_id": 139,
+      "field": "website",
+      "before": "www.diabeticosabulenses.blogspot.com",
+      "after": "https://www.diabeticosabulenses.blogspot.com/"
+    },
+    {
+      "association_id": 141,
+      "field": "municipality_key",
+      "before": "NO SE ENCONTRO TELEFONO DIRECTO EN LA LISTA",
+      "after": null
+    },
+    {
+      "association_id": 141,
+      "field": "municipality_name",
+      "before": "No se encontró teléfono directo en la lista.",
+      "after": null
+    },
+    {
+      "association_id": 141,
+      "field": "website",
+      "before": "www.pronisa.org",
+      "after": "https://www.pronisa.org/"
+    },
+    {
+      "association_id": 142,
+      "field": "website",
+      "before": "aspaceavila.org",
+      "after": "https://aspaceavila.org/"
+    },
+    {
+      "association_id": 143,
+      "field": "municipality_key",
+      "before": "SITIO WEB",
+      "after": null
+    },
+    {
+      "association_id": 143,
+      "field": "municipality_name",
+      "before": "Sitio Web",
+      "after": null
+    },
+    {
+      "association_id": 143,
+      "field": "website",
+      "before": "www.aspaymcyl.org",
+      "after": "https://www.aspaymcyl.org/"
+    },
+    {
+      "association_id": 144,
+      "field": "website",
+      "before": "downavila.es",
+      "after": "https://downavila.es/"
+    },
+    {
+      "association_id": 145,
+      "field": "website",
+      "before": "www.asociacionfaema.org",
+      "after": "https://www.asociacionfaema.org/"
+    },
+    {
+      "association_id": 146,
+      "field": "website",
+      "before": "www.autismoavila.org",
+      "after": "https://www.autismoavila.org/"
+    },
+    {
+      "association_id": 147,
+      "field": "website",
+      "before": "www.diocesisdeavila.com/caritas-diocesana",
+      "after": "https://www.diocesisdeavila.com/caritas-diocesana"
+    },
+    {
+      "association_id": 148,
+      "field": "website",
+      "before": "www.cruzroja.es/principal/web/cruz-roja-avila",
+      "after": "https://www.cruzroja.es/principal/web/cruz-roja-avila"
+    },
+    {
+      "association_id": 149,
+      "field": "website",
+      "before": "www.manosunidas.orgEmail:",
+      "after": "www.manosunidas.orgemail:"
+    },
+    {
+      "association_id": 150,
+      "field": "website",
+      "before": "www.intras.es",
+      "after": "https://www.intras.es/"
+    },
+    {
+      "association_id": 155,
+      "field": "website",
+      "before": "https://www.aabadajoz.org",
+      "after": "https://www.aabadajoz.org/"
+    },
+    {
+      "association_id": 156,
+      "field": "website",
+      "before": "www.cocemfebadajoz.org",
+      "after": "https://www.cocemfebadajoz.org/"
+    },
+    {
+      "association_id": 157,
+      "field": "website",
+      "before": "www.downbadajoz.org",
+      "after": "https://www.downbadajoz.org/"
+    },
+    {
+      "association_id": 159,
+      "field": "website",
+      "before": "feafes-aemis.com",
+      "after": "https://feafes-aemis.com/"
+    },
+    {
+      "association_id": 161,
+      "field": "website",
+      "before": "www.caritasbadajoz.es",
+      "after": "https://www.caritasbadajoz.es/"
+    },
+    {
+      "association_id": 162,
+      "field": "website",
+      "before": "www.cruzroja.es/principal/web/cruz-roja-badajoz",
+      "after": "https://www.cruzroja.es/principal/web/cruz-roja-badajoz"
+    },
+    {
+      "association_id": 163,
+      "field": "website",
+      "before": "gmail.com",
+      "after": "https://gmail.com/"
+    },
+    {
+      "association_id": 164,
+      "field": "website",
+      "before": "www.felcode.org",
+      "after": "https://www.felcode.org/"
+    },
+    {
+      "association_id": 208,
+      "field": "website",
+      "before": "Sitio Web",
+      "after": null
+    },
+    {
+      "association_id": 218,
+      "field": "website",
+      "before": "Sitio Web",
+      "after": null
+    },
+    {
+      "association_id": 247,
+      "field": "website",
+      "before": "contraelcancer.es",
+      "after": "https://contraelcancer.es/"
+    },
+    {
+      "association_id": 248,
+      "field": "website",
+      "before": "afacantabria.com",
+      "after": "https://afacantabria.com/"
+    },
+    {
+      "association_id": 249,
+      "field": "website",
+      "before": "ascasam.org",
+      "after": "https://ascasam.org/"
+    },
+    {
+      "association_id": 250,
+      "field": "website",
+      "before": "gmail.com",
+      "after": "https://gmail.com/"
+    },
+    {
+      "association_id": 251,
+      "field": "website",
+      "before": "acefcantabria.org",
+      "after": "https://acefcantabria.org/"
+    },
+    {
+      "association_id": 252,
+      "field": "website",
+      "before": "alcercantabria.org",
+      "after": "https://alcercantabria.org/"
+    },
+    {
+      "association_id": 253,
+      "field": "website",
+      "before": "hotmail.com",
+      "after": "https://hotmail.com/"
+    },
+    {
+      "association_id": 254,
+      "field": "website",
+      "before": "gmail.com",
+      "after": "https://gmail.com/"
+    },
+    {
+      "association_id": 255,
+      "field": "website",
+      "before": "fqcantabria.org",
+      "after": "https://fqcantabria.org/"
+    },
+    {
+      "association_id": 256,
+      "field": "website",
+      "before": "gmail.com",
+      "after": "https://gmail.com/"
+    },
+    {
+      "association_id": 257,
+      "field": "website",
+      "before": "cocemfecantabria.org",
+      "after": "https://cocemfecantabria.org/"
+    },
+    {
+      "association_id": 258,
+      "field": "website",
+      "before": "cermicantabria.org",
+      "after": "https://cermicantabria.org/"
+    },
+    {
+      "association_id": 259,
+      "field": "website",
+      "before": "caritassantander.org",
+      "after": "https://caritassantander.org/"
+    },
+    {
+      "association_id": 259,
+      "field": "description",
+      "before": "Lucha contra la pobreza y exclusión social (Acogida, empleo, vivienda, programas de menores). | Teléfono: 942 36 33 05 \n\n Correo: info@caritassantander.org \n\n Web: caritassantander.org",
+      "after": "Lucha contra la pobreza y exclusión social (Acogida, empleo, vivienda, programas de menores). | Teléfono: 942 36 33 05\nCorreo: info@caritassantander.org\nWeb: caritassantander.org"
+    },
+    {
+      "association_id": 260,
+      "field": "website",
+      "before": "cruzroja.es/principal/cantabria",
+      "after": "https://cruzroja.es/principal/cantabria"
+    },
+    {
+      "association_id": 260,
+      "field": "description",
+      "before": "Asistencia humanitaria y social (Emergencias, empleo, inclusión social, personas mayores). | Teléfono: 942 22 24 55 \n\n Web: cruzroja.es/principal/cantabria",
+      "after": "Asistencia humanitaria y social (Emergencias, empleo, inclusión social, personas mayores). | Teléfono: 942 22 24 55\nWeb: cruzroja.es/principal/cantabria"
+    },
+    {
+      "association_id": 261,
+      "field": "website",
+      "before": "cocemfecantabria.org",
+      "after": "https://cocemfecantabria.org/"
+    },
+    {
+      "association_id": 261,
+      "field": "description",
+      "before": "Federación de Personas con Discapacidad Física y Orgánica (Defensa de derechos, autonomía personal, accesibilidad). | Teléfono: 942 32 38 56 \n\n Correo: cocemfe@cocemfecantabria.org \n\n Web: cocemfecantabria.org",
+      "after": "Federación de Personas con Discapacidad Física y Orgánica (Defensa de derechos, autonomía personal, accesibilidad). | Teléfono: 942 32 38 56\nCorreo: cocemfe@cocemfecantabria.org\nWeb: cocemfecantabria.org"
+    },
+    {
+      "association_id": 262,
+      "field": "website",
+      "before": "once.es",
+      "after": "https://once.es/"
+    },
+    {
+      "association_id": 262,
+      "field": "description",
+      "before": "Discapacidad Visual (Rehabilitación, formación, empleo, venta de productos de juego). | Teléfono: 942 21 00 24 \n\n Web: once.es",
+      "after": "Discapacidad Visual (Rehabilitación, formación, empleo, venta de productos de juego). | Teléfono: 942 21 00 24\nWeb: once.es"
+    },
+    {
+      "association_id": 263,
+      "field": "website",
+      "before": "gmail.com",
+      "after": "https://gmail.com/"
+    },
+    {
+      "association_id": 263,
+      "field": "description",
+      "before": "Red Cántabra Contra la Pobreza y la Exclusión Social (Plataforma de entidades que trabajan contra la pobreza). | Teléfono: 942 07 68 86 \n\n Correo: eapncantabria@gmail.com \n\n Web: eapncantabria.org",
+      "after": "Red Cántabra Contra la Pobreza y la Exclusión Social (Plataforma de entidades que trabajan contra la pobreza). | Teléfono: 942 07 68 86\nCorreo: eapncantabria@gmail.com\nWeb: eapncantabria.org"
+    },
+    {
+      "association_id": 264,
+      "field": "website",
+      "before": "ampros.org",
+      "after": "https://ampros.org/"
+    },
+    {
+      "association_id": 264,
+      "field": "description",
+      "before": "Discapacidad Intelectual y del Desarrollo (Empleo, atención temprana, centros ocupacionales, formación). | Teléfono: 942 33 06 52 \n\n Correo: info@ampros.org \n\n Web: ampros.org",
+      "after": "Discapacidad Intelectual y del Desarrollo (Empleo, atención temprana, centros ocupacionales, formación). | Teléfono: 942 33 06 52\nCorreo: info@ampros.org\nWeb: ampros.org"
+    },
+    {
+      "association_id": 265,
+      "field": "website",
+      "before": "fundacionnuevavida.es",
+      "after": "https://fundacionnuevavida.es/"
+    },
+    {
+      "association_id": 265,
+      "field": "description",
+      "before": "Inclusión y reinserción social (Especializada en personas en exclusión y reclusos/exreclusos). | Teléfono: 942 37 32 80 \n\n Correo: info@fundacionnuevavida.es \n\n Web: fundacionnuevavida.es",
+      "after": "Inclusión y reinserción social (Especializada en personas en exclusión y reclusos/exreclusos). | Teléfono: 942 37 32 80\nCorreo: info@fundacionnuevavida.es\nWeb: fundacionnuevavida.es"
+    },
+    {
+      "association_id": 266,
+      "field": "website",
+      "before": "digmun.es",
+      "after": "https://digmun.es/"
+    },
+    {
+      "association_id": 266,
+      "field": "description",
+      "before": "Inmigración y Desarrollo (Apoyo a migrantes, sensibilización y programas de cooperación). | Teléfono: 942 37 02 46 \n\n Correo: digmun@digmun.es \n\n Web: digmun.es",
+      "after": "Inmigración y Desarrollo (Apoyo a migrantes, sensibilización y programas de cooperación). | Teléfono: 942 37 02 46\nCorreo: digmun@digmun.es\nWeb: digmun.es"
+    },
+    {
+      "association_id": 267,
+      "field": "website",
+      "before": "gmail.com",
+      "after": "https://gmail.com/"
+    },
+    {
+      "association_id": 267,
+      "field": "description",
+      "before": "Atención a menores y familias vulnerables (Refuerzo educativo, apoyo alimentario y social). | Teléfono: 942 22 79 16 \n\n Correo: gotasolidaria@gmail.com \n\n Web: gotadeleche.com",
+      "after": "Atención a menores y familias vulnerables (Refuerzo educativo, apoyo alimentario y social). | Teléfono: 942 22 79 16\nCorreo: gotasolidaria@gmail.com\nWeb: gotadeleche.com"
+    },
+    {
+      "association_id": 268,
+      "field": "website",
+      "before": "ascasam.org",
+      "after": "https://ascasam.org/"
+    },
+    {
+      "association_id": 268,
+      "field": "description",
+      "before": "Salud Mental (Asociación Cántabra Pro Salud Mental). Apoyo a personas con TMG y a familiares, rehabilitación psicosocial, empleo, ocio. | Teléfono: 942 36 41 15 \n\n Correo: sede@ascasam.org",
+      "after": "Salud Mental (Asociación Cántabra Pro Salud Mental). Apoyo a personas con TMG y a familiares, rehabilitación psicosocial, empleo, ocio. | Teléfono: 942 36 41 15\nCorreo: sede@ascasam.org"
+    },
+    {
+      "association_id": 269,
+      "field": "website",
+      "before": "proyectohombrecantabria.org",
+      "after": "https://proyectohombrecantabria.org/"
+    },
+    {
+      "association_id": 269,
+      "field": "description",
+      "before": "Adicciones (Sustancias, juego, etc.). Tratamiento ambulatorio y residencial, apoyo a familiares, prevención, reinserción. | Teléfono: 942 23 61 06 \n\n Correo: phcantabria@proyectohombrecantabria.org",
+      "after": "Adicciones (Sustancias, juego, etc.). Tratamiento ambulatorio y residencial, apoyo a familiares, prevención, reinserción. | Teléfono: 942 23 61 06\nCorreo: phcantabria@proyectohombrecantabria.org"
+    },
+    {
+      "association_id": 270,
+      "field": "website",
+      "before": "cop.es",
+      "after": "https://cop.es/"
+    },
+    {
+      "association_id": 270,
+      "field": "description",
+      "before": "Asociación Cántabra de Ayuda al Toxicómano (Adicciones). Ofrecen información, orientación y tratamiento. | Teléfono: 942 33 01 40 \n\n Correo: acat@cop.es",
+      "after": "Asociación Cántabra de Ayuda al Toxicómano (Adicciones). Ofrecen información, orientación y tratamiento. | Teléfono: 942 33 01 40\nCorreo: acat@cop.es"
+    },
+    {
+      "association_id": 271,
+      "field": "website",
+      "before": "amattorrelavega.es",
+      "after": "https://amattorrelavega.es/"
+    },
+    {
+      "association_id": 271,
+      "field": "description",
+      "before": "Afrontando Adicciones (Asociación Montañesa de Ayuda al Toxicómano) (Adicciones). Apoyo y tratamiento en la zona occidental de Cantabria. | Teléfono: 942 89 12 42 \n\n Correo: info@amattorrelavega.es",
+      "after": "Afrontando Adicciones (Asociación Montañesa de Ayuda al Toxicómano) (Adicciones). Apoyo y tratamiento en la zona occidental de Cantabria. | Teléfono: 942 89 12 42\nCorreo: info@amattorrelavega.es"
+    },
+    {
+      "association_id": 272,
+      "field": "website",
+      "before": "gmail.com",
+      "after": "https://gmail.com/"
+    },
+    {
+      "association_id": 272,
+      "field": "description",
+      "before": "Trastornos de la Conducta Alimentaria (TCA) y Anorexia Nerviosa (Prevención, apoyo a pacientes y familiares). | Teléfono: 942 07 43 00 \n\n Correo: adanercantabria@gmail.com",
+      "after": "Trastornos de la Conducta Alimentaria (TCA) y Anorexia Nerviosa (Prevención, apoyo a pacientes y familiares). | Teléfono: 942 07 43 00\nCorreo: adanercantabria@gmail.com"
+    },
+    {
+      "association_id": 273,
+      "field": "website",
+      "before": "gmail.com",
+      "after": "https://gmail.com/"
+    },
+    {
+      "association_id": 273,
+      "field": "description",
+      "before": "Alcohólicos Anónimos de Cantabria (Recuperación del alcoholismo basada en el programa de los 12 pasos). | Varios grupos. Contacto centralizado. | Teléfono: 679 27 50 25 (Línea 24h) \n\n Correo: alcohólicos.anónimos.cantabria@gmail.com",
+      "after": "Alcohólicos Anónimos de Cantabria (Recuperación del alcoholismo basada en el programa de los 12 pasos). | Varios grupos. Contacto centralizado. | Teléfono: 679 27 50 25 (Línea 24h)\nCorreo: alcohólicos.anónimos.cantabria@gmail.com"
+    },
+    {
+      "association_id": 274,
+      "field": "website",
+      "before": "castelloncancer.com",
+      "after": "https://castelloncancer.com/"
+    },
+    {
+      "association_id": 274,
+      "field": "description",
+      "before": "Cáncer (Prevención, apoyo social y psicológico, ayuda a pacientes y familiares). | Teléfono: 964 04 89 40 \n\n administracion@castelloncancer.com",
+      "after": "Cáncer (Prevención, apoyo social y psicológico, ayuda a pacientes y familiares). | Teléfono: 964 04 89 40\nadministracion@castelloncancer.com"
+    },
+    {
+      "association_id": 275,
+      "field": "website",
+      "before": "artricas.com",
+      "after": "https://artricas.com/"
+    },
+    {
+      "association_id": 275,
+      "field": "description",
+      "before": "Artritis (Asociación de Artritis de Castellón). Información, apoyo y defensa de personas con artritis. | Teléfono: 964 063 660 \n\n secretaria@artricas.com",
+      "after": "Artritis (Asociación de Artritis de Castellón). Información, apoyo y defensa de personas con artritis. | Teléfono: 964 063 660\nsecretaria@artricas.com"
+    },
+    {
+      "association_id": 276,
+      "field": "website",
+      "before": "afdem.com",
+      "after": "https://afdem.com/"
+    },
+    {
+      "association_id": 276,
+      "field": "description",
+      "before": "Salud Mental (Asociación de Familiares por los Derechos y el Estudio de la Enfermedad Mental). Apoyo a familiares y pacientes. | Teléfono: 964 23 22 45 \n\n salutmentalcastello@afdem.com",
+      "after": "Salud Mental (Asociación de Familiares por los Derechos y el Estudio de la Enfermedad Mental). Apoyo a familiares y pacientes. | Teléfono: 964 23 22 45\nsalutmentalcastello@afdem.com"
+    },
+    {
+      "association_id": 277,
+      "field": "website",
+      "before": "hotmail.com",
+      "after": "https://hotmail.com/"
+    },
+    {
+      "association_id": 277,
+      "field": "description",
+      "before": "Fibromialgia (Asociación de Afectados/as de Fibromialgia de Castellón). Apoyo, difusión y sensibilización. | Teléfono: 964 20 10 12 \n\n asociacionafcas@hotmail.com",
+      "after": "Fibromialgia (Asociación de Afectados/as de Fibromialgia de Castellón). Apoyo, difusión y sensibilización. | Teléfono: 964 20 10 12\nasociacionafcas@hotmail.com"
+    },
+    {
+      "association_id": 278,
+      "field": "website",
+      "before": "asemicv.com",
+      "after": "https://asemicv.com/"
+    },
+    {
+      "association_id": 279,
+      "field": "website",
+      "before": "esclerodermia.es",
+      "after": "https://esclerodermia.es/"
+    },
+    {
+      "association_id": 279,
+      "field": "description",
+      "before": "Esclerodermia (Apoyo, información y visibilidad de esta enfermedad rara). | Teléfono: 964 25 00 48 \n\n info@esclerodermia.es",
+      "after": "Esclerodermia (Apoyo, información y visibilidad de esta enfermedad rara). | Teléfono: 964 25 00 48\ninfo@esclerodermia.es"
+    },
+    {
+      "association_id": 280,
+      "field": "website",
+      "before": "pheipas.org",
+      "after": "https://pheipas.org/"
+    },
+    {
+      "association_id": 280,
+      "field": "description",
+      "before": "Feocromocitoma y Paraganglioma (Acción Solidaria). Apoyo e información sobre estos tumores neuroendocrinos. | Teléfono: 666 67 11 79 \n\n info@pheipas.org | No web específica en resultados, buscar por email.",
+      "after": "Feocromocitoma y Paraganglioma (Acción Solidaria). Apoyo e información sobre estos tumores neuroendocrinos. | Teléfono: 666 67 11 79\ninfo@pheipas.org | No web específica en resultados, buscar por email."
+    },
+    {
+      "association_id": 281,
+      "field": "website",
+      "before": "caritas-segorbecastellon.org",
+      "after": "https://caritas-segorbecastellon.org/"
+    },
+    {
+      "association_id": 281,
+      "field": "description",
+      "before": "Lucha contra la pobreza y exclusión social (Acogida, empleo, vivienda, programas de ayuda). | Teléfono: 964 72 40 40 \n\n Correo: info@caritas-segorbecastellon.org",
+      "after": "Lucha contra la pobreza y exclusión social (Acogida, empleo, vivienda, programas de ayuda). | Teléfono: 964 72 40 40\nCorreo: info@caritas-segorbecastellon.org"
+    },
+    {
+      "association_id": 282,
+      "field": "website",
+      "before": "cruzroja.es/principal/cantabria",
+      "after": "https://cruzroja.es/principal/cantabria"
+    },
+    {
+      "association_id": 282,
+      "field": "description",
+      "before": "Asistencia humanitaria y social (Emergencias, empleo, inclusión social, personas mayores, salud). | Teléfono: 964 24 55 55 \n\n Web: cruzroja.es/principal/cantabria",
+      "after": "Asistencia humanitaria y social (Emergencias, empleo, inclusión social, personas mayores, salud). | Teléfono: 964 24 55 55\nWeb: cruzroja.es/principal/cantabria"
+    },
+    {
+      "association_id": 283,
+      "field": "website",
+      "before": "cocemfecastellon.org",
+      "after": "https://cocemfecastellon.org/"
+    },
+    {
+      "association_id": 283,
+      "field": "description",
+      "before": "Discapacidad Física y Orgánica (Coordinación de asociaciones, defensa de derechos, promoción de autonomía). | Teléfono: 964 23 44 20 \n\n Correo: administracion@cocemfecastellon.org",
+      "after": "Discapacidad Física y Orgánica (Coordinación de asociaciones, defensa de derechos, promoción de autonomía). | Teléfono: 964 23 44 20\nCorreo: administracion@cocemfecastellon.org"
+    },
+    {
+      "association_id": 284,
+      "field": "website",
+      "before": "castello.es",
+      "after": "https://castello.es/"
+    },
+    {
+      "association_id": 284,
+      "field": "description",
+      "before": "Servicio Social Municipal (Asistencia a familias, menores, personas mayores, drogodependencias, etc.). | Teléfono: 964 35 53 10 \n\n Correo: benestarsocial@castello.es",
+      "after": "Servicio Social Municipal (Asistencia a familias, menores, personas mayores, drogodependencias, etc.). | Teléfono: 964 35 53 10\nCorreo: benestarsocial@castello.es"
+    },
+    {
+      "association_id": 285,
+      "field": "website",
+      "before": "gitanos.org",
+      "after": "https://gitanos.org/"
+    },
+    {
+      "association_id": 285,
+      "field": "description",
+      "before": "Comunidad Gitana (Promoción educativa, empleo, vivienda e igualdad de trato). | Teléfono: 964 23 20 80 \n\n Correo: castellon@gitanos.org",
+      "after": "Comunidad Gitana (Promoción educativa, empleo, vivienda e igualdad de trato). | Teléfono: 964 23 20 80\nCorreo: castellon@gitanos.org"
+    },
+    {
+      "association_id": 286,
+      "field": "website",
+      "before": "aspropac.org",
+      "after": "https://aspropac.org/"
+    },
+    {
+      "association_id": 286,
+      "field": "description",
+      "before": "Parálisis Cerebral (Atención integral, rehabilitación, centro ocupacional y apoyo familiar). | Teléfono: 964 20 02 88 \n\n Correo: aspropac@aspropac.org",
+      "after": "Parálisis Cerebral (Atención integral, rehabilitación, centro ocupacional y apoyo familiar). | Teléfono: 964 20 02 88\nCorreo: aspropac@aspropac.org"
+    },
+    {
+      "association_id": 287,
+      "field": "website",
+      "before": "fundacionbalms.org",
+      "after": "https://fundacionbalms.org/"
+    },
+    {
+      "association_id": 287,
+      "field": "description",
+      "before": "Infancia y Adolescencia en riesgo (Acogimiento familiar, programas de apoyo a menores y familias vulnerables). | Teléfono: 964 25 36 26 \n\n Correo: balms@fundacionbalms.org",
+      "after": "Infancia y Adolescencia en riesgo (Acogimiento familiar, programas de apoyo a menores y familias vulnerables). | Teléfono: 964 25 36 26\nCorreo: balms@fundacionbalms.org"
+    },
+    {
+      "association_id": 289,
+      "field": "website",
+      "before": "proyectohombrecastellon.es",
+      "after": "https://proyectohombrecastellon.es/"
+    },
+    {
+      "association_id": 289,
+      "field": "description",
+      "before": "Tratamiento, Rehabilitación y Reinserción. Ofrece programas residenciales y ambulatorios, así como Escuelas de Familias y terapia específica para familiares. | Teléfono: 964 24 57 23 \n\n Correo: info@proyectohombrecastellon.es",
+      "after": "Tratamiento, Rehabilitación y Reinserción. Ofrece programas residenciales y ambulatorios, así como Escuelas de Familias y terapia específica para familiares. | Teléfono: 964 24 57 23\nCorreo: info@proyectohombrecastellon.es"
+    },
+    {
+      "association_id": 291,
+      "field": "website",
+      "before": "jugadoresanonimos.org",
+      "after": "https://jugadoresanonimos.org/"
+    },
+    {
+      "association_id": 292,
+      "field": "address",
+      "before": "Teléfono:  (Línea de ayuda 24h)",
+      "after": "Teléfono: (Línea de ayuda 24h)"
+    },
+    {
+      "association_id": 292,
+      "field": "website",
+      "before": "nimos.org",
+      "after": "https://nimos.org/"
+    },
+    {
+      "association_id": 293,
+      "field": "address",
+      "before": "Teléfono:  (Línea de ayuda)",
+      "after": "Teléfono: (Línea de ayuda)"
+    },
+    {
+      "association_id": 293,
+      "field": "website",
+      "before": "narcoticosanonimos.es",
+      "after": "https://narcoticosanonimos.es/"
+    },
+    {
+      "association_id": 294,
+      "field": "website",
+      "before": "adenceuta.es",
+      "after": "https://adenceuta.es/"
+    },
+    {
+      "association_id": 295,
+      "field": "website",
+      "before": "saludmentalceuta.org",
+      "after": "https://saludmentalceuta.org/"
+    },
+    {
+      "association_id": 296,
+      "field": "website",
+      "before": "contraelcancer.es/ceuta",
+      "after": "https://contraelcancer.es/ceuta"
+    },
+    {
+      "association_id": 298,
+      "field": "website",
+      "before": "cocemfeceuta.es",
+      "after": "https://cocemfeceuta.es/"
+    },
+    {
+      "association_id": 299,
+      "field": "website",
+      "before": "once.es",
+      "after": "https://once.es/"
+    },
+    {
+      "association_id": 301,
+      "field": "website",
+      "before": "www.cruzroja.es/ceuta",
+      "after": "https://www.cruzroja.es/ceuta"
+    },
+    {
+      "association_id": 302,
+      "field": "website",
+      "before": "www.digmun.com",
+      "after": "https://www.digmun.com/"
+    },
+    {
+      "association_id": 304,
+      "field": "website",
+      "before": "www.bancodealimentossolidariosdeceuta.es",
+      "after": "https://www.bancodealimentossolidariosdeceuta.es/"
+    },
+    {
+      "association_id": 305,
+      "field": "website",
+      "before": "cocemfeceuta.es",
+      "after": "https://cocemfeceuta.es/"
+    },
+    {
+      "association_id": 306,
+      "field": "website",
+      "before": "www.plenainclusionceuta.org",
+      "after": "https://www.plenainclusionceuta.org/"
+    },
+    {
+      "association_id": 307,
+      "field": "website",
+      "before": "acepas.org",
+      "after": "https://acepas.org/"
+    },
+    {
+      "association_id": 309,
+      "field": "website",
+      "before": "aspergerceuta.org",
+      "after": "https://aspergerceuta.org/"
+    },
+    {
+      "association_id": 311,
+      "field": "website",
+      "before": "saludmentalceuta.org",
+      "after": "https://saludmentalceuta.org/"
+    },
+    {
+      "association_id": 313,
+      "field": "website",
+      "before": "afaciudadreal.org",
+      "after": "https://afaciudadreal.org/"
+    },
+    {
+      "association_id": 314,
+      "field": "website",
+      "before": "ademcr.es",
+      "after": "https://ademcr.es/"
+    },
+    {
+      "association_id": 315,
+      "field": "website",
+      "before": "hotmail.com",
+      "after": "https://hotmail.com/"
+    },
+    {
+      "association_id": 316,
+      "field": "website",
+      "before": "gmail.com",
+      "after": "https://gmail.com/"
+    },
+    {
+      "association_id": 317,
+      "field": "website",
+      "before": "asimaga.org",
+      "after": "https://asimaga.org/"
+    },
+    {
+      "association_id": 318,
+      "field": "website",
+      "before": "acmeim.org",
+      "after": "https://acmeim.org/"
+    },
+    {
+      "association_id": 319,
+      "field": "website",
+      "before": "www.cruzroja.es/ciudadreal",
+      "after": "https://www.cruzroja.es/ciudadreal"
+    },
+    {
+      "association_id": 320,
+      "field": "website",
+      "before": "www.caritasciudadreal.org",
+      "after": "https://www.caritasciudadreal.org/"
+    },
+    {
+      "association_id": 321,
+      "field": "website",
+      "before": "asociacionfuensanta.com",
+      "after": "https://asociacionfuensanta.com/"
+    },
+    {
+      "association_id": 322,
+      "field": "website",
+      "before": "laborvalia.org",
+      "after": "https://laborvalia.org/"
+    },
+    {
+      "association_id": 323,
+      "field": "website",
+      "before": "plenainclusionclm.org",
+      "after": "https://plenainclusionclm.org/"
+    },
+    {
+      "association_id": 324,
+      "field": "website",
+      "before": "cocemfe.es/ciudadreal",
+      "after": "https://cocemfe.es/ciudadreal"
+    },
+    {
+      "association_id": 325,
+      "field": "website",
+      "before": "terra.es",
+      "after": "https://terra.es/"
+    },
+    {
+      "association_id": 326,
+      "field": "website",
+      "before": "hotmail.com",
+      "after": "https://hotmail.com/"
+    },
+    {
+      "association_id": 327,
+      "field": "website",
+      "before": "asociacionsaludmentalcr.es",
+      "after": "https://asociacionsaludmentalcr.es/"
+    },
+    {
+      "association_id": 328,
+      "field": "website",
+      "before": "apafes.org",
+      "after": "https://apafes.org/"
+    },
+    {
+      "association_id": 331,
+      "field": "website",
+      "before": "sescam.castillalamancha.es",
+      "after": "https://sescam.castillalamancha.es/"
+    },
+    {
+      "association_id": 332,
+      "field": "website",
+      "before": "acpacys.org",
+      "after": "https://acpacys.org/"
+    },
+    {
+      "association_id": 333,
+      "field": "website",
+      "before": "gmail.com",
+      "after": "https://gmail.com/"
+    },
+    {
+      "association_id": 334,
+      "field": "website",
+      "before": "acepi.org",
+      "after": "https://acepi.org/"
+    },
+    {
+      "association_id": 335,
+      "field": "website",
+      "before": "yahoo.es",
+      "after": "https://yahoo.es/"
+    },
+    {
+      "association_id": 336,
+      "field": "website",
+      "before": "alcavia.net",
+      "after": "https://alcavia.net/"
+    },
+    {
+      "association_id": 337,
+      "field": "website",
+      "before": "terra.es",
+      "after": "https://terra.es/"
+    },
+    {
+      "association_id": 338,
+      "field": "website",
+      "before": "fepamic.org",
+      "after": "https://fepamic.org/"
+    },
+    {
+      "association_id": 345,
+      "field": "municipality_key",
+      "before": "NO ESPECIFICADO EN EL RESUMEN",
+      "after": null
+    },
+    {
+      "association_id": 348,
+      "field": "municipality_key",
+      "before": "NO ESPECIFICADO EN EL RESUMEN",
+      "after": null
+    },
+    {
+      "association_id": 360,
+      "field": "website",
+      "before": "adiba.es",
+      "after": "https://adiba.es/"
+    },
+    {
+      "association_id": 361,
+      "field": "website",
+      "before": "telefonica.net",
+      "after": "https://telefonica.net/"
+    },
+    {
+      "association_id": 362,
+      "field": "website",
+      "before": "abdem.es",
+      "after": "https://abdem.es/"
+    },
+    {
+      "association_id": 363,
+      "field": "website",
+      "before": "abaccobaleares.org",
+      "after": "https://abaccobaleares.org/"
+    },
+    {
+      "association_id": 364,
+      "field": "website",
+      "before": "afas.es",
+      "after": "https://afas.es/"
+    },
+    {
+      "association_id": 365,
+      "field": "website",
+      "before": "amascmallorca.org",
+      "after": "https://amascmallorca.org/"
+    },
+    {
+      "association_id": 366,
+      "field": "website",
+      "before": "gmail.com",
+      "after": "https://gmail.com/"
+    },
+    {
+      "association_id": 372,
+      "field": "website",
+      "before": "yahoo.es",
+      "after": "https://yahoo.es/"
+    },
+    {
+      "association_id": 373,
+      "field": "website",
+      "before": "apemlaspalmas.org",
+      "after": "https://apemlaspalmas.org/"
+    },
+    {
+      "association_id": 374,
+      "field": "website",
+      "before": "hemofilialaspalmas.org",
+      "after": "https://hemofilialaspalmas.org/"
+    },
+    {
+      "association_id": 375,
+      "field": "website",
+      "before": "gmail.com",
+      "after": "https://gmail.com/"
+    },
+    {
+      "association_id": 376,
+      "field": "website",
+      "before": "gmail.com",
+      "after": "https://gmail.com/"
+    },
+    {
+      "association_id": 377,
+      "field": "website",
+      "before": "alcermalaga.org",
+      "after": "https://alcermalaga.org/"
+    },
+    {
+      "association_id": 378,
+      "field": "website",
+      "before": "hotmail.com",
+      "after": "https://hotmail.com/"
+    },
+    {
+      "association_id": 379,
+      "field": "website",
+      "before": "adiabetes.org",
+      "after": "https://adiabetes.org/"
+    },
+    {
+      "association_id": 380,
+      "field": "website",
+      "before": "acemamalaga.es",
+      "after": "https://acemamalaga.es/"
+    },
+    {
+      "association_id": 381,
+      "field": "website",
+      "before": "hotmail.com",
+      "after": "https://hotmail.com/"
+    },
+    {
+      "association_id": 382,
+      "field": "website",
+      "before": "cudeca.org",
+      "after": "https://cudeca.org/"
+    },
+    {
+      "association_id": 393,
+      "field": "website",
+      "before": "alzheimernavarra.com",
+      "after": "https://alzheimernavarra.com/"
+    },
+    {
+      "association_id": 394,
+      "field": "website",
+      "before": "afinanavarra.es",
+      "after": "https://afinanavarra.es/"
+    },
+    {
+      "association_id": 395,
+      "field": "website",
+      "before": "alcernavarra.org",
+      "after": "https://alcernavarra.org/"
+    },
+    {
+      "association_id": 396,
+      "field": "website",
+      "before": "amimet.com",
+      "after": "https://amimet.com/"
+    },
+    {
+      "association_id": 397,
+      "field": "website",
+      "before": "anadi.es",
+      "after": "https://anadi.es/"
+    },
+    {
+      "association_id": 398,
+      "field": "website",
+      "before": "hotmail.com",
+      "after": "https://hotmail.com/"
+    },
+    {
+      "association_id": 399,
+      "field": "website",
+      "before": "anelanavarra.es",
+      "after": "https://anelanavarra.es/"
+    },
+    {
+      "association_id": 400,
+      "field": "website",
+      "before": "gmail.com",
+      "after": "https://gmail.com/"
+    },
+    {
+      "association_id": 401,
+      "field": "website",
+      "before": "anpheb.es",
+      "after": "https://anpheb.es/"
+    },
+    {
+      "association_id": 402,
+      "field": "website",
+      "before": "hotmail.com",
+      "after": "https://hotmail.com/"
+    },
+    {
+      "association_id": 403,
+      "field": "website",
+      "before": "gmail.com",
+      "after": "https://gmail.com/"
+    },
+    {
+      "association_id": 404,
+      "field": "website",
+      "before": "gmail.com",
+      "after": "https://gmail.com/"
+    },
+    {
+      "association_id": 405,
+      "field": "website",
+      "before": "emnavarra.com",
+      "after": "https://emnavarra.com/"
+    },
+    {
+      "association_id": 406,
+      "field": "website",
+      "before": "fridanavarra.es",
+      "after": "https://fridanavarra.es/"
+    },
+    {
+      "association_id": 407,
+      "field": "website",
+      "before": "gmail.com",
+      "after": "https://gmail.com/"
+    },
+    {
+      "association_id": 408,
+      "field": "website",
+      "before": "hiruhamabi.org",
+      "after": "https://hiruhamabi.org/"
+    },
+    {
+      "association_id": 409,
+      "field": "website",
+      "before": "asociacionsaray.com",
+      "after": "https://asociacionsaray.com/"
+    },
+    {
+      "association_id": 420,
+      "field": "website",
+      "before": "saludmentalsalamanca.org",
+      "after": "https://saludmentalsalamanca.org/"
+    },
+    {
+      "association_id": 421,
+      "field": "website",
+      "before": "aerscyl.org",
+      "after": "https://aerscyl.org/"
+    },
+    {
+      "association_id": 422,
+      "field": "website",
+      "before": "pyfano.org",
+      "after": "https://pyfano.org/"
+    },
+    {
+      "association_id": 423,
+      "field": "website",
+      "before": "asdem.es",
+      "after": "https://asdem.es/"
+    },
+    {
+      "association_id": 424,
+      "field": "website",
+      "before": "diabetesalamanca.org",
+      "after": "https://diabetesalamanca.org/"
+    },
+    {
+      "association_id": 425,
+      "field": "website",
+      "before": "afessaludmental.org",
+      "after": "https://afessaludmental.org/"
+    },
+    {
+      "association_id": 426,
+      "field": "website",
+      "before": "www.contraelcancer.es",
+      "after": "https://www.contraelcancer.es/"
+    },
+    {
+      "association_id": 427,
+      "field": "website",
+      "before": "amate.es",
+      "after": "https://amate.es/"
+    },
+    {
+      "association_id": 428,
+      "field": "website",
+      "before": "asociacionerte.org",
+      "after": "https://asociacionerte.org/"
+    },
+    {
+      "association_id": 429,
+      "field": "website",
+      "before": "esclerosismultipletenerife.org",
+      "after": "https://esclerosismultipletenerife.org/"
+    },
+    {
+      "association_id": 430,
+      "field": "website",
+      "before": "gmail.com",
+      "after": "https://gmail.com/"
+    },
+    {
+      "association_id": 431,
+      "field": "website",
+      "before": "accudesevilla.org",
+      "after": "https://accudesevilla.org/"
+    },
+    {
+      "association_id": 432,
+      "field": "website",
+      "before": "sevillarespira.org",
+      "after": "https://sevillarespira.org/"
+    },
+    {
+      "association_id": 434,
+      "field": "website",
+      "before": "asovica.es",
+      "after": "https://asovica.es/"
+    },
+    {
+      "association_id": 435,
+      "field": "website",
+      "before": "hotmail.com",
+      "after": "https://hotmail.com/"
+    },
+    {
+      "association_id": 436,
+      "field": "website",
+      "before": "tosquelles.org",
+      "after": "https://tosquelles.org/"
+    },
+    {
+      "association_id": 437,
+      "field": "website",
+      "before": "clubsociallamuralla.com",
+      "after": "https://clubsociallamuralla.com/"
+    },
+    {
+      "association_id": 438,
+      "field": "website",
+      "before": "contraelcancer.es",
+      "after": "https://contraelcancer.es/"
+    },
+    {
+      "association_id": 439,
+      "field": "website",
+      "before": "fundaciolaninetadelsulls.org",
+      "after": "https://fundaciolaninetadelsulls.org/"
+    },
+    {
+      "association_id": 440,
+      "field": "website",
+      "before": "acleg.org",
+      "after": "https://acleg.org/"
+    },
+    {
+      "association_id": 441,
+      "field": "website",
+      "before": "despertar.com",
+      "after": "https://despertar.com/"
+    },
+    {
+      "association_id": 442,
+      "field": "website",
+      "before": "afanion.org",
+      "after": "https://afanion.org/"
+    },
+    {
+      "association_id": 443,
+      "field": "website",
+      "before": "apacetoledo.org",
+      "after": "https://apacetoledo.org/"
+    },
+    {
+      "association_id": 444,
+      "field": "website",
+      "before": "autismotoledo.es",
+      "after": "https://autismotoledo.es/"
+    },
+    {
+      "association_id": 445,
+      "field": "website",
+      "before": "avalem.org",
+      "after": "https://avalem.org/"
+    },
+    {
+      "association_id": 446,
+      "field": "website",
+      "before": "asleuval.org",
+      "after": "https://asleuval.org/"
+    },
+    {
+      "association_id": 447,
+      "field": "website",
+      "before": "avdiabetes.org",
+      "after": "https://avdiabetes.org/"
+    },
+    {
+      "association_id": 448,
+      "field": "website",
+      "before": "gmail.com",
+      "after": "https://gmail.com/"
+    },
+    {
+      "association_id": 449,
+      "field": "website",
+      "before": "aspaym.com",
+      "after": "https://aspaym.com/"
+    },
+    {
+      "association_id": 450,
+      "field": "website",
+      "before": "adiva.es",
+      "after": "https://adiva.es/"
+    },
+    {
+      "association_id": 451,
+      "field": "website",
+      "before": "hotmail.com",
+      "after": "https://hotmail.com/"
+    },
+    {
+      "association_id": 452,
+      "field": "website",
+      "before": "gmail.com",
+      "after": "https://gmail.com/"
+    },
+    {
+      "association_id": 453,
+      "field": "website",
+      "before": "conartritis.org",
+      "after": "https://conartritis.org/"
+    },
+    {
+      "association_id": 455,
+      "field": "website",
+      "before": "hotmail.com",
+      "after": "https://hotmail.com/"
+    },
+    {
+      "association_id": 456,
+      "field": "website",
+      "before": "yahoo.es",
+      "after": "https://yahoo.es/"
+    },
+    {
+      "association_id": 457,
+      "field": "website",
+      "before": "asapme.org",
+      "after": "https://asapme.org/"
+    },
+    {
+      "association_id": 458,
+      "field": "website",
+      "before": "ademat.es",
+      "after": "https://ademat.es/"
+    },
+    {
+      "association_id": 459,
+      "field": "website",
+      "before": "diabetesaragon.es",
+      "after": "https://diabetesaragon.es/"
+    },
+    {
+      "association_id": 460,
+      "field": "website",
+      "before": "hotmail.com",
+      "after": "https://hotmail.com/"
+    },
+    {
+      "association_id": 466,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 467,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 468,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    },
+    {
+      "association_id": 469,
+      "field": "website",
+      "before": "Consultar en web/sede",
+      "after": null
+    }
+  ]
+}
