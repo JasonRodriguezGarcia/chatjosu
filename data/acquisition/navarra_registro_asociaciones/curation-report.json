@@ -1,0 +1,261 @@
+{
+  "format_version": "2",
+  "dataset": "navarra-normalized-v2",
+  "source_id": "navarra_registro_asociaciones",
+  "input_rows": 10254,
+  "output_rows": 10254,
+  "envelope_rows": 10254,
+  "counts": {
+    "email_present": 1685,
+    "phone_present": 97,
+    "website_present": 10,
+    "postal_code_present": 9552,
+    "address_present": 10218,
+    "address_enriched": 9959,
+    "tax_collision_records": 24,
+    "relevance_keep": 668,
+    "relevance_review": 9586
+  },
+  "tax_collision_values": 12,
+  "website_origins": {
+    "structured": 7,
+    "email_promoted": 2,
+    "text_recovered": 1
+  },
+  "invariants": {
+    "rows": true,
+    "email": true,
+    "phone": true,
+    "website": true,
+    "postal_code": true,
+    "address": true,
+    "address_enriched": true,
+    "tax_collision_records": true,
+    "tax_collision_values": true,
+    "relevance_keep": true,
+    "relevance_review": true,
+    "all_passed": true
+  },
+  "exceptions": {
+    "email_invalid": [
+      {
+        "source_record_id": "6689",
+        "value": "www.astronavarra.org",
+        "reason": "at_count"
+      },
+      {
+        "source_record_id": "6692",
+        "value": "lunalunota@gmail",
+        "reason": "tld_missing"
+      },
+      {
+        "source_record_id": "6778",
+        "value": "venquetecuento@yahoo.s",
+        "reason": "label_length"
+      },
+      {
+        "source_record_id": "6885",
+        "value": "asociacion alanda@gmail.com",
+        "reason": "local_charset"
+      },
+      {
+        "source_record_id": "7001",
+        "value": "www.rocaforte.es",
+        "reason": "at_count"
+      },
+      {
+        "source_record_id": "7138",
+        "value": "asociaciontremolo@gmailcom",
+        "reason": "tld_missing"
+      },
+      {
+        "source_record_id": "6995",
+        "value": "iruñataldeaelkartea@gmail.com",
+        "reason": "local_charset"
+      },
+      {
+        "source_record_id": "230",
+        "value": "administración@laescueladeteatro.com",
+        "reason": "local_charset"
+      },
+      {
+        "source_record_id": "152",
+        "value": "correo@coralbarañain.com",
+        "reason": "label_charset"
+      },
+      {
+        "source_record_id": "683",
+        "value": "jubiladosdeaibar.com",
+        "reason": "at_count"
+      },
+      {
+        "source_record_id": "801",
+        "value": "club de jubilados alegría y amistad de cascante",
+        "reason": "at_count"
+      },
+      {
+        "source_record_id": "1729",
+        "value": "p.ciudaddeportiva.gmail.com",
+        "reason": "at_count"
+      },
+      {
+        "source_record_id": "3531",
+        "value": "soci.armañanzas@gmail.com",
+        "reason": "local_charset"
+      },
+      {
+        "source_record_id": "2654",
+        "value": "eragibela2222@hotmail",
+        "reason": "tld_missing"
+      },
+      {
+        "source_record_id": "14945",
+        "value": "contacto@salamgaza.org.",
+        "reason": "label_length"
+      }
+    ],
+    "phone_null": [
+      {
+        "source_record_id": "8732",
+        "telefono1": null,
+        "telefono2": "31630",
+        "telefono3": null
+      },
+      {
+        "source_record_id": "9465",
+        "telefono1": "0",
+        "telefono2": null,
+        "telefono3": null
+      },
+      {
+        "source_record_id": "9466",
+        "telefono1": "0",
+        "telefono2": null,
+        "telefono3": null
+      }
+    ],
+    "email_promoted_to_website": [
+      {
+        "source_record_id": "6689",
+        "value": "www.astronavarra.org",
+        "website": "https://www.astronavarra.org"
+      },
+      {
+        "source_record_id": "7001",
+        "value": "www.rocaforte.es",
+        "website": "https://www.rocaforte.es"
+      }
+    ],
+    "website_recovered_from_text": [
+      {
+        "source_record_id": "14961",
+        "value": "www.lamemoriaperdida.com",
+        "website": "https://www.lamemoriaperdida.com"
+      }
+    ],
+    "postal_code_recovered": [
+      {
+        "source_record_id": "2606",
+        "value": "31100"
+      },
+      {
+        "source_record_id": "8805",
+        "value": "31313"
+      },
+      {
+        "source_record_id": "8816",
+        "value": "31001"
+      },
+      {
+        "source_record_id": "9052",
+        "value": "31520"
+      }
+    ],
+    "postal_code_malformed_kept": [
+      {
+        "source_record_id": "2656",
+        "value": "3514"
+      },
+      {
+        "source_record_id": "3416",
+        "value": "31 00"
+      },
+      {
+        "source_record_id": "4067",
+        "value": "31"
+      },
+      {
+        "source_record_id": "5548",
+        "value": "3159*"
+      },
+      {
+        "source_record_id": "14195",
+        "value": "3159"
+      },
+      {
+        "source_record_id": "14541",
+        "value": "31"
+      },
+      {
+        "source_record_id": "14796",
+        "value": "21"
+      }
+    ],
+    "address_prefix_variant_enriched": [
+      "6985",
+      "7357",
+      "7524",
+      "7595",
+      "7638",
+      "7767",
+      "8209",
+      "2614",
+      "2893",
+      "3243",
+      "3938",
+      "6396",
+      "6511",
+      "9538",
+      "10703",
+      "13986",
+      "14312",
+      "14346",
+      "14743",
+      "14924",
+      "14945",
+      "15013",
+      "15020",
+      "15023",
+      "15030",
+      "15042",
+      "15054",
+      "15062",
+      "15116",
+      "15135",
+      "15167",
+      "15169",
+      "15200",
+      "15271",
+      "15276",
+      "15277",
+      "15295",
+      "15296",
+      "15299",
+      "15332",
+      "15335",
+      "15381",
+      "15405",
+      "15418",
+      "15424",
+      "15427",
+      "15431",
+      "15438",
+      "15440",
+      "15441",
+      "15444",
+      "15459",
+      "15485",
+      "15489"
+    ]
+  }
+}
