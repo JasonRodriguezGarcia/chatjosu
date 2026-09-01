@@ -1,18 +1,18 @@
 {
   "format_version": 1,
   "projection_version": "1.0",
-  "source_rows": 19695,
+  "source_rows": 28091,
   "relevance": {
     "strict_candidates": 2665,
-    "rejected_non_strict": 17030
+    "rejected_non_strict": 25426
   },
   "tagging": {
-    "high_associations": 723,
-    "review_only": 142,
-    "unmapped": 1800,
-    "high_single_tag": 596,
-    "high_multiple_tags": 127,
-    "tag_assignments": 891,
+    "high_associations": 751,
+    "review_only": 147,
+    "unmapped": 1767,
+    "high_single_tag": 589,
+    "high_multiple_tags": 162,
+    "tag_assignments": 962,
     "by_tag": {
       "DISCAPACIDAD_FISICA": 27,
       "EXCLUSION_SOCIAL": 183,
@@ -26,7 +26,7 @@
       "ALZHEIMER": 9,
       "ESCLEROSIS_MULTIPLE": 4,
       "LUPUS": 3,
-      "INSERCION_LABORAL": 45,
+      "INSERCION_LABORAL": 53,
       "DANO_CEREBRAL_ADQUIRIDO": 3,
       "INMIGRACION_REFUGIO": 141,
       "CELIAQUIA": 4,
@@ -39,6 +39,7 @@
       "ELA": 7,
       "ACOGIMIENTO_FAMILIAR": 6,
       "ENFERMEDADES_NEUROMUSCULARES": 4,
+      "DISCAPACIDAD": 63,
       "MEDIACION_FAMILIAR": 11,
       "ADOPCION": 6,
       "PARKINSON": 6,
@@ -67,28 +68,28 @@
     }
   },
   "territory": {
-    "resolved": 723,
+    "resolved": 751,
     "unresolved": 0,
     "by_province": {
-      "ALAVA": 185,
-      "VIZCAYA": 361,
-      "GUIPUZCOA": 177
+      "ALAVA": 194,
+      "VIZCAYA": 371,
+      "GUIPUZCOA": 186
     }
   },
   "contacts": {
     "with_phone": 0,
     "with_email": 0,
-    "with_website": 107,
-    "with_any_contact": 107,
-    "without_direct_contact": 616,
-    "with_official_registry_url": 723
+    "with_website": 111,
+    "with_any_contact": 111,
+    "without_direct_contact": 640,
+    "with_official_registry_url": 751
   },
   "coordinates": {
-    "with_coordinates": 723,
+    "with_coordinates": 751,
     "without_coordinates": 0
   },
   "dedupe": {
-    "new_candidate": 722,
+    "new_candidate": 750,
     "exact_duplicate": 0,
     "probable_duplicate": 1
   },
@@ -97,6 +98,6 @@
     "missing_municipality": 0,
     "missing_province": 0
   },
-  "runtime_candidates": 723,
-  "generated_at": "2026-08-11T07:30:52.474Z"
+  "runtime_candidates": 751,
+  "generated_at": "2026-09-01T13:15:42.414Z"
 }

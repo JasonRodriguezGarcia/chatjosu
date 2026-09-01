@@ -7,22 +7,41 @@ import {
 
 const ROOT = process.cwd();
 
-const INPUT =
+const SOURCE_DIR =
+  process.argv[2] ??
+  "euskadi_registro_asociaciones";
+
+const SOURCE_ROOT =
   path.join(
     ROOT,
-    "data/acquisition/euskadi_registro_asociaciones/normalized.jsonl"
+    "data/acquisition",
+    SOURCE_DIR
+  );
+
+const INPUT_NAME =
+  process.argv[3] ??
+  "normalized.jsonl";
+
+const GATE =
+  process.argv[4] ??
+  "strict";
+
+const INPUT =
+  path.join(
+    SOURCE_ROOT,
+    INPUT_NAME
   );
 
 const OUTPUT =
   path.join(
-    ROOT,
-    "data/acquisition/euskadi_registro_asociaciones/runtime-candidates.jsonl"
+    SOURCE_ROOT,
+    "runtime-candidates.jsonl"
   );
 
 const PREFLIGHT =
   path.join(
-    ROOT,
-    "data/acquisition/euskadi_registro_asociaciones/runtime-preflight.json"
+    SOURCE_ROOT,
+    "runtime-preflight.json"
   );
 
 function readJsonl(filename) {
@@ -60,6 +79,36 @@ function isStrictRelevance(row) {
     reasons.has(
       "hard_direct_purpose"
     )
+  );
+}
+
+function isDirectRelevance(row) {
+  return (
+    row.relevance?.status ===
+    "direct_relevance"
+  );
+}
+
+function passesGate(row) {
+  if (GATE === "direct") {
+    return isDirectRelevance(row);
+  }
+
+  if (GATE !== "strict") {
+    throw new Error(
+      "UNKNOWN_GATE=" + GATE
+    );
+  }
+
+  return isStrictRelevance(row);
+}
+
+if (
+  GATE !== "strict" &&
+  GATE !== "direct"
+) {
+  throw new Error(
+    "UNKNOWN_GATE=" + GATE
   );
 }
 
@@ -124,7 +173,7 @@ const preflight = {
 };
 
 for (const row of rows) {
-  if (!isStrictRelevance(row)) {
+  if (!passesGate(row)) {
     preflight
       .relevance
       .rejected_non_strict += 1;
