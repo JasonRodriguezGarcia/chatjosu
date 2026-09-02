@@ -1,0 +1,27 @@
+{
+  "source": "euskadi",
+  "dry_run": true,
+  "generated_at": "2026-09-02T16:34:50.299Z",
+  "total_candidates": 751,
+  "invalid_no_name": 0,
+  "new": 0,
+  "skipped_existing": 751,
+  "skipped_intra_duplicate": 0,
+  "tags_inserted": 0,
+  "unknown_tags": [],
+  "association_id_range": null,
+  "nif_present": 234,
+  "nif_absent": 517,
+  "scope_distribution": {
+    "Provincial": 294,
+    "Autonómico": 381,
+    "Desconocido": 37,
+    "Local": 39
+  },
+  "province_distribution": {
+    "ALAVA": 194,
+    "VIZCAYA": 371,
+    "GUIPUZCOA": 186
+  },
+  "report_file": "/home/tx4k4l/Projects/copilot-ong/data/reports/import-euskadi-20260902.json"
+}

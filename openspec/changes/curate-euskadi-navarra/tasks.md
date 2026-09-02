@@ -23,20 +23,22 @@
 - [x] 3.5 Sync servidor→local del artefacto proyectado y commit; `git diff --check` + `--name-only`.
 
 ## 4. F2 — Migración 009 v2 (servidor)
-- [ ] 4.1 Redactar `db/local/init/009_tags_v2.sql` idempotente (D3 + D5).
+- [x] 4.1 Redactar `db/local/init/009_tags_v2.sql` idempotente (D3 + D5). Local 2026-09-02: re-aplicación en `copilot_ong` con `--single-transaction` corrigió `TDHA` → `TDAH` (`UPDATE 1`, `INSERT 0 0`).
 - [ ] 4.2 Dry-run (transacción + ROLLBACK) y captura de conteos antes.
 - [ ] 4.3 Aplicar en transacción única; conteos después → `data/reports/migration-009-report.json` (inventario de los 2 legacy ids sin mapeo incluidos).
 - [ ] 4.4 Commit de la migración + reporte.
 - [ ] 4.5 `node --check` no aplica (SQL); validar sintaxis con el dry-run de 4.2.
 
 ## 5. F3 — Importador (servidor)
-- [ ] 5.1 Crear `backend/scripts/import-runtime-candidates-v1.js` (D4): `--source`, `--dry-run`, mapeo + tags + provenance + `ON CONFLICT (content_hash) DO NOTHING`.
+- [x] 5.1 Crear `backend/scripts/import-runtime-candidates-v1.js` (D4): `--source`, `--dry-run`, mapeo + tags + provenance + `ON CONFLICT (content_hash) DO NOTHING`. Local 2026-09-02: dry-run idempotente Euskadi 751/Navarra 265 y tests puros en `backend/tests/import-runtime-candidates-v1.test.js`.
 - [ ] 5.2 Dry-run Euskadi (751) → inspeccionar resumen → importar Euskadi.
 - [ ] 5.3 Dry-run Navarra (265) → inspeccionar resumen → importar Navarra.
 - [ ] 5.4 Commit del importador + reportes de importación en `data/reports/`.
 
 ## 6. F4 — Verificación
-- [ ] 6.1 `npm test` (tests existentes + nuevos: clasificador v2 «soledad», mapeo del importador como función pura).
+- [x] 6.1 `npm test` (tests existentes + nuevos: clasificador v2 «soledad», mapeo del importador como función pura).
+  - Nota local 2026-09-02: `backend/package.json` define ahora `test` y `npm test` pasó en local: 101 tests Vitest + 50 tests `node --test`, exit 0.
 - [ ] 6.2 E2E: smoke del backend (`:5174`) + caso feedback #13 (limitación documentada si requiere LLM).
 - [ ] 6.3 Prueba de rollback (opcional, en ventana aprobada): `pg_restore` en BD de prueba, NO sobre la BD en producción.
-- [ ] 6.4 `git diff --check`, `git diff --name-only`, y verificación de que ningún archivo fuera de scope fue modificado.
+- [x] 6.4 `git diff --check`, `git diff --name-only`, y verificación de que ningún archivo fuera de scope fue modificado.
+  - Nota local 2026-09-02: `git diff --check` limpio; modified/untracked locales dentro del scope (`semantic-prototypes.js`, tests, importador, reportes y migraciones locales).
