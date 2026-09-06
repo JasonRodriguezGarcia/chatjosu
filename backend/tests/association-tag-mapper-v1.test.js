@@ -142,6 +142,40 @@ test(
 );
 
 test(
+  "personas mayores de edad no emite PERSONAS_MAYORES",
+  () => {
+    const result =
+      mapAssociationTagsV1({
+        description:
+          "Asesoramiento jurídico para personas mayores de edad.",
+      });
+
+    assert.ok(
+      !result.tags.some(
+        t => t.key === "PERSONAS_MAYORES"
+      )
+    );
+  }
+);
+
+test(
+  "personas mayores de una edad numérica no emite PERSONAS_MAYORES",
+  () => {
+    const result =
+      mapAssociationTagsV1({
+        description:
+          "Programas de empleo para personas mayores de 45 años.",
+      });
+
+    assert.ok(
+      !result.tags.some(
+        t => t.key === "PERSONAS_MAYORES"
+      )
+    );
+  }
+);
+
+test(
   "expresión explícita de personas mayores emite PERSONAS_MAYORES",
   () => {
     const result =

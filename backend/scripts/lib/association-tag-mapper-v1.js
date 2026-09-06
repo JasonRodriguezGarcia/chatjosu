@@ -281,7 +281,7 @@ const DEFINITIONS = [
   ]],
 
   ["PERSONAS_MAYORES", [
-    /\bPERSONAS MAYORES\b/,
+    /\bPERSONAS MAYORES\b(?!\s+DE\s+(?:EDAD\b|\d{1,3}\s+ANOS\b))/,
     /\bTERCERA EDAD\b/,
     /\bANCIANO(?:S)?\b/,
     /\bGERIATRIA\b/,
