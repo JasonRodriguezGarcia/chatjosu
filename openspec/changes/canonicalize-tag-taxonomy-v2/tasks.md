@@ -39,12 +39,25 @@
 
 ## A4 — Validar migración 009
 
-- [ ] A4.1 Validar la taxonomía declarada por `009_tags_v2.sql`.
-- [ ] A4.2 Validar mappings legacy→v2.
-- [ ] A4.3 Verificar que no existen mappings ambiguos o inválidos.
-- [ ] A4.4 Verificar idempotencia de la migración en un entorno seguro.
-- [ ] A4.5 Registrar los resultados de la validación necesarios para la
+- [x] A4.1 Validar la taxonomía declarada por `009_tags_v2.sql`.
+- [x] A4.2 Validar mappings legacy→v2.
+- [x] A4.3 Verificar que no existen mappings ambiguos o inválidos.
+- [x] A4.4 Verificar idempotencia de la migración en un entorno seguro.
+- [x] A4.5 Registrar los resultados de la validación necesarios para la
       aceptación.
+
+
+### Evidencia de aceptación A4
+
+- Taxonomía `009_tags_v2.sql`: 54 canonical tags; correspondencia completa con las 54 definitions runtime; IDs v2 35..88 verificados en instalación limpia.
+- Mappings legacy→v2: 32 pares, 29 legacy sources y 24 canonical targets; sin pares duplicados, targets inválidos ni solapamiento con provider IDs.
+- Mappings 1→N validados: `15 → PARKINSON + ALZHEIMER`, `27 → EXCLUSION_SOCIAL + INSERCION_LABORAL`, `30 → INMIGRACION_REFUGIO + INSERCION_LABORAL`.
+- Legacy sin mapping conservados: `7 BIENESTAR SOCIAL` y `26 INVESTIGACIÓN CÁNCER`; no se introdujo una equivalencia canónica ambigua.
+- Provider IDs `5`, `8` y `11` eliminados según el contrato existente.
+- Idempotencia estricta validada sobre instalación limpia `001..008 → 009 → 009`: estado lógico y secuencia permanecen idénticos tras la segunda ejecución.
+- Idempotencia estricta validada también sobre clon de la BD ya migrada: `before == after1 == after2`, incluida la secuencia.
+- La BD fuente permaneció intacta durante las validaciones (`1016` asociaciones, `1322` relaciones y `54` canonical tags).
+- SHA-256 de `009_tags_v2.sql` aceptado: `9ded1a60652a0f28f7e439d87c4487fa6877e43e0a5627cfbb1192754ec12bbd`.
 
 ## A5 — Aceptación final
 

@@ -16,62 +16,81 @@ WHERE tag_key = 'TDHA'
     WHERE existing.tag_key = 'TDAH'
   );
 
-INSERT INTO copilot_ong.tags (descripcion, tag_key)
-VALUES
-    ('Alzheimer y demencias', 'ALZHEIMER'),
-    ('Parkinson', 'PARKINSON'),
-    ('Esclerosis lateral amiotrófica (ELA)', 'ELA'),
-    ('Esclerosis múltiple', 'ESCLEROSIS_MULTIPLE'),
-    ('Enfermedades neuromusculares', 'ENFERMEDADES_NEUROMUSCULARES'),
-    ('Daño cerebral adquirido', 'DANO_CEREBRAL_ADQUIRIDO'),
-    ('Neurofibromatosis', 'NEUROFIBROMATOSIS'),
-    ('Cáncer', 'CANCER'),
-    ('Cáncer infantil', 'CANCER_INFANTIL'),
-    ('Diabetes', 'DIABETES'),
-    ('Enfermedad renal', 'ENFERMEDAD_RENAL'),
-    ('Fibrosis quística', 'FIBROSIS_QUISTICA'),
-    ('Celiaquía', 'CELIAQUIA'),
-    ('Hemofilia y coagulopatías', 'HEMOFILIA'),
-    ('Linfedema y lipedema', 'LINFEDEMA_LIPEDEMA'),
-    ('Artritis y espondilitis', 'ARTRITIS_ESPONDILITIS'),
-    ('Psoriasis y artritis psoriásica', 'PSORIASIS'),
-    ('Lupus', 'LUPUS'),
-    ('Fibromialgia y fatiga crónica', 'FIBROMIALGIA_FATIGA_CRONICA'),
-    ('Crohn y colitis ulcerosa', 'CROHN_COLITIS'),
-    ('Espina bífida e hidrocefalia', 'ESPINA_BIFIDA_HIDROCEFALIA'),
-    ('Sensibilidad química múltiple', 'SENSIBILIDAD_QUIMICA'),
-    ('Hepatitis', 'HEPATITIS'),
-    ('Retinosis pigmentaria', 'RETINOSIS_PIGMENTARIA'),
-    ('Autismo', 'AUTISMO'),
-    ('TDAH', 'TDAH'),
-    ('Dislexia y dificultades de lectoescritura', 'DISLEXIA'),
-    ('Discapacidad', 'DISCAPACIDAD'),
-    ('Discapacidad intelectual', 'DISCAPACIDAD_INTELECTUAL'),
-    ('Discapacidad auditiva y sordera', 'DISCAPACIDAD_AUDITIVA'),
-    ('Parálisis cerebral', 'PARALISIS_CEREBRAL'),
-    ('Salud mental', 'SALUD_MENTAL'),
-    ('Trastornos de la conducta alimentaria', 'TRASTORNOS_ALIMENTARIOS'),
-    ('Trastorno bipolar', 'TRASTORNO_BIPOLAR'),
-    ('Alcoholismo', 'ALCOHOLISMO'),
-    ('Adicciones a sustancias', 'ADICCIONES_DROGAS'),
-    ('Ludopatía y adicción al juego', 'LUDOPATIA'),
-    ('Exclusión social', 'EXCLUSION_SOCIAL'),
-    ('Pobreza y necesidades básicas', 'POBREZA_NECESIDADES_BASICAS'),
-    ('Personas sin hogar', 'SIN_HOGAR'),
-    ('Inserción laboral', 'INSERCION_LABORAL'),
-    ('Inmigración, refugio y asilo', 'INMIGRACION_REFUGIO'),
-    ('Violencia de género', 'VIOLENCIA_GENERO'),
-    ('Acoso laboral', 'ACOSO_LABORAL'),
-    ('Acoso escolar', 'ACOSO_ESCOLAR'),
-    ('Soledad no deseada', 'SOLEDAD_NO_DESEADA'),
-    ('Dependencia y apoyo a la autonomía', 'DEPENDENCIA'),
-    ('Personas presas y reinserción', 'PERSONAS_PRESAS'),
-    ('Acogimiento familiar', 'ACOGIMIENTO_FAMILIAR'),
-    ('Adopción y familias adoptivas', 'ADOPCION'),
-    ('Mediación y crisis familiar', 'MEDIACION_FAMILIAR'),
-    ('Personas mayores', 'PERSONAS_MAYORES'),
-    ('Discapacidad física', 'DISCAPACIDAD_FISICA'),
-    ('Adicciones comportamentales', 'ADICCIONES_COMPORTAMENTALES')
+WITH desired_tags (
+    ord,
+    descripcion,
+    tag_key
+) AS (
+    VALUES
+        (1, 'Alzheimer y demencias', 'ALZHEIMER'),
+        (2, 'Parkinson', 'PARKINSON'),
+        (3, 'Esclerosis lateral amiotrófica (ELA)', 'ELA'),
+        (4, 'Esclerosis múltiple', 'ESCLEROSIS_MULTIPLE'),
+        (5, 'Enfermedades neuromusculares', 'ENFERMEDADES_NEUROMUSCULARES'),
+        (6, 'Daño cerebral adquirido', 'DANO_CEREBRAL_ADQUIRIDO'),
+        (7, 'Neurofibromatosis', 'NEUROFIBROMATOSIS'),
+        (8, 'Cáncer', 'CANCER'),
+        (9, 'Cáncer infantil', 'CANCER_INFANTIL'),
+        (10, 'Diabetes', 'DIABETES'),
+        (11, 'Enfermedad renal', 'ENFERMEDAD_RENAL'),
+        (12, 'Fibrosis quística', 'FIBROSIS_QUISTICA'),
+        (13, 'Celiaquía', 'CELIAQUIA'),
+        (14, 'Hemofilia y coagulopatías', 'HEMOFILIA'),
+        (15, 'Linfedema y lipedema', 'LINFEDEMA_LIPEDEMA'),
+        (16, 'Artritis y espondilitis', 'ARTRITIS_ESPONDILITIS'),
+        (17, 'Psoriasis y artritis psoriásica', 'PSORIASIS'),
+        (18, 'Lupus', 'LUPUS'),
+        (19, 'Fibromialgia y fatiga crónica', 'FIBROMIALGIA_FATIGA_CRONICA'),
+        (20, 'Crohn y colitis ulcerosa', 'CROHN_COLITIS'),
+        (21, 'Espina bífida e hidrocefalia', 'ESPINA_BIFIDA_HIDROCEFALIA'),
+        (22, 'Sensibilidad química múltiple', 'SENSIBILIDAD_QUIMICA'),
+        (23, 'Hepatitis', 'HEPATITIS'),
+        (24, 'Retinosis pigmentaria', 'RETINOSIS_PIGMENTARIA'),
+        (25, 'Autismo', 'AUTISMO'),
+        (26, 'TDAH', 'TDAH'),
+        (27, 'Dislexia y dificultades de lectoescritura', 'DISLEXIA'),
+        (28, 'Discapacidad', 'DISCAPACIDAD'),
+        (29, 'Discapacidad intelectual', 'DISCAPACIDAD_INTELECTUAL'),
+        (30, 'Discapacidad auditiva y sordera', 'DISCAPACIDAD_AUDITIVA'),
+        (31, 'Parálisis cerebral', 'PARALISIS_CEREBRAL'),
+        (32, 'Salud mental', 'SALUD_MENTAL'),
+        (33, 'Trastornos de la conducta alimentaria', 'TRASTORNOS_ALIMENTARIOS'),
+        (34, 'Trastorno bipolar', 'TRASTORNO_BIPOLAR'),
+        (35, 'Alcoholismo', 'ALCOHOLISMO'),
+        (36, 'Adicciones a sustancias', 'ADICCIONES_DROGAS'),
+        (37, 'Ludopatía y adicción al juego', 'LUDOPATIA'),
+        (38, 'Exclusión social', 'EXCLUSION_SOCIAL'),
+        (39, 'Pobreza y necesidades básicas', 'POBREZA_NECESIDADES_BASICAS'),
+        (40, 'Personas sin hogar', 'SIN_HOGAR'),
+        (41, 'Inserción laboral', 'INSERCION_LABORAL'),
+        (42, 'Inmigración, refugio y asilo', 'INMIGRACION_REFUGIO'),
+        (43, 'Violencia de género', 'VIOLENCIA_GENERO'),
+        (44, 'Acoso laboral', 'ACOSO_LABORAL'),
+        (45, 'Acoso escolar', 'ACOSO_ESCOLAR'),
+        (46, 'Soledad no deseada', 'SOLEDAD_NO_DESEADA'),
+        (47, 'Dependencia y apoyo a la autonomía', 'DEPENDENCIA'),
+        (48, 'Personas presas y reinserción', 'PERSONAS_PRESAS'),
+        (49, 'Acogimiento familiar', 'ACOGIMIENTO_FAMILIAR'),
+        (50, 'Adopción y familias adoptivas', 'ADOPCION'),
+        (51, 'Mediación y crisis familiar', 'MEDIACION_FAMILIAR'),
+        (52, 'Personas mayores', 'PERSONAS_MAYORES'),
+        (53, 'Discapacidad física', 'DISCAPACIDAD_FISICA'),
+        (54, 'Adicciones comportamentales', 'ADICCIONES_COMPORTAMENTALES')
+)
+INSERT INTO copilot_ong.tags (
+    descripcion,
+    tag_key
+)
+SELECT
+    desired.descripcion,
+    desired.tag_key
+FROM desired_tags AS desired
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM copilot_ong.tags AS existing
+    WHERE existing.tag_key = desired.tag_key
+)
+ORDER BY desired.ord
 ON CONFLICT (tag_key) DO NOTHING;
 
 -- D3.3 re-key association_tags (solo asociaciones activas)
