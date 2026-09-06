@@ -61,9 +61,9 @@
 
 ## A5 — Aceptación final
 
-- [ ] A5.1 Ejecutar los dry-runs definidos.
-- [ ] A5.2 Ejecutar las suites relevantes.
-- [ ] A5.3 Ejecutar `openspec validate canonicalize-tag-taxonomy-v2`.
-- [ ] A5.4 Ejecutar checks de whitespace/diff sobre el scope final.
-- [ ] A5.5 Verificar que no se modificaron archivos fuera del scope.
-- [ ] A5.6 Registrar la aceptación final del change.
+- [x] A5.1 Ejecutar los dry-runs definidos.
+- [x] A5.2 Ejecutar las suites relevantes.
+- [x] A5.3 Ejecutar `openspec validate canonicalize-tag-taxonomy-v2`.
+- [x] A5.4 Ejecutar checks de whitespace/diff sobre el scope final.
+- [x] A5.5 Verificar que no se modificaron archivos fuera del scope.
+- [x] A5.6 Registrar la aceptación final del change.
