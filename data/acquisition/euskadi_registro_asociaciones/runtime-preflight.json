@@ -7,13 +7,14 @@
     "rejected_non_strict": 25426
   },
   "tagging": {
-    "high_associations": 751,
-    "review_only": 147,
-    "unmapped": 1767,
-    "high_single_tag": 589,
-    "high_multiple_tags": 162,
-    "tag_assignments": 962,
+    "high_associations": 958,
+    "review_only": 210,
+    "unmapped": 1497,
+    "high_single_tag": 767,
+    "high_multiple_tags": 191,
+    "tag_assignments": 1213,
     "by_tag": {
+      "PERSONAS_MAYORES": 239,
       "DISCAPACIDAD_FISICA": 27,
       "EXCLUSION_SOCIAL": 183,
       "ADICCIONES_COMPORTAMENTALES": 2,
@@ -55,6 +56,7 @@
       "SIN_HOGAR": 16,
       "VIOLENCIA_GENERO": 86,
       "ESPINA_BIFIDA_HIDROCEFALIA": 3,
+      "ADICCIONES_DROGAS": 12,
       "SENSIBILIDAD_QUIMICA": 3,
       "HEPATITIS": 2,
       "ACOSO_ESCOLAR": 4,
@@ -68,28 +70,28 @@
     }
   },
   "territory": {
-    "resolved": 751,
+    "resolved": 958,
     "unresolved": 0,
     "by_province": {
-      "ALAVA": 194,
-      "VIZCAYA": 371,
-      "GUIPUZCOA": 186
+      "VIZCAYA": 481,
+      "ALAVA": 213,
+      "GUIPUZCOA": 264
     }
   },
   "contacts": {
     "with_phone": 0,
-    "with_email": 0,
-    "with_website": 111,
-    "with_any_contact": 111,
-    "without_direct_contact": 640,
-    "with_official_registry_url": 751
+    "with_email": 1,
+    "with_website": 117,
+    "with_any_contact": 118,
+    "without_direct_contact": 840,
+    "with_official_registry_url": 958
   },
   "coordinates": {
-    "with_coordinates": 751,
+    "with_coordinates": 958,
     "without_coordinates": 0
   },
   "dedupe": {
-    "new_candidate": 750,
+    "new_candidate": 957,
     "exact_duplicate": 0,
     "probable_duplicate": 1
   },
@@ -98,6 +100,6 @@
     "missing_municipality": 0,
     "missing_province": 0
   },
-  "runtime_candidates": 751,
-  "generated_at": "2026-09-01T13:15:42.414Z"
+  "runtime_candidates": 958,
+  "generated_at": "2026-09-06T14:41:05.843Z"
 }

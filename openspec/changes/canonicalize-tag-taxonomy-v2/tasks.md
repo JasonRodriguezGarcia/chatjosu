@@ -21,11 +21,11 @@
 
 ## A2 — Regenerar Euskadi y Navarra
 
-- [ ] A2.1 Regenerar Euskadi con sus parámetros de baseline.
-- [ ] A2.2 Regenerar Navarra con sus parámetros de baseline.
-- [ ] A2.3 Comparar los nuevos artefactos con sus baselines anteriores.
-- [ ] A2.4 Registrar el delta runtime real producido por A1.
-- [ ] A2.5 Verificar que no se utiliza una predicción previa como conteo de
+- [x] A2.1 Regenerar Euskadi con sus parámetros de baseline.
+- [x] A2.2 Regenerar Navarra con sus parámetros de baseline.
+- [x] A2.3 Comparar los nuevos artefactos con sus baselines anteriores.
+- [x] A2.4 Registrar el delta runtime real producido por A1.
+- [x] A2.5 Verificar que no se utiliza una predicción previa como conteo de
       aceptación.
 
 ## A3 — Endurecer el importador
