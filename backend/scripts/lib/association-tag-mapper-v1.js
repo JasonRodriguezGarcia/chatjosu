@@ -280,6 +280,23 @@ const DEFINITIONS = [
     /\bADICCIONES SIN SUSTANCIA\b/,
   ]],
 
+  ["PERSONAS_MAYORES", [
+    /\bPERSONAS MAYORES\b/,
+    /\bTERCERA EDAD\b/,
+    /\bANCIANO(?:S)?\b/,
+    /\bGERIATRIA\b/,
+    /\bGERIATRICO(?:S)?\b/,
+  ]],
+
+  ["ADICCIONES_DROGAS", [
+    /\bDROGADICCION\b/,
+    /\bDROGADICTO(?:S)?\b/,
+    /\bTOXICOMANIA\b/,
+    /\bADICCION(?:ES)? A DROGAS\b/,
+    /\bADICCION(?:ES)? A SUSTANCIAS\b/,
+    /\bADICCION(?:ES)? A ESTUPEFACIENTES\b/,
+  ]],
+
   ["TRASTORNOS_ALIMENTARIOS", [
     /\bANOREXIA\b/,
     /\bBULIMIA\b/,

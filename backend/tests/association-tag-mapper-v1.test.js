@@ -119,7 +119,7 @@ test(
 );
 
 test(
-  "mención genérica a mayores no crea enfermedad",
+  "mención a personas mayores crea población pero no enfermedad",
   () => {
     const result =
       mapAssociationTagsV1({
@@ -127,9 +127,93 @@ test(
           "Actividades culturales para personas mayores.",
       });
 
+    assert.deepEqual(
+      result.tags.map(
+        tag => tag.key
+      ),
+      ["PERSONAS_MAYORES"]
+    );
+
     assert.equal(
-      result.unmapped,
-      true
+      result.tags[0].confidence,
+      "review"
+    );
+  }
+);
+
+test(
+  "expresión explícita de personas mayores emite PERSONAS_MAYORES",
+  () => {
+    const result =
+      mapAssociationTagsV1({
+        name:
+          "Asociación para personas mayores",
+        description:
+          "Apoyo y servicios a personas mayores.",
+      });
+
+    assert.ok(
+      result.tags.some(
+        t => t.key === "PERSONAS_MAYORES"
+      ),
+      "nombre con expresión explícita debería emitir PERSONAS_MAYORES"
+    );
+  }
+);
+
+test(
+  "tercera edad explícita emite PERSONAS_MAYORES",
+  () => {
+    const result =
+      mapAssociationTagsV1({
+        name:
+          "Asociación para la Tercera Edad",
+        description:
+          "Apoyo a la Tercera Edad y sus familias.",
+      });
+
+    assert.ok(
+      result.tags.some(
+        t => t.key === "PERSONAS_MAYORES"
+      )
+    );
+  }
+);
+
+test(
+  "ancianos explícito emite PERSONAS_MAYORES",
+  () => {
+    const result =
+      mapAssociationTagsV1({
+        name:
+          "Asociación para Ancianos",
+        description:
+          "Atención a ancianos y ancianas.",
+      });
+
+    assert.ok(
+      result.tags.some(
+        t => t.key === "PERSONAS_MAYORES"
+      )
+    );
+  }
+);
+
+test(
+  "geriatría explícita emite PERSONAS_MAYORES",
+  () => {
+    const result =
+      mapAssociationTagsV1({
+        name:
+          "Asociación de Geriatría",
+        description:
+          "Servicios geriátricos y geriátricos.",
+      });
+
+    assert.ok(
+      result.tags.some(
+        t => t.key === "PERSONAS_MAYORES"
+      )
     );
   }
 );
@@ -348,6 +432,204 @@ test(
       keys(result).includes(
         "DISCAPACIDAD"
       )
+    );
+  }
+);
+
+test(
+  "drogadicción explícita emite ADICCIONES_DROGAS",
+  () => {
+    const result =
+      mapAssociationTagsV1({
+        name:
+          "Asociación contra la drogadicción",
+        description:
+          "Tratamiento de drogadicción y rehabilitación.",
+      });
+
+    assert.ok(
+      result.tags.some(
+        t => t.key === "ADICCIONES_DROGAS"
+      ),
+      "drogadicción explícita debería emitir ADICCIONES_DROGAS"
+    );
+  }
+);
+
+test(
+  "drogadicto explícito emite ADICCIONES_DROGAS",
+  () => {
+    const result =
+      mapAssociationTagsV1({
+        name:
+          "Asociación de apoyo a drogadictos",
+        description:
+          "Ayuda a drogadictos y sus familias.",
+      });
+
+    assert.ok(
+      result.tags.some(
+        t => t.key === "ADICCIONES_DROGAS"
+      )
+    );
+  }
+);
+
+test(
+  "toxicomanía explícita emite ADICCIONES_DROGAS",
+  () => {
+    const result =
+      mapAssociationTagsV1({
+        name:
+          "Asociación contra la toxicomanía",
+        description:
+          "Tratamiento de toxicomanía y rehabilitación.",
+      });
+
+    assert.ok(
+      result.tags.some(
+        t => t.key === "ADICCIONES_DROGAS"
+      )
+    );
+  }
+);
+
+test(
+  "adicción a sustancias explícita emite ADICCIONES_DROGAS",
+  () => {
+    const result =
+      mapAssociationTagsV1({
+        name:
+          "Asociación para la adicción a sustancias",
+        description:
+          "Apoyo a personas con adicción a sustancias.",
+      });
+
+    assert.ok(
+      result.tags.some(
+        t => t.key === "ADICCIONES_DROGAS"
+      )
+    );
+  }
+);
+
+test(
+  "estupefacientes en contexto de adicción emite ADICCIONES_DROGAS",
+  () => {
+    const result =
+      mapAssociationTagsV1({
+        name:
+          "Asociación de prevención de consumo de estupefacientes",
+        description:
+          "Tratamiento de adicción a estupefacientes.",
+      });
+
+    assert.ok(
+      result.tags.some(
+        t => t.key === "ADICCIONES_DROGAS"
+      )
+    );
+  }
+);
+
+test(
+  "\"droga\" aislada sin contexto de adicción no emite ADICCIONES_DROGAS",
+  () => {
+    const result =
+      mapAssociationTagsV1({
+        name:
+          "Archivo histórico",
+        description:
+          "Exposición sobre el uso de la palabra droga en prensa antigua.",
+      });
+
+    assert.ok(
+      !result.tags.some(
+        t => t.key === "ADICCIONES_DROGAS"
+      ),
+      "\"droga\" aislada sin contexto de adicción no debería emitir ADICCIONES_DROGAS"
+    );
+  }
+);
+
+test(
+  "estupefacientes sin contexto de adicción no emite ADICCIONES_DROGAS",
+  () => {
+    const result =
+      mapAssociationTagsV1({
+        name:
+          "Archivo jurídico",
+        description:
+          "Documentación histórica sobre estupefacientes y normativa.",
+      });
+
+    assert.ok(
+      !result.tags.some(
+        t => t.key === "ADICCIONES_DROGAS"
+      )
+    );
+  }
+);
+
+test(
+  "drogadiccion sin tilde emite ADICCIONES_DROGAS",
+  () => {
+    const result =
+      mapAssociationTagsV1({
+        description:
+          "Servicio de tratamiento de drogadiccion y rehabilitación.",
+      });
+
+    assert.ok(
+      result.tags.some(
+        t => t.key === "ADICCIONES_DROGAS"
+      )
+    );
+  }
+);
+
+test(
+  "\"adicciones\" aislada sin contexto de drogas no emite ADICCIONES_DROGAS",
+  () => {
+    const result =
+      mapAssociationTagsV1({
+        name:
+          "Centro de atención integral",
+        description:
+          "Atención a adicciones y problemas de salud mental.",
+      });
+
+    assert.ok(
+      !result.tags.some(
+        t => t.key === "ADICCIONES_DROGAS"
+      ),
+      "\"adicciones\" aislada sin contexto de drogas no debería emitir ADICCIONES_DROGAS"
+    );
+  }
+);
+
+test(
+  "adicciones comportamentales sin evidencia de sustancias emite ADICCIONES_COMPORTAMENTALES",
+  () => {
+    const result =
+      mapAssociationTagsV1({
+        name:
+          "Asociación contra la ludopatía",
+        description:
+          "Tratamiento de adicciones comportamentales como la ludopatía.",
+      });
+
+    assert.ok(
+      result.tags.some(
+        t => t.key === "ADICCIONES_COMPORTAMENTALES"
+      ),
+      "adicciones comportamentales deberían emitir ADICCIONES_COMPORTAMENTALES"
+    );
+    assert.ok(
+      !result.tags.some(
+        t => t.key === "ADICCIONES_DROGAS"
+      ),
+      "adicciones comportamentales sin sustancias no deberían emitir ADICCIONES_DROGAS"
     );
   }
 );
