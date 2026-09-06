@@ -92,6 +92,53 @@ function nifToRow(tax) {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
+function validateCanonicalTags(candidates, tagMap) {
+  const unknown = [];
+
+  for (const candidate of candidates) {
+    const candidateIdentity =
+      candidate.source_record_id ||
+      candidate.source_id ||
+      'unknown';
+
+    for (const tag of candidate.tags) {
+      if (!tagMap.has(tag.key)) {
+        unknown.push({
+          tagKey: tag.key,
+          candidateIdentity,
+        });
+      }
+    }
+  }
+
+  if (!unknown.length) return;
+
+  unknown.sort((a, b) => {
+    const identityOrder =
+      String(a.candidateIdentity)
+        .localeCompare(
+          String(b.candidateIdentity)
+        );
+
+    if (identityOrder) {
+      return identityOrder;
+    }
+
+    return a.tagKey.localeCompare(b.tagKey);
+  });
+
+  const diagnostic = unknown
+    .map(
+      ({ tagKey, candidateIdentity }) =>
+        `${tagKey} (candidate: ${candidateIdentity})`
+    )
+    .join('; ');
+
+  throw new Error(
+    `Unknown canonical tag(s) found: ${diagnostic}`
+  );
+}
+
 function mapCandidate(row, source) {
   const name = cleanName(row.name);
   const provinceKey = cleanText(row.province_key);
@@ -186,17 +233,16 @@ async function main() {
   const client = await pool.connect();
   let result;
   try {
-    await client.query('BEGIN');
-
-    await client.query(`CREATE SEQUENCE IF NOT EXISTS ${schema}.association_id_seq`);
     await client.query(
-      `SELECT setval('${schema}.association_id_seq', GREATEST(COALESCE(MAX(association_id),0), 1), COALESCE(MAX(association_id),0) > 0) FROM ${schema}.associations`
+      dryRun ? 'BEGIN READ ONLY' : 'BEGIN'
     );
 
     const tagRes = await client.query(
       `SELECT tag_key, tag_id FROM ${schema}.tags WHERE tag_key IS NOT NULL`
     );
     const tagMap = new Map(tagRes.rows.map(row => [row.tag_key, row.tag_id]));
+
+    validateCanonicalTags(valid, tagMap);
 
     const uniqueHashes = [...new Set(valid.map(row => row.content_hash))];
     const existingRes = uniqueHashes.length
@@ -225,18 +271,51 @@ async function main() {
     }
 
     let ids = [];
-    if (toInsert.length) {
-      const idRes = await client.query(
-        `SELECT nextval('${schema}.association_id_seq') AS id FROM generate_series(1, $1)`,
-        [toInsert.length]
+
+    if (dryRun) {
+      if (toInsert.length) {
+        const maxIdRes = await client.query(
+          `SELECT COALESCE(MAX(association_id), 0) AS max_id FROM ${schema}.associations`
+        );
+
+        const maxId =
+          Number(maxIdRes.rows[0]?.max_id || 0);
+
+        const firstId =
+          maxId > 0 ? maxId + 1 : 1;
+
+        ids = Array.from(
+          { length: toInsert.length },
+          (_, index) => firstId + index
+        );
+      }
+    } else {
+      await client.query(
+        `CREATE SEQUENCE IF NOT EXISTS ${schema}.association_id_seq`
       );
-      ids = idRes.rows.map(row => Number(row.id));
+
+      await client.query(
+        `SELECT setval('${schema}.association_id_seq', GREATEST(COALESCE(MAX(association_id),0), 1), COALESCE(MAX(association_id),0) > 0) FROM ${schema}.associations`
+      );
+
+      if (toInsert.length) {
+        const idRes = await client.query(
+          `SELECT nextval('${schema}.association_id_seq') AS id FROM generate_series(1, $1)`,
+          [toInsert.length]
+        );
+
+        ids = idRes.rows.map(
+          row => Number(row.id)
+        );
+      }
     }
+
     toInsert.forEach((row, index) => {
       row.association_id = ids[index];
     });
 
-    for (const row of toInsert) {
+    if (!dryRun) {
+      for (const row of toInsert) {
       await client.query(
         `INSERT INTO ${schema}.associations (
           association_id, name, scope, province_key, municipality_id,
@@ -277,26 +356,46 @@ async function main() {
           row.relevance_status,
           row.resource_role,
         ]
-      );
+        );
+      }
     }
 
     let tagsInserted = 0;
-    const unknownTags = new Set();
-    for (const row of toInsert) {
+
+    if (dryRun) {
+      for (const row of toInsert) {
+        tagsInserted += new Set(
+          row.tags.map(tag => tag.key)
+        ).size;
+      }
+    } else {
+      for (const row of toInsert) {
       for (const tag of row.tags) {
         const tagId = tagMap.get(tag.key);
-        if (!tagId) {
-          unknownTags.add(tag.key);
-          continue;
+
+        if (tagId === undefined) {
+          const candidateIdentity =
+            row.source_record_id ||
+            row.source_id ||
+            'unknown';
+
+          throw new Error(
+            `Unknown canonical tag after validation: ${tag.key} ` +
+            `(candidate: ${candidateIdentity})`
+          );
         }
+
         const res = await client.query(
           `INSERT INTO ${schema}.association_tags (association_id, tag_id, category_source, mapping_source)
            VALUES ($1, $2, $3, 'runtime_candidates_v1')
            ON CONFLICT (association_id, tag_id) DO NOTHING`,
           [row.association_id, tagId, tag.category]
         );
-        if (res.rowCount) tagsInserted += res.rowCount;
+        if (res.rowCount) {
+          tagsInserted += res.rowCount;
+        }
       }
+    }
     }
 
     if (dryRun) {
@@ -310,7 +409,7 @@ async function main() {
       skippedExisting,
       skippedIntra,
       tagsInserted,
-      unknownTags: [...unknownTags].sort(),
+      unknownTags: [],
       associationIdRange: toInsert.length
         ? [toInsert[0].association_id, toInsert[toInsert.length - 1].association_id]
         : null,
@@ -339,11 +438,22 @@ async function main() {
     nif_absent: candidates.length - nifPresent,
     scope_distribution: scopeDist,
     province_distribution: provinceDist,
-    report_file: reportFile,
+    report_file:
+      dryRun ? null : reportFile,
   };
 
-  fs.mkdirSync(reportsDir, { recursive: true });
-  fs.writeFileSync(reportFile, `${JSON.stringify(summary, null, 2)}\n`, 'utf8');
+  if (!dryRun) {
+    fs.mkdirSync(
+      reportsDir,
+      { recursive: true }
+    );
+
+    fs.writeFileSync(
+      reportFile,
+      `${JSON.stringify(summary, null, 2)}\n`,
+      'utf8'
+    );
+  }
 
   console.log(JSON.stringify(summary, null, 2));
 }
@@ -361,4 +471,4 @@ if (isMain) {
   });
 }
 
-export { mapCandidate, normalizeScope, contentHash, cleanName, nifToRow };
+export { mapCandidate, normalizeScope, contentHash, cleanName, nifToRow, validateCanonicalTags };

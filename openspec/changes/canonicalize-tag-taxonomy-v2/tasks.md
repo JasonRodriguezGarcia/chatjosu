@@ -30,12 +30,12 @@
 
 ## A3 — Endurecer el importador
 
-- [ ] A3.1 Cambiar `import-runtime-candidates-v1.js` para que un canonical
+- [x] A3.1 Cambiar `import-runtime-candidates-v1.js` para que un canonical
       tag desconocido produzca un fallo explícito.
-- [ ] A3.2 Añadir o adaptar tests para canonical tags válidos.
-- [ ] A3.3 Añadir test para unknown canonical tag.
-- [ ] A3.4 Verificar que no existe silent-drop.
-- [ ] A3.5 Ejecutar dry-run del importador sin escrituras.
+- [x] A3.2 Añadir o adaptar tests para canonical tags válidos.
+- [x] A3.3 Añadir test para unknown canonical tag.
+- [x] A3.4 Verificar que no existe silent-drop.
+- [x] A3.5 Ejecutar dry-run del importador sin escrituras.
 
 ## A4 — Validar migración 009
 
