@@ -1,0 +1,149 @@
+{
+  "schema_version": 1,
+  "change": "curate-euskadi-navarra",
+  "phase": "F2",
+  "migration": "db/local/init/009_tags_v2.sql",
+  "generated_at": "2026-09-06T22:18:23Z",
+  "target": {
+    "host": "lum-compute-01",
+    "container": "copilot-ong-postgres",
+    "database": "copilot_ong",
+    "postgres_major": 16
+  },
+  "authority": {
+    "git_head_before_closeout": "ead7f791bb7aff55176fe4d2ab8d2c9db92ce905",
+    "migration_sha256": "9ded1a60652a0f28f7e439d87c4487fa6877e43e0a5627cfbb1192754ec12bbd"
+  },
+  "before": {
+    "associations": 271,
+    "active_associations": 270,
+    "association_tags": 270,
+    "tags": 34,
+    "max_tag_id": 34,
+    "tag_key_present": false,
+    "provenance_columns_present": false
+  },
+  "target_dry_run": {
+    "transactional": true,
+    "forced_rollback": true,
+    "accepted": true,
+    "provider_rows_before": 17,
+    "legacy_unmapped_7_26_before": 10,
+    "predicted_association_tags": 255,
+    "predicted_tags": 88,
+    "v2_tag_keys": 54,
+    "active_without_tags": 17,
+    "provider_only_associations": 17,
+    "provider_only_set_difference": 0,
+    "provider_rows_after": 0,
+    "legacy_unmapped_7_26_after": 10,
+    "orphans_after": 0
+  },
+  "application": {
+    "single_transaction": true,
+    "committed": true,
+    "provider_rows_removed": 17,
+    "provider_legacy_ids": [
+      5,
+      8,
+      11
+    ],
+    "legacy_unmapped": [
+      {
+        "tag_id": 7,
+        "association_tag_rows": 10,
+        "preserved": true
+      },
+      {
+        "tag_id": 26,
+        "association_tag_rows": 0,
+        "preserved": true
+      }
+    ]
+  },
+  "sequence_incident": {
+    "detected": true,
+    "cause": "The prior rollback dry-run consumed PostgreSQL sequence values; sequence nextval effects are not rolled back.",
+    "immediate_post_009_v2_id_range": [
+      89,
+      142
+    ],
+    "runtime_expected_v2_id_range": [
+      35,
+      88
+    ],
+    "runtime_risk_confirmed": true,
+    "repair_strategy": "Atomically renumber the 54 V2 tag IDs and dependent foreign-key references from 89..142 to 35..88.",
+    "repair_sha256": "8045bd3d3c50780995263834ef6e6dbe6b19895622b41c6aac88234c02ace095",
+    "clone_validation": {
+      "accepted": true,
+      "v2_tags_updated": 54,
+      "association_tag_refs_updated": 245,
+      "query_metrics_refs_updated": 0,
+      "tags_historico_refs_updated": 0,
+      "second_execution_refused": true
+    },
+    "production_repair": {
+      "accepted": true,
+      "final_v2_id_range": [
+        35,
+        88
+      ],
+      "old_v2_ids_remaining": 0,
+      "old_v2_refs_remaining": 0,
+      "sequence_last_value": 142,
+      "sequence_intentionally_not_rewound": true
+    }
+  },
+  "after": {
+    "associations": 271,
+    "active_associations": 270,
+    "association_tags": 255,
+    "tags": 88,
+    "min_tag_id": 1,
+    "max_tag_id": 88,
+    "v2_tags": 54,
+    "v2_tag_id_min": 35,
+    "v2_tag_id_max": 88,
+    "distinct_tag_keys": 54,
+    "provider_rows": 0,
+    "legacy_tag_7_rows": 10,
+    "legacy_tag_26_rows": 0,
+    "orphans": 0
+  },
+  "coverage_note": {
+    "active_associations_without_tags": 17,
+    "provider_only_associations_before_migration": 17,
+    "exact_set_difference": 0,
+    "interpretation": "These 17 active associations had only provider-contaminated legacy tag relations. Removing those relations intentionally leaves them without tags; no mappable semantic tag coverage was lost."
+  },
+  "runtime_contract_validation": {
+    "runtime_v2_rows": 54,
+    "database_v2_rows": 54,
+    "runtime_database_map_exact_match": true,
+    "classifier_tests_passed": 13,
+    "classifier_tests_failed": 0,
+    "anchors": {
+      "ALZHEIMER": 35,
+      "SOLEDAD_NO_DESEADA": 80,
+      "ADICCIONES_COMPORTAMENTALES": 88
+    },
+    "soledad_active_refs_at_validation_time": 0,
+    "soledad_active_refs_is_acceptance_gate": false
+  },
+  "recovery_points": {
+    "pre_009_dump_sha256": "a9403d14889976f5f3a867d563a805d903bbbc7949d0d78c32b0478e85d030eb",
+    "post_009_pre_id_repair_dump_sha256": "b394cbb79cf8b0d502473c910d4708a508304c0cbd800ffa302b8f3d64178804"
+  },
+  "next_import_authority": {
+    "euskadi": {
+      "records": 958,
+      "sha256": "dedbbb908146fc380c8d03a01b0d73c0ed9c1819a50d0a03f6161c4198d944e5"
+    },
+    "navarra": {
+      "records": 319,
+      "sha256": "507d07c2129214ad741ec098f93e8e130208c485a663f5dcc656e7d3ff78d160"
+    }
+  },
+  "result": "accepted"
+}

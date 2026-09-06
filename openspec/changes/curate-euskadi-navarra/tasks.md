@@ -24,10 +24,10 @@
 
 ## 4. F2 — Migración 009 v2 (servidor)
 - [x] 4.1 Redactar `db/local/init/009_tags_v2.sql` idempotente (D3 + D5). Local 2026-09-02: re-aplicación en `copilot_ong` con `--single-transaction` corrigió `TDHA` → `TDAH` (`UPDATE 1`, `INSERT 0 0`).
-- [ ] 4.2 Ejecutar preflight/dry-run sobre la **BD target/servidor** con transacción + ROLLBACK y capturar conteos antes; no confundir con las validaciones locales ya superadas.
-- [ ] 4.3 Aplicar `009_tags_v2.sql` en transacción única sobre la **BD target/servidor**; capturar conteos después y generar `data/reports/migration-009-report.json`, incluyendo legacy ids sin mapeo.
-- [ ] 4.4 Versionar el reporte/evidencia de la aplicación target. La implementación SQL ya está versionada y su versión estrictamente idempotente quedó fijada en `0b0ad87`.
-- [ ] 4.5 Validar la ejecución SQL target mediante el dry-run de 4.2; `node --check` no aplica.
+- [x] 4.2 Preflight/dry-run ejecutado sobre la **BD target/servidor** con transacción + ROLLBACK; conteos y gates semánticos capturados, con estado post-rollback idéntico al baseline.
+- [x] 4.3 `009_tags_v2.sql` aplicado en transacción única sobre la **BD target/servidor**. Se detectó drift de secuencia 89..142 causado por el dry-run previo y se reparó transaccionalmente a 35..88; estado final: 88 tags, 54 `tag_key`, 255 `association_tags`, 0 huérfanos. Reporte: `data/reports/migration-009-report.json`.
+- [x] 4.4 Reporte/evidencia target consolidado en `data/reports/migration-009-report.json`; la implementación SQL estrictamente idempotente permanece fijada en `0b0ad87`.
+- [x] 4.5 Ejecución SQL target validada mediante el dry-run transaccional de 4.2 y posterior verificación runtime↔BD 54/54; `node --check` no aplica.
 
 ## 5. F3 — Importador (servidor)
 - [x] 5.1 `backend/scripts/import-runtime-candidates-v1.js` implementado y endurecido para rechazar canonical tags desconocidos (`8692e39`). Dry-runs físicos locales sobre los artefactos actuales **958/319** pasaron sin mutación de BD ni reportes.

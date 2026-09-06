@@ -86,7 +86,7 @@ Invariantes fijados (simulación ejecutada sobre raw en servidor, gate de acepta
 
 ## Risks / Trade-offs
 
-- [El re-key altera el retrieval de las 270 asociaciones históricas] → re-key determinista por `legacy_mapping`, reporte antes/después, dump de restauración completo; verificación de que ninguna asociación activa pierde todos sus tags.
+- [El re-key altera el retrieval de las 270 asociaciones históricas] → re-key determinista por `legacy_mapping`, reporte antes/después y dump de restauración completo; ninguna asociación pierde cobertura semántica mapeable. En target, las 17 asociaciones activas que quedaron sin tags coinciden exactamente con el set provider-only previo a eliminar las relaciones contaminadas (set difference = 0).
 - [Colisión de `content_hash` con filas legacy] → 1 duplicado probable ya validado contra master V3; `ON CONFLICT DO NOTHING` hace la importación segura e idempotente.
 - [La primera proyección de Navarra pool B fue 265 y la autoridad canónica posterior es 319] → conservar 265 únicamente como baseline histórica; toda promoción futura usa el artefacto versionado actual de 319 y sus gates deterministas.
 - [Curación v2 diverge de los invariantes simulados sobre raw] → el preflight de F1a compara los conteos reales contra los invariantes fijados (D7); cualquier desviación bloquea F1b.
