@@ -1,5 +1,16 @@
 ## Context
 
+### Autoridad actual reconciliada — 2026-09-06
+
+- `canonicalize-tag-taxonomy-v2` está completado y archivado; `openspec/specs/tag-taxonomy/spec.md` es la autoridad canónica para las 54 needs.
+- La curación Navarra v2 está implementada y versionada en `8aaf793`: script, `normalized-v2.jsonl` y `curation-report.json`.
+- Los invariantes Navarra v2 están verificados: 10.254 filas, email 1.685, teléfono 97, website 10, CP 9.552, address 10.218 (9.959 enriquecidas), tax collisions 24/12 y relevancia 668/9.586.
+- La autoridad runtime actual, regenerada en `227b143`, es **958 Euskadi** (sha256 `dedbbb908146fc380c8d03a01b0d73c0ed9c1819a50d0a03f6161c4198d944e5`) y **319 Navarra** (sha256 `507d07c2129214ad741ec098f93e8e130208c485a663f5dcc656e7d3ff78d160`).
+- Las cifras 751 Euskadi / 265 Navarra describen la primera proyección y se mantienen sólo como linaje histórico.
+- `009_tags_v2.sql` y el importador están implementados; la aplicación/importación efectiva sobre la BD target/servidor sigue siendo trabajo pendiente de este change.
+
+### Contexto histórico al iniciar el change
+
 Ver proposal.md (Why). Estado verificado en el repo y en `lum-compute-01`:
 
 - **Git**: local HEAD `4cccdeb` (branch `copilot-ong/integration`, limpio) está 6 commits por delante del servidor (`ac3d730`). En el servidor hay ~25 scripts untracked (`backend/scripts/**` + `lib/association-resource-role-v1.js`) y datos untracked bajo `data/{acquisition,curation,master,enrichment,reports}/`; además 7 archivos runtime modificados sin commit que **no** se tocan.
@@ -15,8 +26,8 @@ Ver proposal.md (Why). Estado verificado en el repo y en `lum-compute-01`:
 
 **Goals:**
 - Local == servidor para los artefactos curados de Euskadi+Navarra y los scripts que los producen (versionados).
-- Navarra con contactos curados v2 (invariantes fijados sobre raw) y proyectado con **pool B** (`direct_relevance` + ≥1 necesidad high, 265 candidatas); Euskadi mantiene el gate estricto (751, baseline regenerada).
-- `copilot_ong` con vocabulario v2 canónico (54 needs), las 270 activas re-keyadas, y 751+265 candidatas importadas con provenance.
+- Navarra con contactos curados v2 y artefactos runtime canónicos actuales: **319 Navarra**; Euskadi mantiene el gate de origen correspondiente y su artefacto canónico actual contiene **958** candidatas. La primera baseline 751/265 queda preservada como histórico.
+- `copilot_ong` target con vocabulario canónico v2 (54 needs), asociaciones históricas re-keyadas y los artefactos actuales 958+319 promovidos con provenance y deduplicación.
 - Runtime able: el clasificador emite ids v2 y el caso feedback #13 devuelve asociaciones.
 
 **Non-Goals:**
@@ -29,7 +40,7 @@ Ver proposal.md (Why). Estado verificado en el repo y en `lum-compute-01`:
 - *Alternativa descartada*: espejo completo — sobreescribiría archivos local-tracked y los cambios no relacionados del servidor.
 
 ### D2. Proyección de Navarra: input v2 + gate parametrizado (F1b)
-`build-acquisition-runtime-candidates-v1.js` acepta: `process.argv[2]` = directorio bajo `data/acquisition/` (default `euskadi_registro_asociaciones`), `process.argv[3]` = nombre del archivo de entrada (default `normalized.jsonl`), `process.argv[4]` = gate: `strict` (default) = `relevance.reasons ∩ {direct_category, hard_direct_purpose}` (gate actual, sin cambios) o `direct` = `relevance.status === "direct_relevance"`. Navarra se ejecuta con `normalized-v2.jsonl` + gate `direct` → pool B. El mapper no se toca (ya es source-agnóstico y emite keys v2). La clasificación de relevancia de Navarra viaja en `normalized-v2.jsonl` (F1a la une desde el envelope), así la proyección sigue leyendo solo `row.relevance`. Preflight Navarra: 10.254 clasificados, 265 candidatas pool B, invariantes de contacto v2 (email 1.685 / tel 97 / web 10 en el total normalizado). **Baseline Euskadi (decisión de usuario, F1b 3.2)**: la baseline versionada (723) era obsoleta — generada desde un input de 19.695 filas y un tag mapper sin `DISCAPACIDAD`; con el input actual (28.091 filas, pipeline v3) y el tag mapper actual (con `DISCAPACIDAD`), la re-ejecución con defaults produce determinísticamente **751** (sha256 `60a8d663…`), que se adopta como baseline canónica; la re-ejecución con defaults debe ser reproducible (misma sha256).
+`build-acquisition-runtime-candidates-v1.js` quedó parametrizado por directorio, input y gate (`strict`|`direct`). La primera ejecución aceptada produjo Euskadi 751 y Navarra 265. Posteriormente `canonicalize-tag-taxonomy-v2` amplió la cobertura del mapper a las 54 needs y regeneró los mismos artefactos runtime; esa regeneración, commit `227b143`, es la autoridad actual: **958 Euskadi** y **319 Navarra**. Los conteos 751/265 y el hash histórico `60a8d663…` documentan el linaje anterior, pero no SHALL utilizarse como input de nuevas importaciones.
 - *Alternativa descartada 1*: script duplicado para Navarra — duplicación de lógica de gate.
 - *Alternativa descartada 2*: join del envelope dentro del proyecto — acopla la proyección a `data/curation/semantic/` y duplica la fuente de verdad de la relevancia.
 
@@ -77,7 +88,7 @@ Invariantes fijados (simulación ejecutada sobre raw en servidor, gate de acepta
 
 - [El re-key altera el retrieval de las 270 asociaciones históricas] → re-key determinista por `legacy_mapping`, reporte antes/después, dump de restauración completo; verificación de que ninguna asociación activa pierde todos sus tags.
 - [Colisión de `content_hash` con filas legacy] → 1 duplicado probable ya validado contra master V3; `ON CONFLICT DO NOTHING` hace la importación segura e idempotente.
-- [La proyección de Navarra pool B (265) contiene candidatas de calidad irregular (keep + high sobre registro heterogéneo)] → el preflight es gate: si la distribución (needs, provincia, contactos) es desproporcionada, se reporta BLOCKED en lugar de importar; pool A (gate estricto, 77) queda disponible como fallback más conservador (decisión de usuario: pool B).
+- [La primera proyección de Navarra pool B fue 265 y la autoridad canónica posterior es 319] → conservar 265 únicamente como baseline histórica; toda promoción futura usa el artefacto versionado actual de 319 y sus gates deterministas.
 - [Curación v2 diverge de los invariantes simulados sobre raw] → el preflight de F1a compara los conteos reales contra los invariantes fijados (D7); cualquier desviación bloquea F1b.
 - [54 prototipos engordan el prompt LLM y el presupuesto p50<2 s] → textos cortos por need; tests de fast-gates (`helpchat-semantic-fast-gates`) cubren el presupuesto; si degrade, se limita el set de prototipos en el prompt (no en el array).
 - [El sync trae scripts con dependencias no instaladas localmente] → solo se versionan; no se ejecutan localmente salvo los de F1/F3 (sin dependencias nuevas: node + fs/path + pg existente).
@@ -86,7 +97,7 @@ Invariantes fijados (simulación ejecutada sobre raw en servidor, gate de acepta
 
 1. **F0** sync + commit de artefactos (local).
 2. **F1a** curación Navarra v2: `build-navarra-normalized-v2.js` en el servidor (solo datos + raw); verificación de invariantes D7.
-3. **F1b** proyección Navarra pool B (servidor/local según artefactos disponibles, solo datos): `normalized-v2.jsonl` + gate `direct`; preflight 265.
+3. **F1b** proyección Navarra completada; baseline histórica 265 y regeneración canónica posterior aceptada de **319**. Euskadi queda asimismo supersedida de 751 a **958**.
 4. **F2** aplicar `009_tags_v2.sql` al `copilot_ong` del servidor (transacción única) + commit; reportar conteos.
 5. **F3** dry-run Euskadi → import Euskadi → dry-run Navarra → import Navarra (servidor); reportes en `data/reports/`.
 6. **F4** verificación completa (D6).

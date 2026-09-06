@@ -7,33 +7,33 @@
 - [x] 1.4 `git diff --check` limpio; `git diff --name-only` dentro del scope.
 
 ## 2. F1a — Curación de contactos Navarra v2 (solo servidor)
-- [ ] 2.1 Crear `backend/scripts/build-navarra-normalized-v2.js` (D7): email RFC-5322, phone fallback `TELEFONO1→2→3`, website http(s)/promoción/recuperación, postal_code 5 dígitos + 4 recuperaciones, address + `TIPO_VIAL`, tax_id collision flag, join 1:1 de `relevance` desde el envelope por `source_record_id`; salida `normalized-v2.jsonl` + `curation-report.json`.
-- [ ] 2.2 `node --check` del script y ejecución en `lum-compute-01`.
-- [ ] 2.3 Preflight de invariantes (gate): n=10.254; email 1.685; phone 97; website 10; postal_code 9.552; address 10.218 (9.959 con TIPO_VIAL); tax collisions 24 records/12 values; relevancia keep 668 / review 9.586. Cualquier desviación → BLOCKED.
-- [ ] 2.4 Auditoría de excepciones: los 15 emails invalidados, los 3 phones nulos, los 2 emails promovidos a website, la URL recuperada (14961) y las 4 CP recuperados corresponden a los registros esperados con motivo válido en el reporte.
-- [ ] 2.5 Check de equivalencia estructural v1→v2: mismo orden y mismo set de `source_record_id` (10.254), y `relevance` no nulo en todas las filas.
-- [ ] 2.6 Sync servidor→local de `data/acquisition/navarra_registro_asociaciones/` (normalized-v2 + report) y commit.
-- [ ] 2.7 `git diff --check` y `git diff --name-only` dentro del scope.
+- [x] 2.1 `backend/scripts/build-navarra-normalized-v2.js` implementado y versionado en `8aaf793` con las transformaciones deterministas definidas por D7.
+- [x] 2.2 `node --check` del script PASS; los outputs de la ejecución están versionados en `8aaf793`. No se afirma una re-ejecución nueva en `lum-compute-01` durante esta reconciliación.
+- [x] 2.3 Invariantes verificados sobre `curation-report.json`: n=10.254; email 1.685; phone 97; website 10; postal_code 9.552; address 10.218 (9.959 enriquecidas); tax collisions 24/12; relevancia keep 668 / review 9.586.
+- [x] 2.4 Excepciones verificadas: 15 emails invalidados, 3 phones nulos, promociones website 6689/7001, URL recuperada 14961 y CP recuperados 2606/8805/8816/9052.
+- [x] 2.5 Equivalencia estructural v1→v2 verificada: 10.254/10.254, mismo orden y set de `source_record_id`, IDs únicos y `relevance` no nulo en las 10.254 filas.
+- [x] 2.6 Script, `normalized-v2.jsonl` y `curation-report.json` sincronizados/versionados conjuntamente en `8aaf793`.
+- [x] 2.7 Scope histórico de `8aaf793` verificado y estado tracked actual limpio.
 
 ## 3. F1b — Proyección de Navarra (pool B)
 - [x] 3.1 `node --check` del script parametrizado (D2: `argv[2]` dir, `argv[3]` input file, `argv[4]` gate `strict`|`direct`).
-- [x] 3.2 Baseline Euskadi regenerada a 751 (estado actual): la baseline versionada (723) era obsoleta (input 19.695 filas + tag mapper sin `DISCAPACIDAD`); la re-ejecución con defaults produce determinísticamente 751 (sha256 `60a8d663…`), adoptada como baseline canónica y reproducible.
-- [x] 3.3 Ejecutar Navarra: `build-acquisition-runtime-candidates-v1.js navarra_registro_asociaciones normalized-v2.jsonl direct` → `runtime-candidates.jsonl` + `runtime-preflight.json`.
-- [x] 3.4 Preflight (gate): 10.254 clasificados; 265 candidatas pool B; distribución (needs, provincia, contactos) coherente con la simulación local (top: exclusión social 80, inmigración/refugio 79, violencia de género 40). Desviación → BLOCKED.
-- [x] 3.5 Sync servidor→local del artefacto proyectado y commit; `git diff --check` + `--name-only`.
+- [x] 3.2 La baseline histórica Euskadi 751 (`60a8d663…`) fue válida para la primera proyección; la regeneración posterior con taxonomía canónica completa la supersede. Autoridad actual: **958**, sha256 `dedbbb908146fc380c8d03a01b0d73c0ed9c1819a50d0a03f6161c4198d944e5`.
+- [x] 3.3 Navarra fue proyectada originalmente a 265; la regeneración canónica posterior en `227b143` produce la autoridad actual de **319** candidatas.
+- [x] 3.4 Preflights runtime regenerados y aceptados con la taxonomía canónica completa; autoridad actual: Euskadi 958 / Navarra 319.
+- [x] 3.5 Artefactos runtime actuales sincronizados/versionados en `227b143`; hashes canónicos verificados.
 
 ## 4. F2 — Migración 009 v2 (servidor)
 - [x] 4.1 Redactar `db/local/init/009_tags_v2.sql` idempotente (D3 + D5). Local 2026-09-02: re-aplicación en `copilot_ong` con `--single-transaction` corrigió `TDHA` → `TDAH` (`UPDATE 1`, `INSERT 0 0`).
-- [ ] 4.2 Dry-run (transacción + ROLLBACK) y captura de conteos antes.
-- [ ] 4.3 Aplicar en transacción única; conteos después → `data/reports/migration-009-report.json` (inventario de los 2 legacy ids sin mapeo incluidos).
-- [ ] 4.4 Commit de la migración + reporte.
-- [ ] 4.5 `node --check` no aplica (SQL); validar sintaxis con el dry-run de 4.2.
+- [ ] 4.2 Ejecutar preflight/dry-run sobre la **BD target/servidor** con transacción + ROLLBACK y capturar conteos antes; no confundir con las validaciones locales ya superadas.
+- [ ] 4.3 Aplicar `009_tags_v2.sql` en transacción única sobre la **BD target/servidor**; capturar conteos después y generar `data/reports/migration-009-report.json`, incluyendo legacy ids sin mapeo.
+- [ ] 4.4 Versionar el reporte/evidencia de la aplicación target. La implementación SQL ya está versionada y su versión estrictamente idempotente quedó fijada en `0b0ad87`.
+- [ ] 4.5 Validar la ejecución SQL target mediante el dry-run de 4.2; `node --check` no aplica.
 
 ## 5. F3 — Importador (servidor)
-- [x] 5.1 Crear `backend/scripts/import-runtime-candidates-v1.js` (D4): `--source`, `--dry-run`, mapeo + tags + provenance + `ON CONFLICT (content_hash) DO NOTHING`. Local 2026-09-02: dry-run idempotente Euskadi 751/Navarra 265 y tests puros en `backend/tests/import-runtime-candidates-v1.test.js`.
-- [ ] 5.2 Dry-run Euskadi (751) → inspeccionar resumen → importar Euskadi.
-- [ ] 5.3 Dry-run Navarra (265) → inspeccionar resumen → importar Navarra.
-- [ ] 5.4 Commit del importador + reportes de importación en `data/reports/`.
+- [x] 5.1 `backend/scripts/import-runtime-candidates-v1.js` implementado y endurecido para rechazar canonical tags desconocidos (`8692e39`). Dry-runs físicos locales sobre los artefactos actuales **958/319** pasaron sin mutación de BD ni reportes.
+- [ ] 5.2 Sobre la **BD target/servidor**, ejecutar/inspeccionar dry-run Euskadi actual (**958**) y, si el gate pasa, importar Euskadi.
+- [ ] 5.3 Sobre la **BD target/servidor**, ejecutar/inspeccionar dry-run Navarra actual (**319**) y, si el gate pasa, importar Navarra.
+- [ ] 5.4 Versionar los reportes de importación target. La implementación del importador ya está versionada.
 
 ## 6. F4 — Verificación
 - [x] 6.1 `npm test` (tests existentes + nuevos: clasificador v2 «soledad», mapeo del importador como función pura).

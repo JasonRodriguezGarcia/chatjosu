@@ -27,15 +27,15 @@ El script de curación v2 SHALL regenerar `normalized-v2.jsonl` y `curation-repo
 - **THEN** los emails invalidados, teléfonos nulos, promociones a website, URL recuperada y CP recuperados aparecen identificados por registro con su motivo
 
 ### Requirement: Proyección de Navarra con pool B
-La proyección de Navarra SHALL producir `runtime-candidates.jsonl` y `runtime-preflight.json` a partir de `normalized-v2.jsonl` con el gate `direct` (`relevance.status === "direct_relevance"`) y al menos una necesidad de confianza alta. Cada registro SHALL quedar clasificado exactamente en un pool. El pool B SHALL contener 265 candidatas, y el preflight SHALL reportar 10.254 clasificados. La parametrización del script SHALL mantener la compatibilidad con Euskadi (gate `strict` por defecto, re-ejecución reproducible con la baseline canónica).
+La proyección de Navarra SHALL producir `runtime-candidates.jsonl` y `runtime-preflight.json` a partir de `normalized-v2.jsonl` con el gate `direct` (`relevance.status === "direct_relevance"`) y al menos una necesidad de confianza alta. Cada registro SHALL quedar clasificado exactamente en un pool. La primera baseline del pool B fue 265, pero la regeneración posterior con la taxonomía canónica completa SHALL supersederla; la autoridad runtime actual SHALL contener **319** candidatas Navarra, y el preflight SHALL mantener 10.254 registros clasificados. La parametrización del script SHALL mantener la compatibilidad con Euskadi (gate `strict` por defecto, re-ejecución reproducible con la baseline canónica).
 
 #### Scenario: Proyección completa pool B
 - **WHEN** se ejecuta la proyección sobre `normalized-v2.jsonl` con gate `direct`
-- **THEN** se generan `runtime-candidates.jsonl` (265 candidatas) y `runtime-preflight.json` con 10.254 registros clasificados
+- **THEN** se generan los artefactos runtime canónicos actuales (`runtime-candidates.jsonl` con **319 candidatas**) y `runtime-preflight.json` mantiene 10.254 registros clasificados
 
 #### Scenario: Reproducibilidad de la baseline Euskadi
 - **WHEN** se re-ejecuta la proyección de Euskadi con valores por defecto
-- **THEN** la salida coincide con la baseline canónica (751 candidatas, gate `strict`, sha256 `60a8d663…`)
+- **THEN** la salida aceptada coincide con la autoridad canónica actual de **958 candidatas**, sha256 `dedbbb908146fc380c8d03a01b0d73c0ed9c1819a50d0a03f6161c4198d944e5`; la baseline 751/`60a8d663…` se conserva únicamente como histórico
 
 ### Requirement: Vocabulario de tags canónico v2
 La tabla `tags` SHALL contener los 54 needs de la taxonomía v2, cada uno con un `tag_key` único. Las asociaciones activas existentes SHALL re-keyarse de ids legacy a ids v2 mediante `legacy_mapping` sin perder cobertura de tags mapeables. Las filas `association_tags` de los 3 tags legacy contaminados por proveedor SHALL eliminarse. Los ids legacy sin mapeo SHALL conservarse y reportarse.
@@ -68,18 +68,18 @@ El clasificador semántico de helpchat SHALL ser capaz de emitir ids de tag v2 p
 - **THEN** la respuesta incluye al menos una asociación de Bizkaia relevante para soledad/compañía
 
 ### Requirement: Promoción de candidatas con provenance y deduplicación
-El importador SHALL insertar las candidatas de Euskadi (751, gate `strict`) y de Navarra (265, pool B) en `copilot_ong.associations` con provenance (registro de origen, URL del registro, rol de recurso, estado de relevancia: `strict` o `direct`). El contenido duplicado (mismo `content_hash`) SHALL omitirse. El modo `--dry-run` SHALL informar los conteos planeados sin escribir. La re-ejecución SHALL ser idempotente.
+El importador SHALL insertar los artefactos canónicos actuales de Euskadi (**958**) y Navarra (**319**) en `copilot_ong.associations` con provenance (registro de origen, URL del registro, rol de recurso, estado de relevancia: `strict` o `direct`). El contenido duplicado (mismo `content_hash`) SHALL omitirse. El modo `--dry-run` SHALL informar los conteos planeados sin escribir. La re-ejecución SHALL ser idempotente.
 
 #### Scenario: Dry-run sin efectos
 - **WHEN** se ejecuta el importador con `--dry-run` sobre Euskadi
 - **THEN** se reportan los conteos de inserción/omisión y el número de filas de `associations` no cambia
 
 #### Scenario: Importación de Euskadi
-- **WHEN** se ejecuta la importación de las 751 candidatas de Euskadi
+- **WHEN** se ejecuta la importación de las **958** candidatas actuales de Euskadi
 - **THEN** se insertan las nuevas asociaciones (omitidos los duplicados por `content_hash`, conteo exacto verificado en el dry-run de F3) y sus columnas de provenance están pobladas
 
 #### Scenario: Importación de Navarra
-- **WHEN** se ejecuta la importación de las 265 candidatas de Navarra (pool B)
+- **WHEN** se ejecuta la importación de las **319** candidatas actuales de Navarra
 - **THEN** se insertan las asociaciones nuevas (omitidos los duplicados por `content_hash`) con `relevance_status` = `direct` y `province_key` = `NA`
 
 #### Scenario: Idempotencia
