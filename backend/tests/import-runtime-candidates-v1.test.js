@@ -7,6 +7,7 @@ import {
   mapCandidate,
   nifToRow,
   normalizeScope,
+  planIds,
   validateCanonicalTags,
 } from '../scripts/import-runtime-candidates-v1.js';
 
@@ -295,4 +296,19 @@ test('validateCanonicalTags rechaza candidatos con tags conocidos y desconocidos
     error.message.includes('TAG_INCONOCIDO'),
     'el mensaje debe incluir el tag desconocido'
   );
+});
+
+test('planIds(10, 5) -> [11,12,13,14,15]', () => {
+  const ids = planIds(10, 5);
+  assert.deepEqual(ids, [11, 12, 13, 14, 15]);
+});
+
+test('planIds(0, 3) -> [1,2,3]', () => {
+  const ids = planIds(0, 3);
+  assert.deepEqual(ids, [1, 2, 3]);
+});
+
+test('planIds(1427, 0) -> []', () => {
+  const ids = planIds(1427, 0);
+  assert.deepEqual(ids, []);
 });

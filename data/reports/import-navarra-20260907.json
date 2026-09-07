@@ -1,0 +1,27 @@
+{
+  "source": "navarra",
+  "dry_run": false,
+  "generated_at": "2026-09-07T00:03:51.207Z",
+  "total_candidates": 319,
+  "invalid_no_name": 0,
+  "new": 319,
+  "skipped_existing": 0,
+  "skipped_intra_duplicate": 0,
+  "tags_inserted": 448,
+  "unknown_tags": [],
+  "association_id_range": [
+    1428,
+    1746
+  ],
+  "nif_present": 204,
+  "nif_absent": 115,
+  "scope_distribution": {
+    "Local": 44,
+    "Nacional": 271,
+    "Desconocido": 4
+  },
+  "province_distribution": {
+    "NAVARRA": 319
+  },
+  "report_file": "/home/tx4k4l/Projects/copilot-ong/data/reports/import-navarra-20260907.json"
+}

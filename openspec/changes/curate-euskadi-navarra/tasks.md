@@ -31,9 +31,9 @@
 
 ## 5. F3 — Importador (servidor)
 - [x] 5.1 `backend/scripts/import-runtime-candidates-v1.js` implementado y endurecido para rechazar canonical tags desconocidos (`8692e39`). Dry-runs físicos locales sobre los artefactos actuales **958/319** pasaron sin mutación de BD ni reportes.
-- [ ] 5.2 Sobre la **BD target/servidor**, ejecutar/inspeccionar dry-run Euskadi actual (**958**) y, si el gate pasa, importar Euskadi.
-- [ ] 5.3 Sobre la **BD target/servidor**, ejecutar/inspeccionar dry-run Navarra actual (**319**) y, si el gate pasa, importar Navarra.
-- [ ] 5.4 Versionar los reportes de importación target. La implementación del importador ya está versionada.
+- [x] 5.2 Sobre la **BD target/servidor**, dry-run Euskadi **958** aceptado como físicamente read-only e import real completado: 958 nuevas, 1.213 `association_tags`, IDs 470..1427, 0 tags desconocidos. Reporte: `data/reports/import-euskadi-20260906.json`.
+- [x] 5.3 Sobre la **BD target/servidor**, dry-run Navarra **319** aceptado con tablas/digests y `association_id_seq=1427` idénticos antes/después; import real completado: 319 nuevas, 448 `association_tags`, IDs 1428..1746, 0 tags desconocidos. Reporte: `data/reports/import-navarra-20260907.json`.
+- [x] 5.4 Versionar los reportes de importación target Euskadi/Navarra y la reparación del importador que hace `--dry-run` realmente read-only respecto a secuencias (`planIds` puro + `BEGIN READ ONLY`; import real conserva `CREATE SEQUENCE`/`setval`/`nextval`).
 
 ## 6. F4 — Verificación
 - [x] 6.1 `npm test` (tests existentes + nuevos: clasificador v2 «soledad», mapeo del importador como función pura).

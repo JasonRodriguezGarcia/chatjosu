@@ -270,7 +270,7 @@ async function main() {
       toInsert.push(row);
     }
 
-    let ids = [];
+  let planIdsResult;
 
     if (dryRun) {
       if (toInsert.length) {
@@ -281,13 +281,7 @@ async function main() {
         const maxId =
           Number(maxIdRes.rows[0]?.max_id || 0);
 
-        const firstId =
-          maxId > 0 ? maxId + 1 : 1;
-
-        ids = Array.from(
-          { length: toInsert.length },
-          (_, index) => firstId + index
-        );
+        planIdsResult = planIds(maxId, toInsert.length);
       }
     } else {
       await client.query(
@@ -304,14 +298,16 @@ async function main() {
           [toInsert.length]
         );
 
-        ids = idRes.rows.map(
+        planIdsResult = idRes.rows.map(
           row => Number(row.id)
         );
+      } else {
+        planIdsResult = [];
       }
     }
 
     toInsert.forEach((row, index) => {
-      row.association_id = ids[index];
+      row.association_id = planIdsResult[index];
     });
 
     if (!dryRun) {
@@ -471,4 +467,28 @@ if (isMain) {
   });
 }
 
-export { mapCandidate, normalizeScope, contentHash, cleanName, nifToRow, validateCanonicalTags };
+/*
+ * Planifica los IDs de forma pura sin dependencias de DB.
+ * Exportada para tests unitarios.
+ */
+function planIds(maxAssociationId, count) {
+  const firstId =
+    Number(maxAssociationId || 0) > 0
+      ? Number(maxAssociationId) + 1
+      : 1;
+
+  return Array.from(
+    { length: count },
+    (_, index) => firstId + index
+  );
+}
+
+export {
+  mapCandidate,
+  normalizeScope,
+  contentHash,
+  cleanName,
+  nifToRow,
+  validateCanonicalTags,
+  planIds,
+};
