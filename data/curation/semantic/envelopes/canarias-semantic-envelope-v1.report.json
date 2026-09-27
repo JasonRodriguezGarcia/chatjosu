@@ -1,0 +1,42 @@
+{
+  "format_version": 1,
+  "source_id": "canarias_registro_asociaciones",
+  "source_candidates": 23036,
+  "taxonomy": {
+    "matched": 23036,
+    "unmatched": 0,
+    "modes": {
+      "source_assertion": 3264,
+      "strong_candidate": 1094,
+      "candidate_set": 2825,
+      "context": 12612,
+      "none": 3241
+    }
+  },
+  "relevance": {
+    "review:needs_review": 23036
+  },
+  "utility": {
+    "keep": 23036,
+    "drop": 0,
+    "protected": 0
+  },
+  "routing": {
+    "out_of_scope": 0,
+    "deterministic_only": 4010,
+    "constrained": 4278,
+    "llm_open": 14748
+  },
+  "dimensions": {
+    "needs": 439,
+    "functions": 486,
+    "populations": 1758,
+    "activities": 4240
+  },
+  "signals": {
+    "need_or_function": 894,
+    "population_only": 1503,
+    "activity_only": 4011,
+    "no_signal": 16628
+  }
+}
