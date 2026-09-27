@@ -1,0 +1,66 @@
+schema: spec-driven
+
+context: |
+  Repository: target project
+
+  AI coding agents operate under AGENTS.md.
+
+  OpenSpec is supplied by the external agent platform and is invoked as:
+    openspec
+
+  The repository may contain unrelated modified or untracked files.
+  Those changes must be preserved.
+
+  Non-trivial implementation work follows:
+    inspect -> plan -> apply -> verify -> diff -> controller gates
+
+  Planning and implementation are separate phases.
+  Code must not be modified during planning.
+
+rules:
+  proposal:
+    - Identify the exact requested outcome.
+    - Identify intended code files explicitly.
+    - Confirm target files exist before proposing implementation against them.
+    - State non-goals and scope boundaries.
+    - Do not include unrelated refactors or architecture changes.
+
+  specs:
+    - Express observable behavior and acceptance criteria.
+    - Include failure and edge-case behavior when relevant.
+    - Do not introduce requirements outside requested scope.
+
+  design:
+    - Reference only repository paths verified to exist.
+    - Prefer the smallest implementation satisfying the specification.
+    - State explicitly when no dependency or architecture changes are required.
+    - Define concrete verification commands.
+    - Identify the expected set of code files allowed to change.
+
+  tasks:
+    - Separate implementation tasks from verification tasks.
+    - Include syntax, focused behavior, Git diff, and file-scope verification when applicable.
+    - Do not mark tasks complete before corresponding work or verification succeeds.
+    - Keep tasks small and traceable to the specification.
+
+operations:
+  apply:
+    guidance:
+      - Read proposal, specs, design and tasks before editing.
+      - Treat the approved code-file list as a hard scope boundary.
+      - Make no code edits before the apply workflow has been loaded.
+      - Make the smallest targeted code change satisfying the specification.
+      - Do not modify unrelated files.
+      - Do not add dependencies unless explicitly approved.
+      - Do not install packages or start services unless explicitly required.
+      - Preserve unrelated pre-existing modified and untracked files.
+      - Execute verification commands defined by the task contract.
+      - Visual inspection alone is not verification.
+      - Execute git diff --check when applicable.
+      - Inspect git diff and git diff --name-only after implementation.
+      - Never claim execution of a command unless it actually ran.
+
+  archive:
+    guidance:
+      - Archive only changes whose required verification completed successfully.
+      - Preserve a concise record of verification results and known risks.

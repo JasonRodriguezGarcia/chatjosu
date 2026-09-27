@@ -1,0 +1,91 @@
+{
+  "format_version": 1,
+  "projection_version": "1.0",
+  "source_rows": 10254,
+  "relevance": {
+    "strict_candidates": 668,
+    "rejected_non_strict": 9586
+  },
+  "tagging": {
+    "high_associations": 319,
+    "review_only": 85,
+    "unmapped": 264,
+    "high_single_tag": 237,
+    "high_multiple_tags": 82,
+    "tag_assignments": 448,
+    "by_tag": {
+      "PERSONAS_MAYORES": 76,
+      "INMIGRACION_REFUGIO": 79,
+      "EXCLUSION_SOCIAL": 80,
+      "VIOLENCIA_GENERO": 40,
+      "POBREZA_NECESIDADES_BASICAS": 32,
+      "SALUD_MENTAL": 15,
+      "ALZHEIMER": 3,
+      "DISCAPACIDAD": 29,
+      "ADICCIONES_DROGAS": 7,
+      "DEPENDENCIA": 11,
+      "CANCER_INFANTIL": 2,
+      "CANCER": 7,
+      "DISCAPACIDAD_INTELECTUAL": 5,
+      "INSERCION_LABORAL": 14,
+      "SIN_HOGAR": 2,
+      "ENFERMEDAD_RENAL": 1,
+      "DIABETES": 2,
+      "FIBROSIS_QUISTICA": 1,
+      "SENSIBILIDAD_QUIMICA": 2,
+      "FIBROMIALGIA_FATIGA_CRONICA": 2,
+      "ESPINA_BIFIDA_HIDROCEFALIA": 1,
+      "CROHN_COLITIS": 1,
+      "RETINOSIS_PIGMENTARIA": 1,
+      "DANO_CEREBRAL_ADQUIRIDO": 1,
+      "DISCAPACIDAD_AUDITIVA": 1,
+      "PARALISIS_CEREBRAL": 2,
+      "DISCAPACIDAD_FISICA": 7,
+      "ESCLEROSIS_MULTIPLE": 1,
+      "LUDOPATIA": 2,
+      "ALCOHOLISMO": 3,
+      "PERSONAS_PRESAS": 3,
+      "TRASTORNOS_ALIMENTARIOS": 1,
+      "ELA": 3,
+      "ACOSO_ESCOLAR": 1,
+      "LUPUS": 1,
+      "ACOGIMIENTO_FAMILIAR": 2,
+      "ADOPCION": 2,
+      "ENFERMEDADES_NEUROMUSCULARES": 1,
+      "AUTISMO": 2,
+      "SOLEDAD_NO_DESEADA": 1,
+      "LINFEDEMA_LIPEDEMA": 1
+    }
+  },
+  "territory": {
+    "resolved": 319,
+    "unresolved": 0,
+    "by_province": {
+      "NAVARRA": 319
+    }
+  },
+  "contacts": {
+    "with_phone": 13,
+    "with_email": 111,
+    "with_website": 2,
+    "with_any_contact": 113,
+    "without_direct_contact": 206,
+    "with_official_registry_url": 0
+  },
+  "coordinates": {
+    "with_coordinates": 0,
+    "without_coordinates": 319
+  },
+  "dedupe": {
+    "new_candidate": 319,
+    "exact_duplicate": 0,
+    "probable_duplicate": 0
+  },
+  "quality": {
+    "missing_name": 0,
+    "missing_municipality": 0,
+    "missing_province": 0
+  },
+  "runtime_candidates": 319,
+  "generated_at": "2026-09-06T14:41:06.387Z"
+}

@@ -1,0 +1,318 @@
+{
+  "format_version": "1",
+  "source_id": "navarra_registro_asociaciones",
+  "source_records": 10254,
+  "status": "proposal",
+  "contract": {
+    "source_assertion": "Official class itself provides an unambiguous semantic assertion usable without LLM inference.",
+    "strong_candidate": "Official class provides a high-confidence candidate; record evidence should confirm or refine before final materialization.",
+    "candidate_set": "Official class constrains possible canonical concepts but does not assert every member.",
+    "context": "Official class supplies routing/domain context only; FINES or other evidence must establish canonical semantics.",
+    "none": "Official class creates no HelpChat semantic concept by itself."
+  },
+  "governance": {
+    "class_never_drops_record_by_itself": true,
+    "fines_can_override_or_refine_class": true,
+    "activities_do_not_imply_assistive_utility": true,
+    "llm_cannot_promote": true,
+    "personal_contact_not_promoted": true
+  },
+  "classes": [
+    {
+      "source_value": "Culturales y Tradiciones Populares",
+      "count": 3331,
+      "percentage": 32.4849,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "cultural_association"
+      ]
+    },
+    {
+      "source_value": "Deportivas, Recreativas y de Ocio",
+      "count": 2786,
+      "percentage": 27.1699,
+      "mode": "candidate_set",
+      "semantics": {
+        "activities": [
+          "DEPORTE",
+          "ACTIVIDAD_FISICA",
+          "OCIO",
+          "TIEMPO_LIBRE"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "Apymas y Alumnos",
+      "count": 540,
+      "percentage": 5.2662,
+      "mode": "candidate_set",
+      "semantics": {
+        "populations": [
+          "FAMILIAS"
+        ]
+      },
+      "hints": [
+        "education_family_association"
+      ]
+    },
+    {
+      "source_value": "Medioambientales, Caza y Pesca",
+      "count": 445,
+      "percentage": 4.3398,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "environment_or_animals"
+      ]
+    },
+    {
+      "source_value": "Vecinales y de Acción Socio-Comunitaria",
+      "count": 355,
+      "percentage": 3.4621,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "neighbourhood_or_community"
+      ]
+    },
+    {
+      "source_value": "Empresariales, Profesionales y de Trabajadores",
+      "count": 265,
+      "percentage": 2.5844,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "professional_or_workers"
+      ]
+    },
+    {
+      "source_value": "Personas Mayores",
+      "count": 254,
+      "percentage": 2.4771,
+      "mode": "source_assertion",
+      "semantics": {
+        "populations": [
+          "PERSONAS_MAYORES"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "Mujeres",
+      "count": 249,
+      "percentage": 2.4283,
+      "mode": "source_assertion",
+      "semantics": {
+        "populations": [
+          "MUJERES"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "Grupos Colectivos para la Inclusión Social",
+      "count": 215,
+      "percentage": 2.0967,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "social_inclusion"
+      ]
+    },
+    {
+      "source_value": "Educación y Política Lingüística",
+      "count": 192,
+      "percentage": 1.8724,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "education_or_language"
+      ]
+    },
+    {
+      "source_value": "Voluntariado y Cooperación Desarrollo",
+      "count": 191,
+      "percentage": 1.8627,
+      "mode": "candidate_set",
+      "semantics": {
+        "functions": [
+          "VOLUNTARIADO"
+        ],
+        "activities": [
+          "VOLUNTARIADO"
+        ]
+      },
+      "hints": [
+        "cooperation_development"
+      ]
+    },
+    {
+      "source_value": "Humanidades y Ciencia",
+      "count": 184,
+      "percentage": 1.7944,
+      "mode": "none",
+      "semantics": {},
+      "hints": []
+    },
+    {
+      "source_value": "Inmigración",
+      "count": 171,
+      "percentage": 1.6676,
+      "mode": "strong_candidate",
+      "semantics": {
+        "populations": [
+          "MIGRANTES"
+        ]
+      },
+      "hints": [
+        "migration_integration"
+      ]
+    },
+    {
+      "source_value": "Servicios Sociales y Familiares",
+      "count": 170,
+      "percentage": 1.6579,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "social_or_family_services"
+      ]
+    },
+    {
+      "source_value": "Medio Rural",
+      "count": 135,
+      "percentage": 1.3166,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "rural_context"
+      ]
+    },
+    {
+      "source_value": "Religiosas",
+      "count": 127,
+      "percentage": 1.2385,
+      "mode": "none",
+      "semantics": {},
+      "hints": []
+    },
+    {
+      "source_value": "Discapacidad y Asistencia Socio-Sanitaria",
+      "count": 115,
+      "percentage": 1.1215,
+      "mode": "candidate_set",
+      "semantics": {
+        "populations": [
+          "PERSONAS_CON_DISCAPACIDAD"
+        ]
+      },
+      "hints": [
+        "disability_or_social_health_support"
+      ]
+    },
+    {
+      "source_value": "Sanitarias",
+      "count": 112,
+      "percentage": 1.0923,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "health_context"
+      ]
+    },
+    {
+      "source_value": "Terapias Alternativas Salud",
+      "count": 93,
+      "percentage": 0.907,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "alternative_health_context"
+      ]
+    },
+    {
+      "source_value": "Nuevas Tecnologías y Medios Información",
+      "count": 85,
+      "percentage": 0.8289,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "technology_or_media"
+      ]
+    },
+    {
+      "source_value": "<missing>",
+      "count": 71,
+      "percentage": 0.6924,
+      "mode": "none",
+      "semantics": {},
+      "hints": []
+    },
+    {
+      "source_value": "Consumidores y Usuarios",
+      "count": 66,
+      "percentage": 0.6437,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "consumer_context"
+      ]
+    },
+    {
+      "source_value": "Taurinas",
+      "count": 47,
+      "percentage": 0.4584,
+      "mode": "none",
+      "semantics": {},
+      "hints": []
+    },
+    {
+      "source_value": "Turísticas",
+      "count": 22,
+      "percentage": 0.2146,
+      "mode": "none",
+      "semantics": {},
+      "hints": []
+    },
+    {
+      "source_value": "Casas Regionales",
+      "count": 18,
+      "percentage": 0.1755,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "regional_community"
+      ]
+    },
+    {
+      "source_value": "Club Fumadores",
+      "count": 9,
+      "percentage": 0.0878,
+      "mode": "none",
+      "semantics": {},
+      "hints": []
+    },
+    {
+      "source_value": "Comunidades de energía",
+      "count": 6,
+      "percentage": 0.0585,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "energy_community"
+      ]
+    }
+  ],
+  "summary": {
+    "class_count": 27,
+    "mode_records": {
+      "context": 5488,
+      "candidate_set": 2977,
+      "strong_candidate": 826,
+      "source_assertion": 503,
+      "none": 460
+    }
+  }
+}

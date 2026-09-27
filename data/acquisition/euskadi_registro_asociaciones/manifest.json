@@ -1,0 +1,12 @@
+{
+  "format_version": 1,
+  "source_id": "euskadi_registro_asociaciones",
+  "publisher": "Gobierno Vasco",
+  "source_url": "https://opendata.euskadi.eus/contenidos/ds_registros/asociaciones_euskadi/opendata/asociaciones.json",
+  "acquired_at": "2026-08-09T17:29:27Z",
+  "raw_file": "data/acquisition/euskadi_registro_asociaciones/raw/asociaciones.json",
+  "sha256": "245ec9cb412613692e92d1f3d92fdc0a20595f97c005c3438e99a5f8d841ee94",
+  "bytes": 53760435,
+  "mime_type": "text/plain",
+  "persistence": "raw_snapshot_only"
+}

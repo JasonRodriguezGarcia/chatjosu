@@ -1,0 +1,22 @@
+{
+  "format_version": "1",
+  "dataset": "navarra-normalized-v1",
+  "source_id": "navarra_registro_asociaciones",
+  "source_rows": 10254,
+  "output_rows": 10254,
+  "source_record_ids_unique": 10254,
+  "tax_id_collision_values": 12,
+  "fines_present": 7985,
+  "email_present": 1700,
+  "phone_present": 100,
+  "website_present": 7,
+  "address_present": 10218,
+  "municipality_present": 10250,
+  "tax_id_present": 6111,
+  "tax_id_collision_records": 24,
+  "invariants": {
+    "source_output_parity": true,
+    "unique_candidate_ids": true,
+    "personal_contact_promoted": false
+  }
+}

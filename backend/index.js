@@ -1,28 +1,337 @@
 import express from "express";
-import path from "path";
 import cors from 'cors';
-import { fileURLToPath } from "url";
-import { loadExcelContentData } from "./services/excel-service.js";
+import {
+  fileURLToPath,
+  pathToFileURL,
+} from "node:url";
+import { isIP } from "node:net";
+import path from "node:path";
+import { existsSync } from "node:fs";
+import {
+  findAssociationsForHelpchat,
+} from "./services/helpchat-association-service.js";
+import {
+  classifyHelpchatTag,
+} from "./services/helpchat-gemini-service.js";
+import {
+  createHelpchatEmbeddingService,
+} from "./services/helpchat-embedding-service.js";
+import {
+  createHelpchatSemanticClassifier,
+} from "./services/helpchat-semantic-classifier.js";
+import {
+  createHelpchatLocalLlmService,
+} from "./services/helpchat-local-llm-service.js";
+import {
+  createHelpchatClarificationRendererV1,
+} from "./services/helpchat-clarification-renderer-v1.js";
+import {
+  buildClarificationQuestionIntentV1,
+} from "./helpchat/clarification-question-intent-v1.js";
+import {
+  createHelpchatOllamaReadiness,
+} from "./services/helpchat-ollama-readiness.js";
+import {
+  createHelpchatUnderstandingRouter,
+} from "./services/helpchat-understanding-router.js";
+import {
+  createProvinceMatcher,
+} from "./helpchat/conversation-context-enricher-v1.js";
+import {
+  canonicalizeHelpchatLocation,
+  createProvinceResolver,
+  projectProvinceCatalog,
+} from "./helpchat/territory-contract-v1.js";
+import {
+  persistResolvedActiveNeed,
+  persistResolvedActiveNeeds,
+  preferContextResolution,
+  resolveSingleActiveOperationalTag,
+  updateConversationContextV1,
+} from "./helpchat/conversation-context-update-v1.js";
+import {
+  mergeMultiNeedSearchResults,
+  resolveMultipleNeeds,
+} from "./helpchat/multi-need-v1.js";
+import {
+  resolveHelpchatLocationRequirement,
+} from "./helpchat/location-requirement-v1.js";
+import {
+  buildHelpchatResourceResponseV1,
+} from "./helpchat/resource-response-v1.js";
+import {
+  createTesterCaptureRepositoryV1,
+} from "./helpchat/tester-capture-repository-v1.js";
+import {
+  createTesterCaptureServiceV1,
+} from "./helpchat/tester-capture-service-v1.js";
+
+import {
+  applyClarificationStateV2,
+  applyClarificationTransitionV2,
+  finalizeHelpchatRuntimeContextV2,
+  mergeLegacyGlobalsIntoRuntimeContextV2,
+  prepareHelpchatRuntimeContextV2,
+} from "./helpchat/conversation-runtime-v2.js";
+
+import {
+  assessConversationProgressV1,
+} from "./helpchat/conversation-progress-v1.js";
+import {
+  resolveNoRepeatContextV1,
+} from "./helpchat/conversation-no-repeat-context-v1.js";
+import {
+  assessNoRepeatV1,
+} from "./helpchat/conversation-no-repeat-v1.js";
+import {
+  resolveConversationRecoveryV1,
+} from "./helpchat/conversation-recovery-v1.js";
+import {
+  enforceConversationRecoveryV1,
+} from "./helpchat/conversation-recovery-enforcement-v1.js";
+import {
+  isClearlyInsufficient,
+} from "./helpchat/semantic-fast-gates.js";
+import {
+createHelpchatLocationResolver,
+helpchatClientIp,
+isTrustedHelpchatProxyIp,
+normalizeCloudflareLocation,
+} from "./services/helpchat-location-service.js";
+import {
+createIpLocationLookup,
+} from "./services/helpchat-ip-location-provider-v1.js";
 // import { tags } from "./data/tags.js";
 import dotenv from 'dotenv';
 dotenv.config();
 import pool from './db-pg.js';
 
 const SCHEMA_NAME = process.env.SCHEMA_NAME;
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const GEMINI_MODEL = process.env.GEMINI_MODEL;
 
-const app = express(); 
+if (!GEMINI_MODEL || !/^[A-Za-z0-9._-]+$/.test(GEMINI_MODEL)) {
+  throw new Error(
+    "GEMINI_MODEL must contain only letters, numbers, dots, underscores, and hyphens."
+  );
+}
+
+const GEMINI_GENERATE_CONTENT_URL =
+  `https://generativelanguage.googleapis.com/v1beta/models/` +
+  `${encodeURIComponent(GEMINI_MODEL)}:generateContent`;
+if (!SCHEMA_NAME || !/^[A-Za-z0-9_]+$/.test(SCHEMA_NAME)) {
+  throw new Error("SCHEMA_NAME must contain only letters, numbers, and underscores.");
+}
+
+const app = express();
 const PORT = process.env.PORT || 5000;
-const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS.split(','); // devuelve un array tras separar con comas
-app.locals.GEMINI_API_KEY = process.env.GEMINI_API_KEY; // Genera una variable GLOBAL accesible desde cualquier lugar de la app
+
+const BACKEND_HOST =
+    process.env.BACKEND_HOST?.trim() ||
+    "127.0.0.1";
+
+const SERVE_FRONTEND =
+    String(
+        process.env.SERVE_FRONTEND ||
+        "false"
+    ).toLowerCase() === "true";
+
+const FRONTEND_DIST_PATH =
+    fileURLToPath(
+        new URL(
+            "../frontend/dist/",
+            import.meta.url
+        )
+    );
+
+function positiveIntegerEnv(name, fallback) {
+    const raw = process.env[name];
+
+    if (raw === undefined || raw === "") {
+        return fallback;
+    }
+
+    const value = Number(raw);
+
+    if (!Number.isSafeInteger(value) || value <= 0) {
+        throw new Error(
+            `${name} must be a positive integer.`
+        );
+    }
+
+    return value;
+}
+
+const HELPCHAT_AI_TIMEOUT_MS =
+    positiveIntegerEnv(
+        "HELPCHAT_AI_TIMEOUT_MS",
+        12000
+    );
+
+const HELPCHAT_EMBEDDING_BASE_URL =
+    process.env.HELPCHAT_EMBEDDING_BASE_URL?.trim() ||
+    "http://127.0.0.1:11434";
+
+const HELPCHAT_EMBEDDING_MODEL =
+    process.env.HELPCHAT_EMBEDDING_MODEL?.trim() ||
+    "nomic-embed-text";
+
+const HELPCHAT_EMBEDDING_TIMEOUT_MS =
+    positiveIntegerEnv(
+        "HELPCHAT_EMBEDDING_TIMEOUT_MS",
+        3000
+    );
+
+const HELPCHAT_EMBEDDING_KEEP_ALIVE =
+    process.env.HELPCHAT_EMBEDDING_KEEP_ALIVE?.trim() ||
+    "24h";
+
+
+const HELPCHAT_EMBEDDING_WARMUP_TIMEOUT_MS =
+    positiveIntegerEnv(
+        "HELPCHAT_EMBEDDING_WARMUP_TIMEOUT_MS",
+        15000
+    );
+
+
+const HELPCHAT_LOCAL_LLM_MODEL =
+    process.env.HELPCHAT_LOCAL_LLM_MODEL?.trim() ||
+    "qwen3:8b";
+
+const HELPCHAT_LOCAL_LLM_KEEP_ALIVE =
+    process.env.HELPCHAT_LOCAL_LLM_KEEP_ALIVE?.trim() ||
+    "30m";
+
+const HELPCHAT_LOCAL_LLM_TIMEOUT_MS =
+    positiveIntegerEnv(
+        "HELPCHAT_LOCAL_LLM_TIMEOUT_MS",
+        5000
+    );
+
+const HELPCHAT_LOCAL_LLM_WARMUP_TIMEOUT_MS =
+    positiveIntegerEnv(
+        "HELPCHAT_LOCAL_LLM_WARMUP_TIMEOUT_MS",
+        60000
+    );
+
+const HELPCHAT_CLARIFICATION_RENDERER_MODEL =
+    process.env
+        .HELPCHAT_CLARIFICATION_RENDERER_MODEL
+        ?.trim() ||
+    HELPCHAT_LOCAL_LLM_MODEL;
+
+const HELPCHAT_CLARIFICATION_RENDERER_TIMEOUT_MS =
+    positiveIntegerEnv(
+        "HELPCHAT_CLARIFICATION_RENDERER_TIMEOUT_MS",
+        1800
+    );
+
+const HELPCHAT_CLARIFICATION_RENDERER_KEEP_ALIVE =
+    process.env
+        .HELPCHAT_CLARIFICATION_RENDERER_KEEP_ALIVE
+        ?.trim() ||
+    HELPCHAT_LOCAL_LLM_KEEP_ALIVE;
+
+const HELPCHAT_SEMANTIC_MIN_SCORE =
+    Number(
+        process.env.HELPCHAT_SEMANTIC_MIN_SCORE ||
+        "0.62"
+    );
+
+const HELPCHAT_SEMANTIC_MIN_MARGIN =
+    Number(
+        process.env.HELPCHAT_SEMANTIC_MIN_MARGIN ||
+        "0.05"
+    );
+
+if (
+    !Number.isFinite(HELPCHAT_SEMANTIC_MIN_SCORE) ||
+    HELPCHAT_SEMANTIC_MIN_SCORE < 0 ||
+    HELPCHAT_SEMANTIC_MIN_SCORE > 1
+) {
+    throw new Error(
+        "HELPCHAT_SEMANTIC_MIN_SCORE must be between 0 and 1."
+    );
+}
+
+if (
+    !Number.isFinite(HELPCHAT_SEMANTIC_MIN_MARGIN) ||
+    HELPCHAT_SEMANTIC_MIN_MARGIN < 0 ||
+    HELPCHAT_SEMANTIC_MIN_MARGIN > 1
+) {
+    throw new Error(
+        "HELPCHAT_SEMANTIC_MIN_MARGIN must be between 0 and 1."
+    );
+}
+
+const HELPCHAT_STORE_INPUT_MESSAGE =
+    String(
+        process.env.HELPCHAT_STORE_INPUT_MESSAGE ||
+        "false"
+    ).toLowerCase() === "true";
+
+const HELPCHAT_JSON_LIMIT =
+    process.env.HELPCHAT_JSON_LIMIT?.trim() ||
+    "16kb";
+
+const HELPCHAT_RATE_LIMIT_WINDOW_MS =
+    positiveIntegerEnv(
+        "HELPCHAT_RATE_LIMIT_WINDOW_MS",
+        60000
+    );
+
+const HELPCHAT_RATE_LIMIT_MAX =
+    positiveIntegerEnv(
+        "HELPCHAT_RATE_LIMIT_MAX",
+        20
+    );
+
+const HELPCHAT_TRUST_CLOUDFLARE =
+    String(
+        process.env
+            .HELPCHAT_TRUST_CLOUDFLARE ||
+        "false"
+    ).toLowerCase() === "true";
+
+const allowedOriginsValue = process.env.ALLOWED_ORIGINS?.trim();
+if (!allowedOriginsValue) {
+  throw new Error("ALLOWED_ORIGINS is required.");
+}
+
+const ALLOWED_ORIGINS = allowedOriginsValue
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+if (ALLOWED_ORIGINS.length === 0) {
+  throw new Error("ALLOWED_ORIGINS must contain at least one origin.");
+}
+
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY?.trim();
+if (!GEMINI_API_KEY) {
+  throw new Error("GEMINI_API_KEY is required.");
+}
+
+app.locals.GEMINI_API_KEY = GEMINI_API_KEY;
+app.locals.classifyHelpchatTag =
+    classifyHelpchatTag;
 
 //
 // functions
 //
 async function datos() {
     try {
-        const result = await pool.query(`SELECT tag_id, descripcion FROM ${SCHEMA_NAME}.tags ORDER BY descripcion;`)
+        const result = await pool.query(`
+            SELECT DISTINCT
+                t.tag_id,
+                t.descripcion
+            FROM ${SCHEMA_NAME}.tags AS t
+            JOIN ${SCHEMA_NAME}.association_tags AS at
+              ON at.tag_id = t.tag_id
+            JOIN ${SCHEMA_NAME}.associations AS a
+              ON a.association_id = at.association_id
+             AND a.active = TRUE
+            ORDER BY t.descripcion;
+        `)
         
         console.log("Datos tags: result.rows")
         return result.rows
@@ -30,56 +339,625 @@ async function datos() {
     } catch (err) {
         console.error('Error recuperando datos iniciales:', err.message);
         throw err;
-        return { error: true }
     }
 }
 
-async function tagSaving(tagText) {
-    console.log("tagText: ", tagText)
-    tagText = tagText.replace("TAG: ", "").trim();
-    console.log("tagtext: *",tagText, "*")
-    const tag = tags.find((t, index) => {
-            return t.descripcion === tagText
-        })
-    console.log("Tag encontrado: ", tag)
+async function tagSaving(tagText, inputMessage, userId = null) {
+    if (!tagText) {
+        console.warn("No se recibió un tag válido; no se guardará histórico.");
+        return null;
+    }
 
-    // Saving tag in historic database
-    const response = await pool.query(`
+    const normalizedTagText = tagText.trim().toLocaleUpperCase("es-ES");
+
+    const tag = tags.find((candidate) =>
+        candidate.descripcion
+            .trim()
+            .toLocaleUpperCase("es-ES") === normalizedTagText
+    );
+
+    if (!tag) {
+        console.warn("Tag desconocido; no se guardará histórico:", tagText);
+        return null;
+    }
+
+    const response = await pool.query(
+        `
         INSERT INTO ${SCHEMA_NAME}.tags_historico
             (fecha, input_message, tag_id, user_id)
-        VALUES (current_timestamp, 'TEST2-${tag.tag_id}', $1, 222)
+        VALUES
+            (current_timestamp, $1, $2, $3)
         RETURNING tags_historico_id;
-        `, [tag.tag_id]);
-    // const data = await response.json();
-    console.log("Tags historico creado: ", response.rows[0].tags_historico_id);
+        `,
+        [inputMessage, tag.tag_id, userId]
+    );
 
-    return
+    const historyId = response.rows[0].tags_historico_id;
+
+    console.log("Tag guardado:", {
+        historyId,
+        tagId: tag.tag_id,
+        descripcion: tag.descripcion,
+    });
+
+    return {
+        historyId,
+        tagId: tag.tag_id,
+        descripcion: tag.descripcion,
+    };
 }
 
 
 const datosIniciales = await datos()
 const tags = !datosIniciales ? [] : datosIniciales
-console.log("datos tags: ", tags)
+console.log(`Tags operativos cargados: ${tags.length}`)
+
+const helpchatProvinceRows =
+    (
+        await pool.query(
+            `
+            SELECT
+              province_key,
+              name
+            FROM ${SCHEMA_NAME}.provinces
+            ORDER BY name
+            `
+        )
+    ).rows;
+
+const helpchatProvinceMatcher =
+    createProvinceMatcher(
+        helpchatProvinceRows
+    );
+
+const helpchatProvinceResolver =
+    createProvinceResolver(
+        helpchatProvinceRows
+    );
+
+const helpchatProvinceCatalog =
+    projectProvinceCatalog(
+        helpchatProvinceRows
+    );
+
+console.log(
+    `Territorios Helpchat cargados: ${helpchatProvinceRows.length}`
+);
+
+app.locals.tagSaving = tagSaving;
+
+const testerCaptureRepository =
+    createTesterCaptureRepositoryV1({
+        pool,
+        schemaName:
+            SCHEMA_NAME,
+    });
+
+const testerCaptureService =
+    createTesterCaptureServiceV1({
+        repository:
+            testerCaptureRepository,
+    });
+
+app.locals.testerCaptureService =
+    testerCaptureService;
+
+const helpchatEmbeddingService =
+    createHelpchatEmbeddingService({
+        baseUrl: HELPCHAT_EMBEDDING_BASE_URL,
+        model: HELPCHAT_EMBEDDING_MODEL,
+        timeoutMs: HELPCHAT_EMBEDDING_TIMEOUT_MS,
+        keepAlive: HELPCHAT_EMBEDDING_KEEP_ALIVE,
+    });
+
+const helpchatSemanticClassifier =
+    createHelpchatSemanticClassifier({
+        embeddingService:
+            helpchatEmbeddingService,
+        minimumScore:
+            HELPCHAT_SEMANTIC_MIN_SCORE,
+        minimumMargin:
+            HELPCHAT_SEMANTIC_MIN_MARGIN,
+    });
+
+const helpchatLocalLlmService =
+    createHelpchatLocalLlmService({
+        baseUrl:
+            HELPCHAT_EMBEDDING_BASE_URL,
+        model:
+            HELPCHAT_LOCAL_LLM_MODEL,
+        timeoutMs:
+            HELPCHAT_LOCAL_LLM_TIMEOUT_MS,
+        keepAlive:
+            HELPCHAT_LOCAL_LLM_KEEP_ALIVE,
+    });
+
+const helpchatClarificationRenderer =
+    createHelpchatClarificationRendererV1({
+        baseUrl:
+            HELPCHAT_EMBEDDING_BASE_URL,
+        model:
+            HELPCHAT_CLARIFICATION_RENDERER_MODEL,
+        timeoutMs:
+            HELPCHAT_CLARIFICATION_RENDERER_TIMEOUT_MS,
+        keepAlive:
+            HELPCHAT_CLARIFICATION_RENDERER_KEEP_ALIVE,
+    });
+
+app.locals.renderHelpchatClarification =
+    helpchatClarificationRenderer.render;
+
+const helpchatUnderstandingRouter =
+    createHelpchatUnderstandingRouter({
+        semanticClassifier:
+            helpchatSemanticClassifier,
+        localLlmService:
+            helpchatLocalLlmService,
+    });
+
+app.locals.understandHelpchat =
+    helpchatUnderstandingRouter.understand;
+
+let helpchatSemanticReady = false;
+let helpchatSemanticState =
+    "warming";
+let helpchatSemanticWarmupError = null;
+let helpchatSemanticWarmupMs = null;
+
+async function warmHelpchatSemanticRouter() {
+    const startedAt =
+        performance.now();
+
+    try {
+        await helpchatSemanticClassifier.warmup({
+            timeoutMs:
+                HELPCHAT_EMBEDDING_WARMUP_TIMEOUT_MS,
+        });
+
+        helpchatSemanticReady = true;
+        helpchatSemanticState =
+            "ready";
+        helpchatSemanticWarmupError = null;
+        helpchatSemanticWarmupMs =
+            Number(
+                (
+                    performance.now() -
+                    startedAt
+                ).toFixed(1)
+            );
+
+        console.log(
+            "Helpchat semantic router warm:",
+            {
+                model:
+                    HELPCHAT_EMBEDDING_MODEL,
+                durationMs:
+                    helpchatSemanticWarmupMs,
+            }
+        );
+
+        return true;
+    } catch (error) {
+        helpchatSemanticReady = false;
+        helpchatSemanticState =
+            "degraded";
+        helpchatSemanticWarmupMs =
+            Number(
+                (
+                    performance.now() -
+                    startedAt
+                ).toFixed(1)
+            );
+        helpchatSemanticWarmupError =
+            error?.code ||
+            error?.message ||
+            "unknown";
+
+        console.warn(
+            "Helpchat semantic router warmup failed:",
+            helpchatSemanticWarmupError
+        );
+
+        return false;
+    }
+}
+
+app.locals.warmHelpchatSemanticRouter =
+    warmHelpchatSemanticRouter;
+
+const helpchatOllamaReadiness =
+    createHelpchatOllamaReadiness({
+        baseUrl:
+            HELPCHAT_EMBEDDING_BASE_URL,
+    });
+
+let helpchatLocalLlmState = {
+    model:
+        HELPCHAT_LOCAL_LLM_MODEL,
+    state:
+        "pending",
+    installed:
+        null,
+    loaded:
+        null,
+    warmupMs:
+        null,
+    error:
+        null,
+};
+
+async function inspectHelpchatLocalLlmState() {
+    const inspection =
+        await helpchatOllamaReadiness.inspectModel(
+            HELPCHAT_LOCAL_LLM_MODEL
+        );
+
+    if (
+        inspection.state === "ready"
+    ) {
+        return {
+            ...helpchatLocalLlmState,
+            state: "ready",
+            installed: true,
+            loaded: true,
+            error: null,
+        };
+    }
+
+    if (
+        inspection.state === "cold"
+    ) {
+        return {
+            ...helpchatLocalLlmState,
+            state: "cold",
+            installed: true,
+            loaded: false,
+            error: null,
+        };
+    }
+
+    if (
+        inspection.state === "missing"
+    ) {
+        return {
+            ...helpchatLocalLlmState,
+            state: "missing",
+            installed: false,
+            loaded: false,
+            error:
+                "MODEL_NOT_INSTALLED",
+        };
+    }
+
+    return {
+        ...helpchatLocalLlmState,
+        state: "degraded",
+        installed:
+            inspection.installed,
+        loaded:
+            inspection.loaded,
+        error:
+            inspection.error ||
+            "OLLAMA_UNAVAILABLE",
+    };
+}
+
+async function warmHelpchatLocalLlm() {
+    const startedAt =
+        performance.now();
+
+    helpchatLocalLlmState = {
+        ...helpchatLocalLlmState,
+        state:
+            "checking",
+        error:
+            null,
+    };
+
+    const inspection =
+        await helpchatOllamaReadiness.inspectModel(
+            HELPCHAT_LOCAL_LLM_MODEL
+        );
+
+    if (
+        inspection.state ===
+        "ready"
+    ) {
+        helpchatLocalLlmState = {
+            model:
+                HELPCHAT_LOCAL_LLM_MODEL,
+            state:
+                "ready",
+            installed:
+                true,
+            loaded:
+                true,
+            warmupMs:
+                Number(
+                    (
+                        performance.now() -
+                        startedAt
+                    ).toFixed(1)
+                ),
+            error:
+                null,
+        };
+
+        console.log(
+            "Helpchat local LLM already warm:",
+            helpchatLocalLlmState
+        );
+
+        return true;
+    }
+
+    if (
+        inspection.state ===
+        "missing"
+    ) {
+        helpchatLocalLlmState = {
+            model:
+                HELPCHAT_LOCAL_LLM_MODEL,
+            state:
+                "missing",
+            installed:
+                false,
+            loaded:
+                false,
+            warmupMs:
+                Number(
+                    (
+                        performance.now() -
+                        startedAt
+                    ).toFixed(1)
+                ),
+            error:
+                "MODEL_NOT_INSTALLED",
+        };
+
+        console.warn(
+            "Helpchat local LLM model missing:",
+            HELPCHAT_LOCAL_LLM_MODEL
+        );
+
+        return false;
+    }
+
+    if (
+        inspection.state !==
+        "cold"
+    ) {
+        helpchatLocalLlmState = {
+            model:
+                HELPCHAT_LOCAL_LLM_MODEL,
+            state:
+                "degraded",
+            installed:
+                inspection.installed,
+            loaded:
+                inspection.loaded,
+            warmupMs:
+                Number(
+                    (
+                        performance.now() -
+                        startedAt
+                    ).toFixed(1)
+                ),
+            error:
+                inspection.error ||
+                "OLLAMA_UNAVAILABLE",
+        };
+
+        console.warn(
+            "Helpchat local LLM unavailable:",
+            helpchatLocalLlmState.error
+        );
+
+        return false;
+    }
+
+    helpchatLocalLlmState = {
+        model:
+            HELPCHAT_LOCAL_LLM_MODEL,
+        state:
+            "warming",
+        installed:
+            true,
+        loaded:
+            false,
+        warmupMs:
+            null,
+        error:
+            null,
+    };
+
+    // Loading the large local LLM may temporarily
+    // evict the embedding model from VRAM.
+    helpchatSemanticReady = false;
+    helpchatSemanticState =
+        "warming";
+    helpchatSemanticWarmupError =
+        null;
+
+    const preload =
+        await helpchatOllamaReadiness.preloadGenerate({
+            model:
+                HELPCHAT_LOCAL_LLM_MODEL,
+            keepAlive:
+                HELPCHAT_LOCAL_LLM_KEEP_ALIVE,
+            timeoutMs:
+                HELPCHAT_LOCAL_LLM_WARMUP_TIMEOUT_MS,
+        });
+
+    if (!preload.ok) {
+        helpchatLocalLlmState = {
+            ...helpchatLocalLlmState,
+            state:
+                "degraded",
+            warmupMs:
+                Number(
+                    (
+                        performance.now() -
+                        startedAt
+                    ).toFixed(1)
+                ),
+            error:
+                preload.error ||
+                "LOCAL_LLM_PRELOAD_FAILED",
+        };
+
+        console.warn(
+            "Helpchat local LLM warmup failed:",
+            helpchatLocalLlmState.error
+        );
+
+        return false;
+    }
+
+    try {
+        helpchatSemanticState =
+            "warming";
+
+        await helpchatEmbeddingService.preload({
+            timeoutMs:
+                HELPCHAT_EMBEDDING_WARMUP_TIMEOUT_MS,
+        });
+
+        helpchatSemanticReady = true;
+        helpchatSemanticState =
+            "ready";
+        helpchatSemanticWarmupError =
+            null;
+    } catch (error) {
+        helpchatSemanticReady = false;
+        helpchatSemanticState =
+            "degraded";
+        helpchatSemanticWarmupError =
+            error?.code ||
+            error?.message ||
+            "EMBEDDING_REWARM_FAILED";
+
+        console.warn(
+            "Helpchat embedding rewarm after local LLM failed:",
+            helpchatSemanticWarmupError
+        );
+    }
+
+    const after =
+        await helpchatOllamaReadiness.inspectModel(
+            HELPCHAT_LOCAL_LLM_MODEL
+        );
+
+    const loaded =
+        after.state ===
+        "ready";
+
+    const runtimeReady =
+        loaded &&
+        helpchatSemanticState ===
+            "ready";
+
+    helpchatLocalLlmState = {
+        model:
+            HELPCHAT_LOCAL_LLM_MODEL,
+        state:
+            runtimeReady
+                ? "ready"
+                : "degraded",
+        installed:
+            after.installed,
+        loaded:
+            after.loaded,
+        warmupMs:
+            Number(
+                (
+                    performance.now() -
+                    startedAt
+                ).toFixed(1)
+            ),
+        error:
+            runtimeReady
+                ? null
+                : (
+                    helpchatSemanticState !==
+                        "ready"
+                        ? "EMBEDDING_NOT_READY_AFTER_PRELOAD"
+                        : (
+                            after.error ||
+                            "MODEL_NOT_RESIDENT_AFTER_PRELOAD"
+                        )
+                ),
+    };
+
+    if (runtimeReady) {
+        console.log(
+            "Helpchat local LLM warm:",
+            helpchatLocalLlmState
+        );
+    } else {
+        console.warn(
+            "Helpchat local LLM preload did not make model resident:",
+            helpchatLocalLlmState
+        );
+    }
+
+    return runtimeReady;
+}
+
+app.locals.warmHelpchatLocalLlm =
+    warmHelpchatLocalLlm;
+
+let helpchatLocalLlmWarmupPromise = null;
+
+function ensureHelpchatLocalLlmWarmInBackground() {
+    if (
+        helpchatLocalLlmWarmupPromise
+    ) {
+        return helpchatLocalLlmWarmupPromise;
+    }
+
+    helpchatLocalLlmWarmupPromise =
+        Promise.resolve()
+            .then(
+                () =>
+                    warmHelpchatLocalLlm()
+            )
+            .catch(
+                (error) => {
+                    console.warn(
+                        "Helpchat local LLM background warmup failed:",
+                        error?.code ||
+                        error?.message ||
+                        "unknown"
+                    );
+
+                    return false;
+                }
+            )
+            .finally(
+                () => {
+                    helpchatLocalLlmWarmupPromise =
+                        null;
+                }
+            );
+
+    return helpchatLocalLlmWarmupPromise;
+}
+
+app.locals.ensureHelpchatLocalLlmWarmInBackground =
+    ensureHelpchatLocalLlmWarmInBackground;
 
 // Middleware
 
 // Configurar cors
-const corsOptions = { 
-    origin: ALLOWED_ORIGINS
-    // origin: "http://localhost:5173",
-    // methods:["POST"] // sin esta línea se deja todos los methods
+const corsOptions = {
+  origin: ALLOWED_ORIGINS,
 };
 
-// Llama a la conversión del fichero excel de contexto y a la vez lo traduce a un objeto compatible Json
-const excelContentData = await loadExcelContentData();
-// app.locals es un objeto global asociado a la aplicación Express.
-// Permite que cualquier ruta o middleware acceda a esos datos SIN VOLVER A LEER el Excel o ejecutar la funcion.
-// Funcionaría también en res.app.locals.excelData para usarlo
-app.locals.excelContentData = excelContentData;
-// console.log ("ExcelData: ", excelContentData)
-
-app.use(cors());
-app.use(express.json());
+app.use(cors(corsOptions));
+app.use(express.json({
+    limit: HELPCHAT_JSON_LIMIT,
+}));
 
 // API Route Example
 app.get("/api/message", (req, res) => {
@@ -88,80 +966,1227 @@ app.get("/api/message", (req, res) => {
 
 // '/api/provincias' es viejo anterior a chat4
 // '/api/v1/helpchat/provincias' es nuevo
-app.get(['/api/provincias', '/api/v1/helpchat/provincias'], async (req, res) => {
-  try {
-    const response = await fetch('https://datos.gob.es/apidata/nti/territory/Province?_pageSize=100&_sort=label');
-    const data = await response.json();
-    // console.log(data.result.items)
-    res.json(data.result.items);
-  } catch (err) {
-    console.log("Error al obtener provincias: ", err.message);
-    res.status(500).json({ error: 'Error al obtener provincias' });
-  }
+app.get(
+    [
+        "/api/provincias",
+        "/api/v1/helpchat/provincias",
+    ],
+    (req, res) => {
+        return res.json(
+            helpchatProvinceCatalog
+        );
+    }
+);
+
+const helpchatLocationResolver =
+    createHelpchatLocationResolver({
+        lookupIp:
+            createIpLocationLookup(),
+    });
+
+app.locals.resolveHelpchatLocation =
+    helpchatLocationResolver;
+
+app.get(
+    "/api/v1/helpchat/location",
+    async (req, res) => {
+        const ip =
+            helpchatClientIp({
+                remoteAddress:
+                    req.socket
+                        ?.remoteAddress,
+                cloudflareConnectingIp:
+                    req.get(
+                        "CF-Connecting-IP"
+                    ),
+                trustCloudflare:
+                    HELPCHAT_TRUST_CLOUDFLARE,
+            });
+
+        let location;
+
+        if (
+            HELPCHAT_TRUST_CLOUDFLARE &&
+            isTrustedHelpchatProxyIp(
+                req.socket
+                    ?.remoteAddress
+            )
+        ) {
+            location =
+                normalizeCloudflareLocation({
+                    country:
+                        req.get(
+                            "CF-IPCountry"
+                        ),
+                    province:
+                        req.get(
+                            "CF-Region"
+                        ),
+                    municipality:
+                        req.get(
+                            "CF-IPCity"
+                        ),
+                });
+        }
+
+        if (
+            !location ||
+            !location.province
+        ) {
+            location =
+                await app.locals
+                    .resolveHelpchatLocation({
+                        ip,
+                    });
+        }
+
+        location =
+            canonicalizeHelpchatLocation({
+                location,
+                provinceResolver:
+                    helpchatProvinceResolver,
+            });
+
+        return res.json(
+            location
+        );
+    }
+);
+
+const helpchatRateLimitBuckets = new Map();
+
+function isLoopbackAddress(value) {
+    const address =
+        String(value || "").trim();
+
+    return (
+        address === "127.0.0.1" ||
+        address === "::1" ||
+        address === "::ffff:127.0.0.1"
+    );
+}
+
+function helpchatClientKey(req) {
+    const remoteAddress =
+        req.socket?.remoteAddress ||
+        "";
+
+    if (
+        HELPCHAT_TRUST_CLOUDFLARE &&
+        isLoopbackAddress(remoteAddress)
+    ) {
+        const connectingIp =
+            String(
+                req.get(
+                    "CF-Connecting-IP"
+                ) || ""
+            ).trim();
+
+        if (isIP(connectingIp)) {
+            return `cf:${connectingIp}`;
+        }
+    }
+
+    return (
+        `direct:` +
+        (
+            remoteAddress ||
+            "unknown"
+        )
+    );
+}
+
+function helpchatRateLimit(req, res, next) {
+    const now = Date.now();
+    const key = helpchatClientKey(req);
+
+    let bucket =
+        helpchatRateLimitBuckets.get(key);
+
+    if (
+        !bucket ||
+        now - bucket.windowStartedAt >=
+            HELPCHAT_RATE_LIMIT_WINDOW_MS
+    ) {
+        bucket = {
+            windowStartedAt: now,
+            count: 0,
+        };
+
+        helpchatRateLimitBuckets.set(
+            key,
+            bucket
+        );
+    }
+
+    bucket.count += 1;
+
+    if (
+        bucket.count >
+        HELPCHAT_RATE_LIMIT_MAX
+    ) {
+        const remainingMs =
+            HELPCHAT_RATE_LIMIT_WINDOW_MS -
+            (now - bucket.windowStartedAt);
+
+        res.set(
+            "Retry-After",
+            String(
+                Math.max(
+                    1,
+                    Math.ceil(remainingMs / 1000)
+                )
+            )
+        );
+
+        return res.status(429).json({
+            error:
+                "Demasiadas consultas. Inténtalo de nuevo en unos segundos.",
+            code: "RATE_LIMITED",
+        });
+    }
+
+    return next();
+}
+
+app.get('/api/health', (req, res) => {
+    return res.json({
+        status: "ok",
+        service: "copilot-ong-backend",
+    });
 });
 
-app.post('/api/v1/helpchat/iacall', async (req, res) => {
+app.get('/api/ready', async (req, res) => {
+    try {
+        await pool.query("SELECT 1");
 
-        const { inputMessage, selectedProvincia } = req.body;
+        const currentLocalLlmState =
+            await inspectHelpchatLocalLlmState();
 
-        console.log("HA PASADO POR AQUI");
-        let replyMessage = "";
+        return res.json({
+            status: "ready",
+            database: "ok",
+            semanticRouter:
+                helpchatSemanticState,
+            semanticFallback:
+                helpchatSemanticState ===
+                    "degraded"
+                    ? "gemini"
+                    : null,
+            semanticWarmupError:
+                helpchatSemanticWarmupError,
+            semanticWarmupMs:
+                helpchatSemanticWarmupMs,
+            localLlm:
+                currentLocalLlmState,
+        });
+    } catch (error) {
+        console.error(
+            "Readiness check failed:",
+            error.message
+        );
+
+        return res.status(503).json({
+            status: "not_ready",
+            database: "error",
+        });
+    }
+});
+
+function testerCaptureErrorResponse(
+    error,
+    res
+) {
+    const message =
+        String(
+            error?.message ||
+            ""
+        );
+
+    if (
+        message.includes(
+            "obligatorio"
+        ) ||
+        message.includes(
+            "sequence"
+        ) ||
+        message ===
+            "UNKNOWN_FEEDBACK_TURN"
+    ) {
+        return res.status(400).json({
+            error:
+                "Los datos de captura no son válidos.",
+            code:
+                message ===
+                "UNKNOWN_FEEDBACK_TURN"
+                    ? "UNKNOWN_FEEDBACK_TURN"
+                    : "INVALID_TESTER_CAPTURE",
+        });
+    }
+
+    if (
+        message ===
+        "TURN_ID_CONFLICT"
+    ) {
+        return res.status(409).json({
+            error:
+                "El turno ya existe con datos diferentes.",
+            code:
+                "TURN_ID_CONFLICT",
+        });
+    }
+
+    console.error(
+        "Tester Capture error:",
+        error
+    );
+
+    return res.status(500).json({
+        error:
+            "No se pudo registrar la captura de prueba.",
+        code:
+            "TESTER_CAPTURE_ERROR",
+    });
+}
+
+app.post(
+    '/api/v1/helpchat/tester/sessions',
+    helpchatRateLimit,
+    async (req, res) => {
         try {
-            const response = await fetch( 
-                // "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent",
-                // "https://generativelanguage.googleapis.com/v1/models/gemini-3-flash-preview:generateContent", 
-                    // "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=" + GEMINI_API_KEY,
-            // "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent",
-            "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent",
-                { 
-                    method: "POST",
-                    headers: { 
-                        "Content-Type": "application/json",
-                        "x-goog-api-key": app.locals.GEMINI_API_KEY 
+            const result =
+                await app.locals
+                    .testerCaptureService
+                    .createSession(
+                        req.body
+                    );
+
+            return res
+                .status(201)
+                .json(result);
+        } catch (error) {
+            return testerCaptureErrorResponse(
+                error,
+                res
+            );
+        }
+    }
+);
+
+app.post(
+    '/api/v1/helpchat/tester/turns',
+    helpchatRateLimit,
+    async (req, res) => {
+        try {
+            const result =
+                await app.locals
+                    .testerCaptureService
+                    .appendTurn(
+                        req.body
+                    );
+
+            return res
+                .status(
+                    result.status ===
+                        "duplicate"
+                        ? 200
+                        : 201
+                )
+                .json(result);
+        } catch (error) {
+            return testerCaptureErrorResponse(
+                error,
+                res
+            );
+        }
+    }
+);
+
+app.post(
+    '/api/v1/helpchat/tester/feedback',
+    helpchatRateLimit,
+    async (req, res) => {
+        try {
+            const result =
+                await app.locals
+                    .testerCaptureService
+                    .createFeedback(
+                        req.body
+                    );
+
+            return res
+                .status(201)
+                .json(result);
+        } catch (error) {
+            return testerCaptureErrorResponse(
+                error,
+                res
+            );
+        }
+    }
+);
+
+app.post(
+    '/api/v1/helpchat/iacall',
+    helpchatRateLimit,
+    async (req, res) => {
+    const startedAt = Date.now();
+
+    const inputMessage =
+        typeof req.body?.inputMessage === "string"
+            ? req.body.inputMessage.trim()
+            : "";
+
+    const selectedProvincia =
+        typeof req.body?.selectedProvincia === "string"
+            ? req.body.selectedProvincia.trim()
+            : "";
+
+    if (!inputMessage) {
+        return res.status(400).json({
+            error: "El mensaje no puede estar vacío.",
+        });
+    }
+
+    void app.locals
+        .ensureHelpchatLocalLlmWarmInBackground();
+
+    try {
+        const classificationStartedAt =
+            performance.now();
+
+        const runtimeContext =
+            prepareHelpchatRuntimeContextV2({
+                conversationContext:
+                    req.body?.conversationContext,
+                inputMessage,
+            });
+
+        const contextUpdate =
+            updateConversationContextV1({
+                conversationContext:
+                    runtimeContext.legacyContext,
+                inputMessage,
+                selectedProvince:
+                    selectedProvincia,
+                provinceMatcher:
+                    helpchatProvinceMatcher,
+            });
+
+        const conversationContext =
+            contextUpdate.context;
+
+        let relationalContext =
+            mergeLegacyGlobalsIntoRuntimeContextV2({
+                relationalContext:
+                    runtimeContext.relationalContext,
+                legacyContext:
+                    conversationContext,
+            });
+
+        const effectiveProvince =
+            conversationContext
+                ?.territory
+                ?.province ||
+            selectedProvincia;
+
+        const activeContextTag =
+            resolveSingleActiveOperationalTag({
+                conversationContext,
+                tags,
+            });
+
+        let understanding;
+
+        try {
+            understanding =
+                await app.locals.understandHelpchat({
+                    inputMessage,
+                    conversationContext,
+                    relationalContext,
+                    controlledReply:
+                        req.body?.controlledReply,
+                    pendingClarification:
+                        relationalContext
+                            ?.pendingClarification ||
+                        null,
+                });
+        } catch (localError) {
+            console.warn(
+                "Router local no disponible; usando Gemini fallback:",
+                localError?.code ||
+                localError?.message
+            );
+
+            const fallbackTag =
+                await app.locals.classifyHelpchatTag({
+                    apiKey:
+                        app.locals.GEMINI_API_KEY,
+                    generateContentUrl:
+                        GEMINI_GENERATE_CONTENT_URL,
+                    inputMessage,
+                    tags,
+                    timeoutMs:
+                        HELPCHAT_AI_TIMEOUT_MS,
+                });
+
+            understanding = {
+                status: "resolved",
+                tag: fallbackTag,
+                resolvedNeeds: [
+                    {
+                        tag_id:
+                            Number(
+                                fallbackTag.tag_id
+                            ),
+                        descripcion:
+                            fallbackTag.descripcion,
+                        source:
+                            "gemini",
                     },
-                    body: JSON.stringify({
-                        contents: [ 
-                            { 
-                                role: "user", 
-                                parts: [ 
-                                    { 
-                                        text: `Eres un asistente que recomienda asociaciones de pacientes u ONG. Pregunto ${inputMessage}
-                                            y los resultados que aparezcan serán para la provincia ${selectedProvincia} que en el caso de no
-                                            tener resultados para esa provincia se dirá que no hay resultados pero se indicarán los resultados
-                                            de las provincias más cercanas y devuelve el tag mas adecuado de los siguiente disponibles
-                                            ${JSON.stringify(tags)} pero indicando el texto "#TAG: "+el tag oportuno+"#"
-                                            CONTEXTO: ${JSON.stringify(app.locals.excelContentData)} 
-                                            INSTRUCCIÓN: Dime asociaciones u OGNs que me puedan ayudar.`
-                                    }
-                                ]
-                            } 
-                        ] 
-                    })
+                ],
+                context:
+                    conversationContext,
+                needsClarification: false,
+                clarificationQuestion: null,
+                provider: "gemini",
+                model: GEMINI_MODEL,
+                durationMs: null,
+                diagnostics: null,
+            };
+        }
+
+        understanding =
+            preferContextResolution({
+                understanding,
+                contextUpdate,
+                activeTag:
+                    activeContextTag,
+            });
+
+        const classificationMs =
+            performance.now() -
+            classificationStartedAt;
+
+        const relationalContextBeforeClarification =
+            structuredClone(
+                relationalContext
+            );
+
+        if (
+            understanding
+                .clarificationTransition
+        ) {
+            relationalContext =
+                applyClarificationTransitionV2({
+                    relationalContext,
+                    personId:
+                        runtimeContext.personId,
+                    sourceNode:
+                        understanding
+                            .clarificationTransition
+                            .sourceNode,
+                    action:
+                        understanding
+                            .clarificationTransition
+                            .action,
+                });
+        }
+
+        if (
+            !understanding
+                .clarificationTransition &&
+            understanding
+                .clarificationState
+        ) {
+            relationalContext =
+                applyClarificationStateV2({
+                    relationalContext,
+                    personId:
+                        runtimeContext.personId,
+                    clarificationState:
+                        understanding
+                            .clarificationState,
+                });
+        }
+
+        const conversationProgress =
+            assessConversationProgressV1({
+                beforeContext:
+                    relationalContextBeforeClarification,
+                afterContext:
+                    relationalContext,
+            });
+
+        if (
+            understanding
+                .clarificationTransition ||
+            understanding
+                .clarificationState
+        ) {
+            console.log(
+                "Helpchat conversation progress:",
+                {
+                    progressed:
+                        conversationProgress
+                            .progressed,
+                    reasons:
+                        conversationProgress
+                            .reasons,
+                    sourceNode:
+                        understanding
+                            .clarificationTransition
+                            ?.sourceNode ||
+                        relationalContextBeforeClarification
+                            ?.pendingClarification
+                            ?.node ||
+                        null,
+                    targetNode:
+                        relationalContext
+                            ?.pendingClarification
+                            ?.node ||
+                        null,
                 }
             );
-            const data = await response.json();
-            console.log("Respuesta Gemini: ", data);
-            replyMessage = data.candidates?.[0]?.content?.parts?.[0]?.text;
-
-            const tagText = replyMessage.match(/#([^#]+)#/);
-            const extraido = tagText ? tagText[1] : null;
-            console.log("TAG devuelto: ", extraido);
-
-            const textoSinTag = replyMessage.replace(/#[^#]+#/, "");
-
-            // Guardando TAG en la base de datos
-
-            await tagSaving(extraido);
-            
-            // res.json ({ message: textoSinTag, tag: tagExtraido });
-            res.json ({ message: replyMessage });
         }
-        catch (err) {
-            console.log("Error al llamar a la IA: ", err.message);
-            res.status(500).json({ error: 'Error al llamar a la IA' });
 
+        const noRepeatContext =
+            resolveNoRepeatContextV1({
+                beforeContext:
+                    relationalContextBeforeClarification,
+                afterContext:
+                    relationalContext,
+            });
+
+        const inputInsufficient =
+            isClearlyInsufficient(
+                inputMessage,
+                conversationContext
+            );
+
+        const noRepeatDecision =
+            assessNoRepeatV1({
+                progress:
+                    conversationProgress,
+                beforePending:
+                    relationalContextBeforeClarification
+                        ?.pendingClarification ||
+                    null,
+                afterPending:
+                    relationalContext
+                        ?.pendingClarification ||
+                    null,
+                clarificationPurpose:
+                    noRepeatContext
+                        .clarificationPurpose,
+                inputInsufficient,
+                dimensionResolved:
+                    noRepeatContext
+                        .dimensionResolved,
+            });
+
+        const conversationRecovery =
+            resolveConversationRecoveryV1({
+                inputMessage,
+                pendingClarification:
+                    relationalContextBeforeClarification
+                        ?.pendingClarification ||
+                    null,
+                noRepeatDecision,
+            });
+
+        if (
+            relationalContextBeforeClarification
+                ?.pendingClarification ||
+            relationalContext
+                ?.pendingClarification ||
+            understanding
+                .clarificationTransition ||
+            understanding
+                .clarificationState
+        ) {
+            console.log(
+                "Helpchat no-repeat guard:",
+                {
+                    status:
+                        noRepeatDecision
+                            .status,
+                    reason:
+                        noRepeatDecision
+                            .reason,
+                    inputInsufficient,
+                    clarificationPurpose:
+                        noRepeatContext
+                            .clarificationPurpose,
+                    dimensionResolved:
+                        noRepeatContext
+                            .dimensionResolved,
+                    sourceNode:
+                        relationalContextBeforeClarification
+                            ?.pendingClarification
+                            ?.node ||
+                        understanding
+                            .clarificationTransition
+                            ?.sourceNode ||
+                        null,
+                    targetNode:
+                        relationalContext
+                            ?.pendingClarification
+                            ?.node ||
+                        null,
+                }
+            );
         }
-})
+
+        if (
+            conversationRecovery.status !==
+                "not_applicable"
+        ) {
+            console.log(
+                "Helpchat conversation recovery:",
+                {
+                    status:
+                        conversationRecovery
+                            .status,
+                    reason:
+                        conversationRecovery
+                            .reason,
+                    sourceNode:
+                        conversationRecovery
+                            .sourcePending
+                            ?.node ||
+                        null,
+                    path:
+                        conversationRecovery
+                            .path,
+                    action:
+                        conversationRecovery
+                            .action,
+                    matches:
+                        conversationRecovery
+                            .matches,
+                }
+            );
+        }
+
+        const recoveryEnforcement =
+            enforceConversationRecoveryV1({
+                relationalContext,
+                personId:
+                    runtimeContext.personId,
+                understanding,
+                recovery:
+                    conversationRecovery,
+            });
+
+        if (
+            recoveryEnforcement.status ===
+                "enforced"
+        ) {
+            relationalContext =
+                recoveryEnforcement.context;
+
+            understanding =
+                recoveryEnforcement
+                    .understanding;
+
+            console.log(
+                "Helpchat conversation recovery enforcement:",
+                {
+                    status:
+                        recoveryEnforcement
+                            .status,
+                    reason:
+                        recoveryEnforcement
+                            .reason,
+                    provider:
+                        understanding
+                            .provider,
+                    resolvedNeeds:
+                        understanding
+                            .resolvedNeeds,
+                    pendingClarification:
+                        relationalContext
+                            ?.pendingClarification ||
+                        null,
+                }
+            );
+        }
+
+        if (
+            understanding.status ===
+                "needs_clarification" ||
+            understanding.needsClarification === true
+        ) {
+            const canonicalClarificationQuestion =
+                understanding.clarificationQuestion;
+
+            let publicClarificationQuestion =
+                canonicalClarificationQuestion;
+
+            const questionIntent =
+                buildClarificationQuestionIntentV1({
+                    understanding,
+                    relationalContext,
+                });
+
+            let clarificationRender =
+                null;
+
+            if (questionIntent) {
+                try {
+                    clarificationRender =
+                        await app.locals
+                            .renderHelpchatClarification({
+                                intent:
+                                    questionIntent,
+                            });
+
+                    if (
+                        clarificationRender
+                            ?.question
+                    ) {
+                        publicClarificationQuestion =
+                            clarificationRender.question;
+                    }
+                } catch (renderError) {
+                    clarificationRender = {
+                        rendered:
+                            false,
+                        reason:
+                            "unexpected_renderer_error",
+                        model:
+                            HELPCHAT_CLARIFICATION_RENDERER_MODEL,
+                        durationMs:
+                            null,
+                    };
+
+                    publicClarificationQuestion =
+                        canonicalClarificationQuestion;
+                }
+            }
+
+            if (questionIntent) {
+                console.log(
+                    "Helpchat clarification renderer:",
+                    {
+                        askFor:
+                            questionIntent.askFor,
+                        rendered:
+                            clarificationRender
+                                ?.rendered ===
+                                true,
+                        reason:
+                            clarificationRender
+                                ?.reason ||
+                            "not_rendered",
+                        model:
+                            clarificationRender
+                                ?.model ||
+                            HELPCHAT_CLARIFICATION_RENDERER_MODEL,
+                        durationMs:
+                            clarificationRender
+                                ?.durationMs ??
+                            null,
+                    }
+                );
+            }
+
+            const durationMs =
+                Date.now() - startedAt;
+
+            const timings = {
+                classificationMs:
+                    Number(
+                        classificationMs.toFixed(1)
+                    ),
+                searchMs: 0,
+                historyMs: 0,
+                totalMs: durationMs,
+            };
+
+            console.log(
+                "Helpchat necesita aclaración:",
+                {
+                    provider:
+                        understanding.provider,
+                    model:
+                        understanding.model,
+                    missingDimension:
+                        understanding.missingDimension ||
+                        null,
+                    timings,
+                }
+            );
+
+            return res.json({
+                status:
+                    "needs_clarification",
+                message:
+                    publicClarificationQuestion,
+                tag: null,
+                context:
+                    relationalContext,
+                needsClarification: true,
+                clarificationQuestion:
+                    publicClarificationQuestion,
+                quickReplies:
+                    Array.isArray(
+                        understanding.quickReplies
+                    )
+                        ? understanding.quickReplies
+                        : [],
+                needsLocation: false,
+                locationReason: null,
+                requestedProvince:
+                    selectedProvincia,
+                effectiveProvince,
+                resolvedProvince:
+                    effectiveProvince,
+                fallbackUsed: false,
+                fallbackType: null,
+                localCount: 0,
+                neighborCount: 0,
+                nationalCount: 0,
+                associations: [],
+                provider:
+                    understanding.provider,
+                model:
+                    understanding.model,
+                historyId: null,
+                durationMs,
+                timings,
+            });
+        }
+
+        const tag =
+            understanding.tag;
+
+        if (
+            !tag ||
+            !tag.tag_id ||
+            !tag.descripcion
+        ) {
+            const error = new Error(
+                "El router no devolvió un tag válido."
+            );
+
+            error.code =
+                "HELPCHAT_INVALID_ROUTER_RESULT";
+
+            throw error;
+        }
+
+        const resolvedNeeds =
+            await resolveMultipleNeeds({
+                inputMessage,
+                conversationContext:
+                    understanding.context ||
+                    conversationContext,
+                primaryUnderstanding:
+                    understanding,
+                understand:
+                    app.locals.understandHelpchat,
+            });
+
+        if (
+            resolvedNeeds.length === 0
+        ) {
+            resolvedNeeds.push({
+                tag_id:
+                    Number(
+                        tag.tag_id
+                    ),
+                descripcion:
+                    tag.descripcion,
+                source:
+                    understanding.provider ||
+                    null,
+            });
+        }
+
+        understanding.resolvedNeeds =
+            resolvedNeeds;
+
+        understanding.context =
+            persistResolvedActiveNeeds({
+                conversationContext:
+                    understanding.context ||
+                    conversationContext,
+                tags:
+                    resolvedNeeds,
+            });
+
+        const finalizedRuntime =
+            finalizeHelpchatRuntimeContextV2({
+                relationalContext,
+                personId:
+                    runtimeContext.personId,
+                subjectStatus:
+                    runtimeContext.status,
+                resolvedNeeds,
+            });
+
+        relationalContext =
+            finalizedRuntime.context;
+
+        const locationRequirement =
+            resolveHelpchatLocationRequirement({
+                effectiveProvince,
+                understanding,
+            });
+
+        if (
+            locationRequirement
+                .needsLocation
+        ) {
+            const durationMs =
+                Date.now() -
+                startedAt;
+
+            const timings = {
+                classificationMs:
+                    Number(
+                        classificationMs
+                            .toFixed(1)
+                    ),
+                searchMs: 0,
+                historyMs: 0,
+                totalMs:
+                    durationMs,
+            };
+
+            return res.json({
+                status:
+                    "needs_location",
+                message: null,
+                tag:
+                    tag.descripcion,
+                resolvedNeeds:
+                    understanding
+                        .resolvedNeeds,
+                context:
+                    relationalContext,
+                needsClarification:
+                    false,
+                clarificationQuestion:
+                    null,
+                needsLocation:
+                    true,
+                locationReason:
+                    locationRequirement
+                        .locationReason,
+                requestedProvince:
+                    selectedProvincia ||
+                    null,
+                effectiveProvince:
+                    null,
+                resolvedProvince:
+                    null,
+                fallbackUsed:
+                    false,
+                fallbackType:
+                    null,
+                localCount: 0,
+                neighborCount: 0,
+                nationalCount: 0,
+                associations: [],
+                provider:
+                    understanding.provider,
+                model:
+                    understanding.model,
+                historyId: null,
+                durationMs,
+                timings,
+            });
+        }
+
+        const searchStartedAt =
+            performance.now();
+
+        const searchResults =
+            await Promise.all(
+                resolvedNeeds.map(
+                    (need) =>
+                        findAssociationsForHelpchat({
+                            pool,
+                            schemaName:
+                                SCHEMA_NAME,
+                            tagId:
+                                need.tag_id,
+                            selectedProvince:
+                                effectiveProvince,
+                            limit: 5,
+                        })
+                )
+            );
+
+        const mergedSearch =
+            mergeMultiNeedSearchResults({
+                resolvedNeeds,
+                searchResults,
+                limit: 5,
+            });
+
+        const primarySearchResult =
+            searchResults[0];
+
+        const searchResult = {
+            ...primarySearchResult,
+            ...mergedSearch,
+            resolvedProvince:
+                primarySearchResult
+                    ?.resolvedProvince ||
+                effectiveProvince,
+        };
+
+        const searchMs =
+            performance.now() -
+            searchStartedAt;
+
+        const historyStartedAt =
+            performance.now();
+
+        const savedTags =
+            await Promise.all(
+                resolvedNeeds.map(
+                    (need) =>
+                        app.locals.tagSaving(
+                            need.descripcion,
+                            HELPCHAT_STORE_INPUT_MESSAGE
+                                ? inputMessage
+                                : "[not-stored]"
+                        )
+                )
+            );
+
+        const savedTag =
+            savedTags[0] ||
+            null;
+
+        const historyMs =
+            performance.now() -
+            historyStartedAt;
+
+        const associations =
+            searchResult.associations;
+
+        const message =
+            buildHelpchatResourceResponseV1({
+                associations,
+                resolvedNeeds:
+                    understanding.resolvedNeeds,
+                effectiveProvince,
+                resolvedProvince:
+                    searchResult.resolvedProvince,
+                localCount:
+                    searchResult.localCount,
+                fallbackType:
+                    searchResult.fallbackType,
+            });
+
+        const durationMs = Date.now() - startedAt;
+
+        const timings = {
+            classificationMs:
+                Number(classificationMs.toFixed(1)),
+            searchMs:
+                Number(searchMs.toFixed(1)),
+            historyMs:
+                Number(historyMs.toFixed(1)),
+            totalMs: durationMs,
+        };
+
+        console.log("Helpchat procesado:", {
+            tag: tag.descripcion,
+            resolvedNeeds:
+                understanding.resolvedNeeds
+                    .map(
+                        (need) =>
+                            need.descripcion
+                    ),
+            requestedProvince: selectedProvincia,
+            effectiveProvince,
+            resolvedProvince: searchResult.resolvedProvince,
+            localCount: searchResult.localCount,
+            neighborCount: searchResult.neighborCount,
+            nationalCount: searchResult.nationalCount,
+            fallbackType: searchResult.fallbackType,
+            timings,
+        });
+
+        return res.json({
+            status: "resolved",
+            message,
+            tag: tag.descripcion,
+            resolvedNeeds:
+                understanding.resolvedNeeds,
+            context:
+                relationalContext,
+            needsClarification: false,
+            clarificationQuestion: null,
+            needsLocation: false,
+            locationReason: null,
+            requestedProvince: selectedProvincia,
+            effectiveProvince,
+            resolvedProvince: searchResult.resolvedProvince,
+            fallbackUsed: searchResult.fallbackUsed,
+            fallbackType: searchResult.fallbackType,
+            localCount: searchResult.localCount,
+            neighborCount: searchResult.neighborCount,
+            nationalCount: searchResult.nationalCount,
+            associations,
+            provider:
+                understanding.provider,
+            model:
+                understanding.model,
+            historyId: savedTag?.historyId || null,
+            durationMs,
+            timings,
+        });
+    } catch (err) {
+        console.error("Error procesando la consulta de IA:", err);
+
+        if (err?.providerStatus) {
+            let status = 502;
+            let message =
+                "El proveedor de IA no pudo clasificar la consulta.";
+
+            if (err.providerStatus === 504) {
+                status = 504;
+                message =
+                    "El proveedor de IA tardó demasiado en responder.";
+            } else if (
+                err.providerStatus === 429
+            ) {
+                status = 503;
+                message =
+                    "El servicio de IA está temporalmente saturado.";
+            }
+
+            if (err.retryAfter) {
+                res.set(
+                    "Retry-After",
+                    String(err.retryAfter)
+                );
+            }
+
+            return res.status(status).json({
+                error: message,
+                code:
+                    err.code ||
+                    "AI_PROVIDER_ERROR",
+                providerStatus:
+                    err.providerStatus,
+            });
+        }
+
+        return res.status(500).json({
+            error: "Error interno al procesar la consulta.",
+        });
+    }
+});
+
 // **OPCIONAL**
 // Serve React Frontend 
 //app.use(express.static(path.join(__dirname, "../build")));
@@ -171,7 +2196,63 @@ app.post('/api/v1/helpchat/iacall', async (req, res) => {
 //});
 // **END OPCIONAL**
 
+if (SERVE_FRONTEND) {
+    if (!existsSync(FRONTEND_DIST_PATH)) {
+        throw new Error(
+            `Frontend dist not found: ${FRONTEND_DIST_PATH}`
+        );
+    }
+
+    app.use(
+        express.static(
+            FRONTEND_DIST_PATH
+        )
+    );
+
+    app.use((req, res, next) => {
+        if (
+            req.method !== "GET" ||
+            req.path.startsWith("/api/")
+        ) {
+            return next();
+        }
+
+        return res.sendFile(
+            path.join(
+                FRONTEND_DIST_PATH,
+                "index.html"
+            )
+        );
+    });
+
+    console.log(
+        `Frontend dist enabled: ${FRONTEND_DIST_PATH}`
+    );
+}
+
+export { app, pool };
+
+const isMainModule =
+    Boolean(process.argv[1]) &&
+    import.meta.url ===
+        pathToFileURL(process.argv[1]).href;
+
 // Start Server
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+if (isMainModule) {
+    app.listen(
+        PORT,
+        BACKEND_HOST,
+        () => {
+            console.log(
+                `Server running on ` +
+                `http://${BACKEND_HOST}:${PORT}`
+            );
+
+            void (
+                async () => {
+                    await warmHelpchatSemanticRouter();
+                }
+            )();
+        }
+    );
+}

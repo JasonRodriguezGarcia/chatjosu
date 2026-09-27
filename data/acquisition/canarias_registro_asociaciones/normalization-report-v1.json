@@ -1,0 +1,111 @@
+{
+  "format_version": 1,
+  "dataset": "canarias_registro_asociaciones",
+  "generated_at": "2026-09-04T19:19:18.337Z",
+  "source_rows": 23036,
+  "output_rows": 23036,
+  "source_record_ids_unique": 23036,
+  "name_missing": 0,
+  "tax_id_status": {
+    "valid_format": 3541,
+    "malformed": 43,
+    "missing": 19452
+  },
+  "postal_code": {
+    "match": 17439,
+    "missing": 5562,
+    "mismatch": 8,
+    "foreign_prefix": 27,
+    "unverifiable": 0
+  },
+  "contact": {
+    "phone_present": 6890,
+    "email_present": 5664,
+    "website_present": 70,
+    "multi_phone_rows": 427,
+    "multi_email_rows": 501,
+    "multi_actividad_rows": 535
+  },
+  "unique_actividades": 140,
+  "distinct_actividades_cells": 420,
+  "distributions": {
+    "scope": {
+      "Autonómico": 12081,
+      "Desconocido": 4930,
+      "Local": 4731,
+      "Provincial": 759,
+      "Nacional": 535
+    },
+    "resource_role": {
+      "asociacion": 22084,
+      "nacional_extranjera": 534,
+      "federacion": 217,
+      "registro_especial": 201
+    },
+    "province_key": {
+      "SANTA CRUZ DE TENERIFE": 11813,
+      "LAS PALMAS": 11223
+    },
+    "island": {
+      "Tenerife": 10068,
+      "Gran Canaria": 8483,
+      "Lanzarote": 1646,
+      "La Palma": 1121,
+      "Fuerteventura": 1087,
+      "La Gomera": 357,
+      "El Hierro": 267,
+      "La Graciosa": 7
+    },
+    "ambito": {
+      "AUTONÓMICO": 12081,
+      "INSULAR": 4865,
+      "MUNICIPAL": 4030,
+      "PROVINCIAL": 759,
+      "LOCAL": 701,
+      "NACIONAL": 535,
+      "COMARCAL": 65
+    },
+    "relevance_status": {
+      "needs_review": 19306,
+      "contextual_relevance": 2830,
+      "direct_relevance": 471,
+      "out_of_scope": 429
+    },
+    "utility_decision": {
+      "keep": 22607,
+      "drop": 429
+    }
+  },
+  "unknowns": {
+    "province": 0,
+    "island": 0,
+    "ambito": 0,
+    "seccion": 0
+  },
+  "invariants": {
+    "source_output_parity": true,
+    "unique_candidate_ids": true,
+    "personal_contact_promoted": false
+  },
+  "source_freshness": {
+    "manifest": {
+      "source_issued": "2020-12-03",
+      "source_modified": "2026-09-01",
+      "acquired_at": "2026-09-04T11:22:00Z",
+      "publisher_snapshot_date": "2021-01-20",
+      "publisher_snapshot_date_source": "raw_file_name:resultado_asociaciones_20012021.csv"
+    },
+    "probe": {
+      "url": "https://datos.canarias.es/catalogos/general/api/3/action/package_show?id=2c3c9915-3fae-4085-9f82-bd01911c1126",
+      "status": "ok",
+      "fetched_at": "2026-09-04T19:19:16.745Z",
+      "metadata_modified": null,
+      "resource_last_modified_max": "2026-09-01T04:06:27.064131",
+      "error": null
+    },
+    "updated_since_acquisition": false,
+    "source_stale": false,
+    "note": "resource last_modified <= acquired_at; publisher registry snapshot (2021-01-20) predates acquisition; re-verify content before production import"
+  },
+  "production_import": "no — requiere revisión"
+}

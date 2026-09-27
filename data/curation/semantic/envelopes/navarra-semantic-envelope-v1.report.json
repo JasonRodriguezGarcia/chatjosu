@@ -1,0 +1,43 @@
+{
+  "format_version": 1,
+  "source_id": "navarra_registro_asociaciones",
+  "source_candidates": 10254,
+  "taxonomy": {
+    "matched": 10254,
+    "unmatched": 0,
+    "modes": {
+      "source_assertion": 503,
+      "strong_candidate": 171,
+      "candidate_set": 3632,
+      "context": 5488,
+      "none": 460
+    }
+  },
+  "relevance": {
+    "review:needs_review": 9586,
+    "keep:direct_relevance": 668
+  },
+  "utility": {
+    "keep": 10254,
+    "drop": 0,
+    "protected": 0
+  },
+  "routing": {
+    "out_of_scope": 0,
+    "deterministic_only": 749,
+    "constrained": 6440,
+    "llm_open": 3065
+  },
+  "dimensions": {
+    "needs": 493,
+    "functions": 2924,
+    "populations": 2451,
+    "activities": 5255
+  },
+  "signals": {
+    "need_or_function": 3053,
+    "population_only": 1142,
+    "activity_only": 2894,
+    "no_signal": 3165
+  }
+}

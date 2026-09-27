@@ -1,0 +1,302 @@
+[
+  {
+    "provincia": "Albacete",
+    "provincia_key": "ALBACETE",
+    "entidades": 16,
+    "importables": 11,
+    "municipios": 9,
+    "tags": 10,
+    "con_contacto": 16,
+    "geocodificacion": "Pendiente geocodificación"
+  },
+  {
+    "provincia": "Alicante",
+    "provincia_key": "ALICANTE",
+    "entidades": 24,
+    "importables": 11,
+    "municipios": 7,
+    "tags": 11,
+    "con_contacto": 24,
+    "geocodificacion": "Pendiente geocodificación"
+  },
+  {
+    "provincia": "Almería",
+    "provincia_key": "ALMERIA",
+    "entidades": 17,
+    "importables": 6,
+    "municipios": 5,
+    "tags": 6,
+    "con_contacto": 17,
+    "geocodificacion": "Pendiente geocodificación"
+  },
+  {
+    "provincia": "Asturias",
+    "provincia_key": "ASTURIAS",
+    "entidades": 28,
+    "importables": 8,
+    "municipios": 15,
+    "tags": 7,
+    "con_contacto": 28,
+    "geocodificacion": "Pendiente geocodificación"
+  },
+  {
+    "provincia": "Badajoz",
+    "provincia_key": "BADAJOZ",
+    "entidades": 15,
+    "importables": 4,
+    "municipios": 4,
+    "tags": 4,
+    "con_contacto": 12,
+    "geocodificacion": "Pendiente geocodificación"
+  },
+  {
+    "provincia": "Barcelona",
+    "provincia_key": "BARCELONA",
+    "entidades": 30,
+    "importables": 8,
+    "municipios": 9,
+    "tags": 7,
+    "con_contacto": 30,
+    "geocodificacion": "Pendiente geocodificación"
+  },
+  {
+    "provincia": "Burgos",
+    "provincia_key": "BURGOS",
+    "entidades": 28,
+    "importables": 8,
+    "municipios": 5,
+    "tags": 5,
+    "con_contacto": 28,
+    "geocodificacion": "Pendiente geocodificación"
+  },
+  {
+    "provincia": "Cantabria",
+    "provincia_key": "CANTABRIA",
+    "entidades": 27,
+    "importables": 9,
+    "municipios": 6,
+    "tags": 9,
+    "con_contacto": 27,
+    "geocodificacion": "Pendiente geocodificación"
+  },
+  {
+    "provincia": "Castellón",
+    "provincia_key": "CASTELLON",
+    "entidades": 20,
+    "importables": 8,
+    "municipios": 18,
+    "tags": 7,
+    "con_contacto": 20,
+    "geocodificacion": "Pendiente geocodificación"
+  },
+  {
+    "provincia": "Ceuta",
+    "provincia_key": "CEUTA",
+    "entidades": 19,
+    "importables": 7,
+    "municipios": 0,
+    "tags": 7,
+    "con_contacto": 19,
+    "geocodificacion": "Pendiente geocodificación"
+  },
+  {
+    "provincia": "Ciudad Real",
+    "provincia_key": "CIUDAD REAL",
+    "entidades": 19,
+    "importables": 6,
+    "municipios": 11,
+    "tags": 5,
+    "con_contacto": 19,
+    "geocodificacion": "Pendiente geocodificación"
+  },
+  {
+    "provincia": "Cuenca",
+    "provincia_key": "CUENCA",
+    "entidades": 21,
+    "importables": 9,
+    "municipios": 2,
+    "tags": 9,
+    "con_contacto": 17,
+    "geocodificacion": "Pendiente geocodificación"
+  },
+  {
+    "provincia": "Cádiz",
+    "provincia_key": "CADIZ",
+    "entidades": 23,
+    "importables": 6,
+    "municipios": 9,
+    "tags": 5,
+    "con_contacto": 19,
+    "geocodificacion": "Pendiente geocodificación"
+  },
+  {
+    "provincia": "Córdoba",
+    "provincia_key": "CORDOBA",
+    "entidades": 7,
+    "importables": 2,
+    "municipios": 6,
+    "tags": 2,
+    "con_contacto": 7,
+    "geocodificacion": "Pendiente geocodificación"
+  },
+  {
+    "provincia": "Illes Balears",
+    "provincia_key": "ILLES BALEARS",
+    "entidades": 7,
+    "importables": 5,
+    "municipios": 7,
+    "tags": 5,
+    "con_contacto": 7,
+    "geocodificacion": "Pendiente geocodificación"
+  },
+  {
+    "provincia": "Jaén",
+    "provincia_key": "JAEN",
+    "entidades": 16,
+    "importables": 9,
+    "municipios": 10,
+    "tags": 9,
+    "con_contacto": 14,
+    "geocodificacion": "Pendiente geocodificación"
+  },
+  {
+    "provincia": "Murcia",
+    "provincia_key": "MURCIA",
+    "entidades": 10,
+    "importables": 4,
+    "municipios": 0,
+    "tags": 4,
+    "con_contacto": 10,
+    "geocodificacion": "Pendiente geocodificación"
+  },
+  {
+    "provincia": "Navarra",
+    "provincia_key": "NAVARRA",
+    "entidades": 27,
+    "importables": 14,
+    "municipios": 13,
+    "tags": 13,
+    "con_contacto": 27,
+    "geocodificacion": "Pendiente geocodificación"
+  },
+  {
+    "provincia": "Salamanca",
+    "provincia_key": "SALAMANCA",
+    "entidades": 5,
+    "importables": 2,
+    "municipios": 5,
+    "tags": 2,
+    "con_contacto": 5,
+    "geocodificacion": "Pendiente geocodificación"
+  },
+  {
+    "provincia": "Santa Cruz de Tenerife",
+    "provincia_key": "SANTA CRUZ DE TENERIFE",
+    "entidades": 6,
+    "importables": 3,
+    "municipios": 6,
+    "tags": 2,
+    "con_contacto": 6,
+    "geocodificacion": "Pendiente geocodificación"
+  },
+  {
+    "provincia": "Sevilla",
+    "provincia_key": "SEVILLA",
+    "entidades": 3,
+    "importables": 2,
+    "municipios": 2,
+    "tags": 2,
+    "con_contacto": 2,
+    "geocodificacion": "Pendiente geocodificación"
+  },
+  {
+    "provincia": "Soria",
+    "provincia_key": "SORIA",
+    "entidades": 2,
+    "importables": 0,
+    "municipios": 2,
+    "tags": 0,
+    "con_contacto": 2,
+    "geocodificacion": "Pendiente geocodificación"
+  },
+  {
+    "provincia": "Tarragona",
+    "provincia_key": "TARRAGONA",
+    "entidades": 5,
+    "importables": 2,
+    "municipios": 5,
+    "tags": 2,
+    "con_contacto": 5,
+    "geocodificacion": "Pendiente geocodificación"
+  },
+  {
+    "provincia": "Toledo",
+    "provincia_key": "TOLEDO",
+    "entidades": 8,
+    "importables": 4,
+    "municipios": 8,
+    "tags": 4,
+    "con_contacto": 8,
+    "geocodificacion": "Pendiente geocodificación"
+  },
+  {
+    "provincia": "Valladolid",
+    "provincia_key": "VALLADOLID",
+    "entidades": 3,
+    "importables": 2,
+    "municipios": 1,
+    "tags": 2,
+    "con_contacto": 3,
+    "geocodificacion": "Pendiente geocodificación"
+  },
+  {
+    "provincia": "Zamora",
+    "provincia_key": "ZAMORA",
+    "entidades": 5,
+    "importables": 1,
+    "municipios": 3,
+    "tags": 1,
+    "con_contacto": 5,
+    "geocodificacion": "Pendiente geocodificación"
+  },
+  {
+    "provincia": "Zaragoza",
+    "provincia_key": "ZARAGOZA",
+    "entidades": 4,
+    "importables": 1,
+    "municipios": 4,
+    "tags": 1,
+    "con_contacto": 4,
+    "geocodificacion": "Pendiente geocodificación"
+  },
+  {
+    "provincia": "Álava",
+    "provincia_key": "ALAVA",
+    "entidades": 23,
+    "importables": 16,
+    "municipios": 3,
+    "tags": 14,
+    "con_contacto": 23,
+    "geocodificacion": "Pendiente geocodificación"
+  },
+  {
+    "provincia": "Ávila",
+    "provincia_key": "AVILA",
+    "entidades": 23,
+    "importables": 11,
+    "municipios": 2,
+    "tags": 9,
+    "con_contacto": 23,
+    "geocodificacion": "Pendiente geocodificación"
+  },
+  {
+    "provincia": "Nacional",
+    "provincia_key": "NACIONAL",
+    "entidades": 28,
+    "importables": 8,
+    "municipios": 0,
+    "tags": 4,
+    "con_contacto": 26,
+    "geocodificacion": "Ámbito nacional"
+  }
+]

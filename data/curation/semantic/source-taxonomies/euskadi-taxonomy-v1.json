@@ -1,0 +1,1257 @@
+{
+  "format_version": 1,
+  "source_id": "euskadi_registro_asociaciones",
+  "source_records": 28091,
+  "fields": {
+    "section": {
+      "source_field": "asoSection",
+      "values": [
+        {
+          "value": "Asociación",
+          "count": 27836,
+          "percentage": 99.0922
+        },
+        {
+          "value": "Federación",
+          "count": 247,
+          "percentage": 0.8793
+        },
+        {
+          "value": "Confederación",
+          "count": 3,
+          "percentage": 0.0107
+        },
+        {
+          "value": "0",
+          "count": 3,
+          "percentage": 0.0107
+        },
+        {
+          "value": "Unión de asociaciones",
+          "count": 1,
+          "percentage": 0.0036
+        }
+      ]
+    },
+    "sorting": {
+      "source_field": "asoSorting",
+      "values": [
+        {
+          "value": "Cultura General",
+          "count": 14540,
+          "percentage": 51.7604
+        },
+        {
+          "value": "Socio-Económico",
+          "count": 5926,
+          "percentage": 21.0957
+        },
+        {
+          "value": "Cultural Específico",
+          "count": 1761,
+          "percentage": 6.2689
+        },
+        {
+          "value": "Carácter Benéfico Asistencial",
+          "count": 1605,
+          "percentage": 5.7136
+        },
+        {
+          "value": "Docente",
+          "count": 1545,
+          "percentage": 5.5
+        },
+        {
+          "value": "Vecinal",
+          "count": 1382,
+          "percentage": 4.9197
+        },
+        {
+          "value": "Familiarista",
+          "count": 751,
+          "percentage": 2.6735
+        },
+        {
+          "value": "Juvenil",
+          "count": 580,
+          "percentage": 2.0647
+        }
+      ]
+    },
+    "goal_type": {
+      "source_field": "asoGoalType",
+      "values": [
+        {
+          "value": "Promoción Cultural",
+          "count": 3298,
+          "percentage": 11.7404
+        },
+        {
+          "value": "Recreativas",
+          "count": 2952,
+          "percentage": 10.5087
+        },
+        {
+          "value": "Música, Danza, Folklore",
+          "count": 2751,
+          "percentage": 9.7932
+        },
+        {
+          "value": "Otros Colectivos",
+          "count": 1567,
+          "percentage": 5.5783
+        },
+        {
+          "value": "Deportivas (no competitivas)",
+          "count": 1228,
+          "percentage": 4.3715
+        },
+        {
+          "value": "De Vecinos",
+          "count": 1147,
+          "percentage": 4.0832
+        },
+        {
+          "value": "De Padres de Alumnos",
+          "count": 1135,
+          "percentage": 4.0404
+        },
+        {
+          "value": "Promociones Sectoriales",
+          "count": 1101,
+          "percentage": 3.9194
+        },
+        {
+          "value": "Naturalistas-Ecologistas",
+          "count": 934,
+          "percentage": 3.3249
+        },
+        {
+          "value": "Tiempo Libre",
+          "count": 915,
+          "percentage": 3.2573
+        },
+        {
+          "value": "Gastronómicas",
+          "count": 864,
+          "percentage": 3.0757
+        },
+        {
+          "value": "Estudios",
+          "count": 835,
+          "percentage": 2.9725
+        },
+        {
+          "value": "Solidaridad Internacional",
+          "count": 657,
+          "percentage": 2.3388
+        },
+        {
+          "value": "Teatro",
+          "count": 609,
+          "percentage": 2.168
+        },
+        {
+          "value": "Ayuda a Otros Colectivos",
+          "count": 588,
+          "percentage": 2.0932
+        },
+        {
+          "value": "Promoción de la Mujer",
+          "count": 480,
+          "percentage": 1.7087
+        },
+        {
+          "value": "Promoción del Euskera",
+          "count": 449,
+          "percentage": 1.5984
+        },
+        {
+          "value": "Corales",
+          "count": 437,
+          "percentage": 1.5557
+        },
+        {
+          "value": "Tercera Edad",
+          "count": 424,
+          "percentage": 1.5094
+        },
+        {
+          "value": "Juveniles",
+          "count": 402,
+          "percentage": 1.4311
+        },
+        {
+          "value": "Humanistas",
+          "count": 392,
+          "percentage": 1.3955
+        },
+        {
+          "value": "Ayuda a Grupos Marginados",
+          "count": 363,
+          "percentage": 1.2922
+        },
+        {
+          "value": "Bellas Artes",
+          "count": 348,
+          "percentage": 1.2388
+        },
+        {
+          "value": "Ayuda a Enfermos",
+          "count": 319,
+          "percentage": 1.1356
+        },
+        {
+          "value": "Científicas",
+          "count": 307,
+          "percentage": 1.0929
+        },
+        {
+          "value": "De Estudiantes",
+          "count": 246,
+          "percentage": 0.8757
+        },
+        {
+          "value": "Cinematografía",
+          "count": 218,
+          "percentage": 0.776
+        },
+        {
+          "value": "Yoga y Artes Marciales",
+          "count": 193,
+          "percentage": 0.6871
+        },
+        {
+          "value": "Círculos de Opinión",
+          "count": 180,
+          "percentage": 0.6408
+        },
+        {
+          "value": "De Tiempo Libre",
+          "count": 178,
+          "percentage": 0.6337
+        },
+        {
+          "value": "De Padres de Familia",
+          "count": 172,
+          "percentage": 0.6123
+        },
+        {
+          "value": "Técnicas",
+          "count": 170,
+          "percentage": 0.6052
+        },
+        {
+          "value": "Grupos Feministas",
+          "count": 165,
+          "percentage": 0.5874
+        },
+        {
+          "value": "Literarias",
+          "count": 164,
+          "percentage": 0.5838
+        },
+        {
+          "value": "Radio",
+          "count": 155,
+          "percentage": 0.5518
+        },
+        {
+          "value": "Amigos de ...",
+          "count": 150,
+          "percentage": 0.534
+        },
+        {
+          "value": "De Antiguos Alumnos",
+          "count": 142,
+          "percentage": 0.5055
+        },
+        {
+          "value": "Promoción del Menor",
+          "count": 137,
+          "percentage": 0.4877
+        },
+        {
+          "value": "Promoción de Empleo",
+          "count": 135,
+          "percentage": 0.4806
+        },
+        {
+          "value": "Ayuda a Minusválidos",
+          "count": 124,
+          "percentage": 0.4414
+        },
+        {
+          "value": "Casas Regionales",
+          "count": 119,
+          "percentage": 0.4236
+        },
+        {
+          "value": "Fotografía",
+          "count": 111,
+          "percentage": 0.3951
+        },
+        {
+          "value": "Promoción de la Juventud",
+          "count": 111,
+          "percentage": 0.3951
+        },
+        {
+          "value": "Taurinas",
+          "count": 92,
+          "percentage": 0.3275
+        },
+        {
+          "value": "De Propietarios",
+          "count": 85,
+          "percentage": 0.3026
+        },
+        {
+          "value": "Pacifistas, Objetores",
+          "count": 67,
+          "percentage": 0.2385
+        },
+        {
+          "value": "Ayuda a Ancianos",
+          "count": 64,
+          "percentage": 0.2278
+        },
+        {
+          "value": "Micológicas",
+          "count": 55,
+          "percentage": 0.1958
+        },
+        {
+          "value": "Consumidores",
+          "count": 49,
+          "percentage": 0.1744
+        },
+        {
+          "value": "Ayuda a Drogadictos",
+          "count": 47,
+          "percentage": 0.1673
+        },
+        {
+          "value": "Ayuda a Accid/Gru. Rescate",
+          "count": 44,
+          "percentage": 0.1566
+        },
+        {
+          "value": "De Padres de Enfermos",
+          "count": 33,
+          "percentage": 0.1175
+        },
+        {
+          "value": "Ayuda a Disminuídos Psíquicos",
+          "count": 33,
+          "percentage": 0.1175
+        },
+        {
+          "value": "Filatélicas/Numismáticas",
+          "count": 31,
+          "percentage": 0.1104
+        },
+        {
+          "value": "De Viudos-as",
+          "count": 31,
+          "percentage": 0.1104
+        },
+        {
+          "value": "De Divorciados-as",
+          "count": 25,
+          "percentage": 0.089
+        },
+        {
+          "value": "Ayuda a Alcohólicos",
+          "count": 23,
+          "percentage": 0.0819
+        },
+        {
+          "value": "De Alumnos (LODE)",
+          "count": 22,
+          "percentage": 0.0783
+        },
+        {
+          "value": "Amas de Casa",
+          "count": 13,
+          "percentage": 0.0463
+        },
+        {
+          "value": "Madres Solteras",
+          "count": 4,
+          "percentage": 0.0142
+        }
+      ]
+    },
+    "scope": {
+      "source_field": "asoScope",
+      "values": [
+        {
+          "value": "C.A. del País Vasco",
+          "count": 12572,
+          "percentage": 44.7545
+        },
+        {
+          "value": "Municipal",
+          "count": 5535,
+          "percentage": 19.7038
+        },
+        {
+          "value": "T.H. de Bizkaia",
+          "count": 3570,
+          "percentage": 12.7087
+        },
+        {
+          "value": "T.H. de Gipuzkoa",
+          "count": 1973,
+          "percentage": 7.0236
+        },
+        {
+          "value": "Comarcal",
+          "count": 1534,
+          "percentage": 5.4608
+        },
+        {
+          "value": "T.H. de Alava",
+          "count": 1468,
+          "percentage": 5.2259
+        },
+        {
+          "value": "Local",
+          "count": 1348,
+          "percentage": 4.7987
+        },
+        {
+          "value": "T.H. de Gipuzkoa y Bizkaia",
+          "count": 27,
+          "percentage": 0.0961
+        },
+        {
+          "value": "Territorial",
+          "count": 26,
+          "percentage": 0.0926
+        },
+        {
+          "value": "T.H. de Alava y Bizkaia",
+          "count": 20,
+          "percentage": 0.0712
+        },
+        {
+          "value": "C.A. del País Vasco y C.Foral de Navarra",
+          "count": 13,
+          "percentage": 0.0463
+        },
+        {
+          "value": "T.H. de Gipuzkoa y Alava",
+          "count": 3,
+          "percentage": 0.0107
+        },
+        {
+          "value": "13",
+          "count": 1,
+          "percentage": 0.0036
+        }
+      ]
+    }
+  },
+  "combinations": [
+    {
+      "section": "Asociación",
+      "sorting": "Cultura General",
+      "goal_type": "Promoción Cultural",
+      "count": 3288,
+      "percentage": 11.7048
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Cultura General",
+      "goal_type": "Recreativas",
+      "count": 2936,
+      "percentage": 10.4517
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Cultura General",
+      "goal_type": "Música, Danza, Folklore",
+      "count": 2744,
+      "percentage": 9.7683
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Socio-Económico",
+      "goal_type": "Otros Colectivos",
+      "count": 1546,
+      "percentage": 5.5035
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Cultura General",
+      "goal_type": "Deportivas (no competitivas)",
+      "count": 1218,
+      "percentage": 4.3359
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Vecinal",
+      "goal_type": "De Vecinos",
+      "count": 1138,
+      "percentage": 4.0511
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Docente",
+      "goal_type": "De Padres de Alumnos",
+      "count": 1110,
+      "percentage": 3.9514
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Socio-Económico",
+      "goal_type": "Promociones Sectoriales",
+      "count": 1082,
+      "percentage": 3.8518
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Socio-Económico",
+      "goal_type": "Naturalistas-Ecologistas",
+      "count": 925,
+      "percentage": 3.2929
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Cultura General",
+      "goal_type": "Tiempo Libre",
+      "count": 897,
+      "percentage": 3.1932
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Cultura General",
+      "goal_type": "Gastronómicas",
+      "count": 863,
+      "percentage": 3.0722
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Cultural Específico",
+      "goal_type": "Estudios",
+      "count": 834,
+      "percentage": 2.9689
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Socio-Económico",
+      "goal_type": "Solidaridad Internacional",
+      "count": 653,
+      "percentage": 2.3246
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Cultura General",
+      "goal_type": "Teatro",
+      "count": 607,
+      "percentage": 2.1608
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Carácter Benéfico Asistencial",
+      "goal_type": "Ayuda a Otros Colectivos",
+      "count": 583,
+      "percentage": 2.0754
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Socio-Económico",
+      "goal_type": "Promoción de la Mujer",
+      "count": 476,
+      "percentage": 1.6945
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Cultural Específico",
+      "goal_type": "Promoción del Euskera",
+      "count": 443,
+      "percentage": 1.577
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Cultura General",
+      "goal_type": "Corales",
+      "count": 432,
+      "percentage": 1.5379
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Familiarista",
+      "goal_type": "Tercera Edad",
+      "count": 422,
+      "percentage": 1.5023
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Juvenil",
+      "goal_type": "Juveniles",
+      "count": 402,
+      "percentage": 1.4311
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Socio-Económico",
+      "goal_type": "Humanistas",
+      "count": 390,
+      "percentage": 1.3883
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Carácter Benéfico Asistencial",
+      "goal_type": "Ayuda a Grupos Marginados",
+      "count": 355,
+      "percentage": 1.2637
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Cultura General",
+      "goal_type": "Bellas Artes",
+      "count": 348,
+      "percentage": 1.2388
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Cultural Específico",
+      "goal_type": "Científicas",
+      "count": 307,
+      "percentage": 1.0929
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Carácter Benéfico Asistencial",
+      "goal_type": "Ayuda a Enfermos",
+      "count": 302,
+      "percentage": 1.0751
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Docente",
+      "goal_type": "De Estudiantes",
+      "count": 245,
+      "percentage": 0.8722
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Cultura General",
+      "goal_type": "Cinematografía",
+      "count": 218,
+      "percentage": 0.776
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Cultura General",
+      "goal_type": "Yoga y Artes Marciales",
+      "count": 192,
+      "percentage": 0.6835
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Socio-Económico",
+      "goal_type": "Círculos de Opinión",
+      "count": 180,
+      "percentage": 0.6408
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Juvenil",
+      "goal_type": "De Tiempo Libre",
+      "count": 176,
+      "percentage": 0.6265
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Familiarista",
+      "goal_type": "De Padres de Familia",
+      "count": 171,
+      "percentage": 0.6087
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Cultural Específico",
+      "goal_type": "Técnicas",
+      "count": 170,
+      "percentage": 0.6052
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Socio-Económico",
+      "goal_type": "Grupos Feministas",
+      "count": 165,
+      "percentage": 0.5874
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Cultura General",
+      "goal_type": "Literarias",
+      "count": 164,
+      "percentage": 0.5838
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Cultura General",
+      "goal_type": "Radio",
+      "count": 154,
+      "percentage": 0.5482
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Vecinal",
+      "goal_type": "Amigos de ...",
+      "count": 150,
+      "percentage": 0.534
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Docente",
+      "goal_type": "De Antiguos Alumnos",
+      "count": 142,
+      "percentage": 0.5055
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Socio-Económico",
+      "goal_type": "Promoción de Empleo",
+      "count": 135,
+      "percentage": 0.4806
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Socio-Económico",
+      "goal_type": "Promoción del Menor",
+      "count": 134,
+      "percentage": 0.477
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Carácter Benéfico Asistencial",
+      "goal_type": "Ayuda a Minusválidos",
+      "count": 115,
+      "percentage": 0.4094
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Cultura General",
+      "goal_type": "Fotografía",
+      "count": 110,
+      "percentage": 0.3916
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Cultura General",
+      "goal_type": "Casas Regionales",
+      "count": 110,
+      "percentage": 0.3916
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Socio-Económico",
+      "goal_type": "Promoción de la Juventud",
+      "count": 109,
+      "percentage": 0.388
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Cultura General",
+      "goal_type": "Taurinas",
+      "count": 90,
+      "percentage": 0.3204
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Vecinal",
+      "goal_type": "De Propietarios",
+      "count": 85,
+      "percentage": 0.3026
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Socio-Económico",
+      "goal_type": "Pacifistas, Objetores",
+      "count": 66,
+      "percentage": 0.235
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Carácter Benéfico Asistencial",
+      "goal_type": "Ayuda a Ancianos",
+      "count": 63,
+      "percentage": 0.2243
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Cultura General",
+      "goal_type": "Micológicas",
+      "count": 54,
+      "percentage": 0.1922
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Familiarista",
+      "goal_type": "Consumidores",
+      "count": 45,
+      "percentage": 0.1602
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Carácter Benéfico Asistencial",
+      "goal_type": "Ayuda a Drogadictos",
+      "count": 44,
+      "percentage": 0.1566
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Carácter Benéfico Asistencial",
+      "goal_type": "Ayuda a Accid/Gru. Rescate",
+      "count": 43,
+      "percentage": 0.1531
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Familiarista",
+      "goal_type": "De Padres de Enfermos",
+      "count": 32,
+      "percentage": 0.1139
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Cultura General",
+      "goal_type": "Filatélicas/Numismáticas",
+      "count": 30,
+      "percentage": 0.1068
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Carácter Benéfico Asistencial",
+      "goal_type": "Ayuda a Disminuídos Psíquicos",
+      "count": 30,
+      "percentage": 0.1068
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Familiarista",
+      "goal_type": "De Viudos-as",
+      "count": 29,
+      "percentage": 0.1032
+    },
+    {
+      "section": "Federación",
+      "sorting": "Docente",
+      "goal_type": "De Padres de Alumnos",
+      "count": 24,
+      "percentage": 0.0854
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Familiarista",
+      "goal_type": "De Divorciados-as",
+      "count": 23,
+      "percentage": 0.0819
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Docente",
+      "goal_type": "De Alumnos (LODE)",
+      "count": 22,
+      "percentage": 0.0783
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Carácter Benéfico Asistencial",
+      "goal_type": "Ayuda a Alcohólicos",
+      "count": 22,
+      "percentage": 0.0783
+    },
+    {
+      "section": "Federación",
+      "sorting": "Socio-Económico",
+      "goal_type": "Otros Colectivos",
+      "count": 20,
+      "percentage": 0.0712
+    },
+    {
+      "section": "Federación",
+      "sorting": "Cultura General",
+      "goal_type": "Tiempo Libre",
+      "count": 18,
+      "percentage": 0.0641
+    },
+    {
+      "section": "Federación",
+      "sorting": "Socio-Económico",
+      "goal_type": "Promociones Sectoriales",
+      "count": 18,
+      "percentage": 0.0641
+    },
+    {
+      "section": "Federación",
+      "sorting": "Carácter Benéfico Asistencial",
+      "goal_type": "Ayuda a Enfermos",
+      "count": 17,
+      "percentage": 0.0605
+    },
+    {
+      "section": "Federación",
+      "sorting": "Cultura General",
+      "goal_type": "Recreativas",
+      "count": 16,
+      "percentage": 0.057
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Familiarista",
+      "goal_type": "Amas de Casa",
+      "count": 13,
+      "percentage": 0.0463
+    },
+    {
+      "section": "Federación",
+      "sorting": "Socio-Económico",
+      "goal_type": "Naturalistas-Ecologistas",
+      "count": 9,
+      "percentage": 0.032
+    },
+    {
+      "section": "Federación",
+      "sorting": "Vecinal",
+      "goal_type": "De Vecinos",
+      "count": 9,
+      "percentage": 0.032
+    },
+    {
+      "section": "Federación",
+      "sorting": "Carácter Benéfico Asistencial",
+      "goal_type": "Ayuda a Minusválidos",
+      "count": 9,
+      "percentage": 0.032
+    },
+    {
+      "section": "Federación",
+      "sorting": "Cultura General",
+      "goal_type": "Deportivas (no competitivas)",
+      "count": 9,
+      "percentage": 0.032
+    },
+    {
+      "section": "Federación",
+      "sorting": "Cultura General",
+      "goal_type": "Promoción Cultural",
+      "count": 9,
+      "percentage": 0.032
+    },
+    {
+      "section": "Federación",
+      "sorting": "Cultura General",
+      "goal_type": "Casas Regionales",
+      "count": 8,
+      "percentage": 0.0285
+    },
+    {
+      "section": "Federación",
+      "sorting": "Carácter Benéfico Asistencial",
+      "goal_type": "Ayuda a Grupos Marginados",
+      "count": 8,
+      "percentage": 0.0285
+    },
+    {
+      "section": "Federación",
+      "sorting": "Cultura General",
+      "goal_type": "Música, Danza, Folklore",
+      "count": 7,
+      "percentage": 0.0249
+    },
+    {
+      "section": "Federación",
+      "sorting": "Cultural Específico",
+      "goal_type": "Promoción del Euskera",
+      "count": 6,
+      "percentage": 0.0214
+    },
+    {
+      "section": "Federación",
+      "sorting": "Cultura General",
+      "goal_type": "Corales",
+      "count": 5,
+      "percentage": 0.0178
+    },
+    {
+      "section": "Asociación",
+      "sorting": "Familiarista",
+      "goal_type": "Madres Solteras",
+      "count": 4,
+      "percentage": 0.0142
+    },
+    {
+      "section": "Federación",
+      "sorting": "Socio-Económico",
+      "goal_type": "Promoción de la Mujer",
+      "count": 4,
+      "percentage": 0.0142
+    },
+    {
+      "section": "Federación",
+      "sorting": "Socio-Económico",
+      "goal_type": "Solidaridad Internacional",
+      "count": 4,
+      "percentage": 0.0142
+    },
+    {
+      "section": "Federación",
+      "sorting": "Carácter Benéfico Asistencial",
+      "goal_type": "Ayuda a Otros Colectivos",
+      "count": 4,
+      "percentage": 0.0142
+    },
+    {
+      "section": "Federación",
+      "sorting": "Familiarista",
+      "goal_type": "Consumidores",
+      "count": 4,
+      "percentage": 0.0142
+    },
+    {
+      "section": "Federación",
+      "sorting": "Socio-Económico",
+      "goal_type": "Promoción del Menor",
+      "count": 3,
+      "percentage": 0.0107
+    },
+    {
+      "section": "Federación",
+      "sorting": "Carácter Benéfico Asistencial",
+      "goal_type": "Ayuda a Drogadictos",
+      "count": 3,
+      "percentage": 0.0107
+    },
+    {
+      "section": "Federación",
+      "sorting": "Carácter Benéfico Asistencial",
+      "goal_type": "Ayuda a Disminuídos Psíquicos",
+      "count": 3,
+      "percentage": 0.0107
+    },
+    {
+      "section": "Federación",
+      "sorting": "Juvenil",
+      "goal_type": "De Tiempo Libre",
+      "count": 2,
+      "percentage": 0.0071
+    },
+    {
+      "section": "Federación",
+      "sorting": "Familiarista",
+      "goal_type": "De Viudos-as",
+      "count": 2,
+      "percentage": 0.0071
+    },
+    {
+      "section": "Federación",
+      "sorting": "Familiarista",
+      "goal_type": "Tercera Edad",
+      "count": 2,
+      "percentage": 0.0071
+    },
+    {
+      "section": "Federación",
+      "sorting": "Socio-Económico",
+      "goal_type": "Promoción de la Juventud",
+      "count": 2,
+      "percentage": 0.0071
+    },
+    {
+      "section": "Federación",
+      "sorting": "Cultura General",
+      "goal_type": "Teatro",
+      "count": 2,
+      "percentage": 0.0071
+    },
+    {
+      "section": "Federación",
+      "sorting": "Socio-Económico",
+      "goal_type": "Humanistas",
+      "count": 2,
+      "percentage": 0.0071
+    },
+    {
+      "section": "Federación",
+      "sorting": "Cultura General",
+      "goal_type": "Taurinas",
+      "count": 2,
+      "percentage": 0.0071
+    },
+    {
+      "section": "Federación",
+      "sorting": "Familiarista",
+      "goal_type": "De Divorciados-as",
+      "count": 2,
+      "percentage": 0.0071
+    },
+    {
+      "section": "",
+      "sorting": "",
+      "goal_type": "",
+      "count": 1,
+      "percentage": 0.0036
+    },
+    {
+      "section": "Confederación",
+      "sorting": "Cultura General",
+      "goal_type": "Casas Regionales",
+      "count": 1,
+      "percentage": 0.0036
+    },
+    {
+      "section": "Confederación",
+      "sorting": "Cultura General",
+      "goal_type": "Promoción Cultural",
+      "count": 1,
+      "percentage": 0.0036
+    },
+    {
+      "section": "Confederación",
+      "sorting": "Docente",
+      "goal_type": "De Padres de Alumnos",
+      "count": 1,
+      "percentage": 0.0036
+    },
+    {
+      "section": "0",
+      "sorting": "Socio-Económico",
+      "goal_type": "Promociones Sectoriales",
+      "count": 1,
+      "percentage": 0.0036
+    },
+    {
+      "section": "Federación",
+      "sorting": "Familiarista",
+      "goal_type": "De Padres de Enfermos",
+      "count": 1,
+      "percentage": 0.0036
+    },
+    {
+      "section": "Federación",
+      "sorting": "Familiarista",
+      "goal_type": "De Padres de Familia",
+      "count": 1,
+      "percentage": 0.0036
+    },
+    {
+      "section": "Federación",
+      "sorting": "Docente",
+      "goal_type": "De Estudiantes",
+      "count": 1,
+      "percentage": 0.0036
+    },
+    {
+      "section": "Federación",
+      "sorting": "Cultura General",
+      "goal_type": "Radio",
+      "count": 1,
+      "percentage": 0.0036
+    },
+    {
+      "section": "Federación",
+      "sorting": "Carácter Benéfico Asistencial",
+      "goal_type": "Ayuda a Alcohólicos",
+      "count": 1,
+      "percentage": 0.0036
+    },
+    {
+      "section": "Federación",
+      "sorting": "Socio-Económico",
+      "goal_type": "Pacifistas, Objetores",
+      "count": 1,
+      "percentage": 0.0036
+    },
+    {
+      "section": "Federación",
+      "sorting": "Carácter Benéfico Asistencial",
+      "goal_type": "Ayuda a Ancianos",
+      "count": 1,
+      "percentage": 0.0036
+    },
+    {
+      "section": "Federación",
+      "sorting": "Cultura General",
+      "goal_type": "Filatélicas/Numismáticas",
+      "count": 1,
+      "percentage": 0.0036
+    },
+    {
+      "section": "Federación",
+      "sorting": "Carácter Benéfico Asistencial",
+      "goal_type": "Ayuda a Accid/Gru. Rescate",
+      "count": 1,
+      "percentage": 0.0036
+    },
+    {
+      "section": "Federación",
+      "sorting": "Cultura General",
+      "goal_type": "Yoga y Artes Marciales",
+      "count": 1,
+      "percentage": 0.0036
+    },
+    {
+      "section": "Federación",
+      "sorting": "Cultura General",
+      "goal_type": "Gastronómicas",
+      "count": 1,
+      "percentage": 0.0036
+    },
+    {
+      "section": "Federación",
+      "sorting": "Cultural Específico",
+      "goal_type": "Estudios",
+      "count": 1,
+      "percentage": 0.0036
+    },
+    {
+      "section": "Federación",
+      "sorting": "Cultura General",
+      "goal_type": "Micológicas",
+      "count": 1,
+      "percentage": 0.0036
+    },
+    {
+      "section": "Federación",
+      "sorting": "Cultura General",
+      "goal_type": "Fotografía",
+      "count": 1,
+      "percentage": 0.0036
+    },
+    {
+      "section": "0",
+      "sorting": "Socio-Económico",
+      "goal_type": "Otros Colectivos",
+      "count": 1,
+      "percentage": 0.0036
+    },
+    {
+      "section": "0",
+      "sorting": "Cultura General",
+      "goal_type": "Deportivas (no competitivas)",
+      "count": 1,
+      "percentage": 0.0036
+    },
+    {
+      "section": "Unión de asociaciones",
+      "sorting": "Carácter Benéfico Asistencial",
+      "goal_type": "Ayuda a Otros Colectivos",
+      "count": 1,
+      "percentage": 0.0036
+    }
+  ],
+  "coverage": {
+    "section_nonempty": 28090,
+    "sorting_nonempty": 28090,
+    "goal_type_nonempty": 28090,
+    "scope_nonempty": 28090,
+    "rec_goal_nonempty": 27951
+  }
+}

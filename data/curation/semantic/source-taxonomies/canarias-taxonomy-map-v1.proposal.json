@@ -1,0 +1,1553 @@
+{
+  "format_version": "1",
+  "source_id": "canarias_registro_asociaciones",
+  "source_records": 23036,
+  "status": "proposal",
+  "contract": {
+    "source_assertion": "Official class itself provides an unambiguous semantic assertion usable without LLM inference.",
+    "strong_candidate": "Official class provides a high-confidence candidate; record evidence should confirm or refine before final materialization.",
+    "candidate_set": "Official class constrains possible canonical concepts but does not assert every member.",
+    "context": "Official class supplies routing/domain context only; FINES or other evidence must establish canonical semantics.",
+    "none": "Official class creates no HelpChat semantic concept by itself."
+  },
+  "governance": {
+    "class_never_drops_record_by_itself": true,
+    "fines_can_override_or_refine_class": true,
+    "activities_do_not_imply_assistive_utility": true,
+    "llm_cannot_promote": true,
+    "personal_contact_not_promoted": true
+  },
+  "summary": {
+    "class_count": 141,
+    "mode_records": {
+      "source_assertion": 3264,
+      "strong_candidate": 1094,
+      "candidate_set": 2825,
+      "context": 12612,
+      "none": 3241
+    }
+  },
+  "classes": [
+    {
+      "source_value": "SOCIO-CULTURALES",
+      "count": 3679,
+      "percentage": 15.9707,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "cultural_association"
+      ]
+    },
+    {
+      "source_value": "<missing>",
+      "count": 2092,
+      "percentage": 9.0814,
+      "mode": "none",
+      "semantics": {},
+      "hints": []
+    },
+    {
+      "source_value": "CULTURALES",
+      "count": 1663,
+      "percentage": 7.2191,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "cultural_association"
+      ]
+    },
+    {
+      "source_value": "VECINOS Y COMERCIANTES",
+      "count": 1430,
+      "percentage": 6.2077,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "neighbourhood_association"
+      ]
+    },
+    {
+      "source_value": "PADRES DE ALUMNOS, AMIGOS Y PROTECTORES DE CENTROS ESCOLARES",
+      "count": 1168,
+      "percentage": 5.0703,
+      "mode": "source_assertion",
+      "semantics": {
+        "populations": [
+          "FAMILIAS"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "JÓVENES",
+      "count": 889,
+      "percentage": 3.8592,
+      "mode": "source_assertion",
+      "semantics": {
+        "populations": [
+          "JUVENTUD"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "VARIAS",
+      "count": 750,
+      "percentage": 3.2558,
+      "mode": "none",
+      "semantics": {},
+      "hints": []
+    },
+    {
+      "source_value": "MUSICA POPULAR Y FOLKLORICA",
+      "count": 696,
+      "percentage": 3.0214,
+      "mode": "candidate_set",
+      "semantics": {
+        "activities": [
+          "MUSICA",
+          "FOLKLORE"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "MUSICALES",
+      "count": 546,
+      "percentage": 2.3702,
+      "mode": "source_assertion",
+      "semantics": {
+        "activities": [
+          "MUSICA"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "VECINOS",
+      "count": 534,
+      "percentage": 2.3181,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "neighbourhood_association"
+      ]
+    },
+    {
+      "source_value": "NATURISMO Y MEDICINAS ALTERNATIVAS",
+      "count": 509,
+      "percentage": 2.2096,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "alternative_health_context"
+      ]
+    },
+    {
+      "source_value": "DE ACCION SOCIAL",
+      "count": 503,
+      "percentage": 2.1835,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "social_support_resource"
+      ]
+    },
+    {
+      "source_value": "DEPORTIVAS EN GENERAL",
+      "count": 490,
+      "percentage": 2.1271,
+      "mode": "strong_candidate",
+      "semantics": {
+        "activities": [
+          "DEPORTE"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "SOBRE ANIMALES Y PLANTAS",
+      "count": 483,
+      "percentage": 2.0967,
+      "mode": "candidate_set",
+      "semantics": {
+        "activities": [
+          "NATURALEZA"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "DE PROFESIONALES",
+      "count": 475,
+      "percentage": 2.062,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "professional_or_workers"
+      ]
+    },
+    {
+      "source_value": "DE ACCIÓN SANITARIA, EDUCATIVA Y SOCIAL",
+      "count": 448,
+      "percentage": 1.9448,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "health_or_condition_resource",
+        "social_support_resource"
+      ]
+    },
+    {
+      "source_value": "DEFENSA DEL MEDIO AMBIENTE",
+      "count": 372,
+      "percentage": 1.6149,
+      "mode": "candidate_set",
+      "semantics": {
+        "activities": [
+          "NATURALEZA",
+          "ECOLOGIA"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "DEPORTIVAS, RECREATIVAS Y JOVENES",
+      "count": 351,
+      "percentage": 1.5237,
+      "mode": "candidate_set",
+      "semantics": {
+        "activities": [
+          "DEPORTE",
+          "OCIO",
+          "TIEMPO_LIBRE"
+        ],
+        "populations": [
+          "JUVENTUD"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "TERCERA EDAD",
+      "count": 315,
+      "percentage": 1.3674,
+      "mode": "strong_candidate",
+      "semantics": {
+        "populations": [
+          "PERSONAS_MAYORES"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "REFERIDAS A PAISES EXTRANJEROS",
+      "count": 289,
+      "percentage": 1.2546,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "international_solidarity"
+      ]
+    },
+    {
+      "source_value": "RECREATIVAS",
+      "count": 254,
+      "percentage": 1.1026,
+      "mode": "candidate_set",
+      "semantics": {
+        "activities": [
+          "OCIO",
+          "TIEMPO_LIBRE"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "REFERIDAS A LA MUJER",
+      "count": 250,
+      "percentage": 1.0853,
+      "mode": "source_assertion",
+      "semantics": {
+        "populations": [
+          "MUJERES"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "DE FESTEJOS",
+      "count": 248,
+      "percentage": 1.0766,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "festivity_context"
+      ]
+    },
+    {
+      "source_value": "DE ALUMNOS",
+      "count": 217,
+      "percentage": 0.942,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "student_association"
+      ]
+    },
+    {
+      "source_value": "DEFICIENCIAS Y ENFERMEDADES",
+      "count": 199,
+      "percentage": 0.8639,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "health_or_condition_resource"
+      ]
+    },
+    {
+      "source_value": "PROFESIONALES DE LA SANIDAD",
+      "count": 189,
+      "percentage": 0.8205,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "professional_or_workers",
+        "health_context"
+      ]
+    },
+    {
+      "source_value": "DEPORTIVAS",
+      "count": 184,
+      "percentage": 0.7987,
+      "mode": "strong_candidate",
+      "semantics": {
+        "activities": [
+          "DEPORTE"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "CULTURALES E IDEOLOGICAS",
+      "count": 165,
+      "percentage": 0.7163,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "cultural_association",
+        "rights_or_advocacy"
+      ]
+    },
+    {
+      "source_value": "OTRAS MUSICALES",
+      "count": 141,
+      "percentage": 0.6121,
+      "mode": "source_assertion",
+      "semantics": {
+        "activities": [
+          "MUSICA"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "REFERENTES A LA NATURALEZA",
+      "count": 135,
+      "percentage": 0.586,
+      "mode": "candidate_set",
+      "semantics": {
+        "activities": [
+          "NATURALEZA"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "DE ACCION EDUCATIVA",
+      "count": 125,
+      "percentage": 0.5426,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "education_context"
+      ]
+    },
+    {
+      "source_value": "PEÑAS DE SEGUIDORES Y AFICIONADOS",
+      "count": 123,
+      "percentage": 0.5339,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "fan_club"
+      ]
+    },
+    {
+      "source_value": "CULTURALES, RECREATIVAS Y DEPORTIVAS",
+      "count": 102,
+      "percentage": 0.4428,
+      "mode": "candidate_set",
+      "semantics": {
+        "activities": [
+          "DEPORTE",
+          "OCIO",
+          "TIEMPO_LIBRE"
+        ]
+      },
+      "hints": [
+        "cultural_association"
+      ]
+    },
+    {
+      "source_value": "REFERIDAS A LA JUVENTUD",
+      "count": 102,
+      "percentage": 0.4428,
+      "mode": "source_assertion",
+      "semantics": {
+        "populations": [
+          "JUVENTUD"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "ECONÓMICAS Y PROFESIONALES",
+      "count": 99,
+      "percentage": 0.4298,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "professional_or_workers"
+      ]
+    },
+    {
+      "source_value": "EDUCATIVAS",
+      "count": 85,
+      "percentage": 0.369,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "education_context"
+      ]
+    },
+    {
+      "source_value": "DEPORTIVAS ESPECIFICAS",
+      "count": 81,
+      "percentage": 0.3516,
+      "mode": "candidate_set",
+      "semantics": {
+        "activities": [
+          "DEPORTE"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "DE BASE RELIGIOSA",
+      "count": 76,
+      "percentage": 0.3299,
+      "mode": "none",
+      "semantics": {},
+      "hints": []
+    },
+    {
+      "source_value": "ARTES, HUMANIDADES Y CIENCIAS SOCIALES",
+      "count": 71,
+      "percentage": 0.3082,
+      "mode": "none",
+      "semantics": {},
+      "hints": []
+    },
+    {
+      "source_value": "AGRICULTURA",
+      "count": 70,
+      "percentage": 0.3039,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "agricultural_or_rural_sector"
+      ]
+    },
+    {
+      "source_value": "TURISMO Y HOSTELERIA",
+      "count": 66,
+      "percentage": 0.2865,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "tourism_or_hospitality"
+      ]
+    },
+    {
+      "source_value": "COSTUMBRISTAS Y TRADICIONES HISTORICAS",
+      "count": 64,
+      "percentage": 0.2778,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "tradition_or_heritage"
+      ]
+    },
+    {
+      "source_value": "DE ACCIÓN SANITARIA",
+      "count": 64,
+      "percentage": 0.2778,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "health_or_condition_resource"
+      ]
+    },
+    {
+      "source_value": "DEFICIENCIAS PSICOLÓGICAS",
+      "count": 64,
+      "percentage": 0.2778,
+      "mode": "candidate_set",
+      "semantics": {
+        "needs": [
+          "SALUD_MENTAL"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "OTROS",
+      "count": 64,
+      "percentage": 0.2778,
+      "mode": "none",
+      "semantics": {},
+      "hints": []
+    },
+    {
+      "source_value": "RECREATIVAS EN GENERAL",
+      "count": 64,
+      "percentage": 0.2778,
+      "mode": "candidate_set",
+      "semantics": {
+        "activities": [
+          "OCIO",
+          "TIEMPO_LIBRE"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "ASOCIACIONES O COMUNIDADES DE PROPIETARIOS",
+      "count": 61,
+      "percentage": 0.2648,
+      "mode": "none",
+      "semantics": {},
+      "hints": []
+    },
+    {
+      "source_value": "DE EX-ALUMNOS",
+      "count": 61,
+      "percentage": 0.2648,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "alumni_association"
+      ]
+    },
+    {
+      "source_value": "ASISTENCIALES EN GENERAL",
+      "count": 60,
+      "percentage": 0.2605,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "social_support_resource"
+      ]
+    },
+    {
+      "source_value": "GASTRONOMÍA",
+      "count": 59,
+      "percentage": 0.2561,
+      "mode": "source_assertion",
+      "semantics": {
+        "activities": [
+          "GASTRONOMIA"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "MOTORISTAS",
+      "count": 59,
+      "percentage": 0.2561,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "motor_club"
+      ]
+    },
+    {
+      "source_value": "CIENCIAS",
+      "count": 58,
+      "percentage": 0.2518,
+      "mode": "none",
+      "semantics": {},
+      "hints": []
+    },
+    {
+      "source_value": "DESARROLLO COMUNITARIO",
+      "count": 56,
+      "percentage": 0.2431,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "neighbourhood_or_community"
+      ]
+    },
+    {
+      "source_value": "PROTECCION CIVIL",
+      "count": 55,
+      "percentage": 0.2388,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "emergency_or_rescue"
+      ]
+    },
+    {
+      "source_value": "OTROS PROFESIONALES",
+      "count": 50,
+      "percentage": 0.2171,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "professional_or_workers"
+      ]
+    },
+    {
+      "source_value": "CONSUMIDORES, USUARIOS Y PERJUDICADOS",
+      "count": 47,
+      "percentage": 0.204,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "consumer_context"
+      ]
+    },
+    {
+      "source_value": "CLUBES DE AUTOMOVILISTAS, MOTORISTAS Y OTROS",
+      "count": 45,
+      "percentage": 0.1953,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "automotive_club"
+      ]
+    },
+    {
+      "source_value": "SECTOR DE AGRICULTURA, GANADERIA, CAZA Y PESCA",
+      "count": 45,
+      "percentage": 0.1953,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "agricultural_or_rural_sector"
+      ]
+    },
+    {
+      "source_value": "ENFERMEDADES Y OTRAS DEFICIENCIAS",
+      "count": 44,
+      "percentage": 0.191,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "health_or_condition_resource"
+      ]
+    },
+    {
+      "source_value": "DERECHOS HUMANOS",
+      "count": 43,
+      "percentage": 0.1867,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "rights_or_advocacy"
+      ]
+    },
+    {
+      "source_value": "ASISTENCIALES",
+      "count": 41,
+      "percentage": 0.178,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "social_support_resource"
+      ]
+    },
+    {
+      "source_value": "CIENCIAS Y HUMANIDADES",
+      "count": 41,
+      "percentage": 0.178,
+      "mode": "none",
+      "semantics": {},
+      "hints": []
+    },
+    {
+      "source_value": "DE AFECTADOS POR PLANES URBANISTICOS, INDUSTRIALES O DE OBRAS",
+      "count": 41,
+      "percentage": 0.178,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "affected_residents_or_advocacy"
+      ]
+    },
+    {
+      "source_value": "CLUB DE AUTOMOVILISTAS",
+      "count": 38,
+      "percentage": 0.165,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "automotive_club"
+      ]
+    },
+    {
+      "source_value": "HISTORICAS Y COSTUMBRISTAS",
+      "count": 38,
+      "percentage": 0.165,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "tradition_or_heritage"
+      ]
+    },
+    {
+      "source_value": "HUMANITARIAS CON PROYECCION EN EL EXTRANJERO",
+      "count": 38,
+      "percentage": 0.165,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "international_solidarity"
+      ]
+    },
+    {
+      "source_value": "AFECTADOS Y PERJUDICADOS",
+      "count": 37,
+      "percentage": 0.1606,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "affected_residents_or_advocacy"
+      ]
+    },
+    {
+      "source_value": "OTRAS VECINOS",
+      "count": 37,
+      "percentage": 0.1606,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "neighbourhood_association"
+      ]
+    },
+    {
+      "source_value": "CASAS REGIONALES",
+      "count": 35,
+      "percentage": 0.1519,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "regional_cultural_association"
+      ]
+    },
+    {
+      "source_value": "IDEOLOGICAS",
+      "count": 35,
+      "percentage": 0.1519,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "rights_or_advocacy"
+      ]
+    },
+    {
+      "source_value": "JUBILADOS Y PENSIONISTAS CIVILES",
+      "count": 35,
+      "percentage": 0.1519,
+      "mode": "strong_candidate",
+      "semantics": {
+        "populations": [
+          "PERSONAS_MAYORES"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "ACTIVIDADES CÍVICO-POLÍTICAS",
+      "count": 34,
+      "percentage": 0.1476,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "rights_or_advocacy"
+      ]
+    },
+    {
+      "source_value": "OTRAS DEFENSA DE LA NATURALEZA",
+      "count": 31,
+      "percentage": 0.1346,
+      "mode": "candidate_set",
+      "semantics": {
+        "activities": [
+          "NATURALEZA",
+          "ECOLOGIA"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "CONSUMIDORES Y USUARIOS",
+      "count": 30,
+      "percentage": 0.1302,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "consumer_context"
+      ]
+    },
+    {
+      "source_value": "HOGARES, CLUBES, ASILOS Y RESIDENCIAS DE TERCERA EDAD",
+      "count": 30,
+      "percentage": 0.1302,
+      "mode": "strong_candidate",
+      "semantics": {
+        "populations": [
+          "PERSONAS_MAYORES"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "RADIOAFICION",
+      "count": 30,
+      "percentage": 0.1302,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "radio_activity"
+      ]
+    },
+    {
+      "source_value": "DIRIGIDAS A LA INFANCIA",
+      "count": 29,
+      "percentage": 0.1259,
+      "mode": "candidate_set",
+      "semantics": {
+        "populations": [
+          "INFANCIA"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "MUSICA CLASICA",
+      "count": 29,
+      "percentage": 0.1259,
+      "mode": "source_assertion",
+      "semantics": {
+        "activities": [
+          "MUSICA"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "MOVIMIENTOS MIGRATORIOS",
+      "count": 28,
+      "percentage": 0.1215,
+      "mode": "strong_candidate",
+      "semantics": {
+        "populations": [
+          "MIGRANTES"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "ESPECTACULOS",
+      "count": 26,
+      "percentage": 0.1129,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "entertainment_context"
+      ]
+    },
+    {
+      "source_value": "JUEGOS DE SALÓN",
+      "count": 26,
+      "percentage": 0.1129,
+      "mode": "candidate_set",
+      "semantics": {
+        "activities": [
+          "OCIO"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "PREVENCIÓN Y REHABILITACIÓN DE ADICCIONES PATOLÓGICAS",
+      "count": 25,
+      "percentage": 0.1085,
+      "mode": "candidate_set",
+      "semantics": {
+        "needs": [
+          "ADICCIONES_DROGAS",
+          "ADICCIONES_COMPORTAMENTALES",
+          "ALCOHOLISMO"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "OTRAS REFERIDAS A LA MUJER",
+      "count": 24,
+      "percentage": 0.1042,
+      "mode": "source_assertion",
+      "semantics": {
+        "populations": [
+          "MUJERES"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "FAMILIARES",
+      "count": 23,
+      "percentage": 0.0998,
+      "mode": "candidate_set",
+      "semantics": {
+        "populations": [
+          "FAMILIAS"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "OTROS QUE AFECTAN A LA FAMILIA",
+      "count": 22,
+      "percentage": 0.0955,
+      "mode": "candidate_set",
+      "semantics": {
+        "populations": [
+          "FAMILIAS"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "SECTOR COMERCIO, TRANSPORTE Y OTROS SERVICIOS",
+      "count": 21,
+      "percentage": 0.0912,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "professional_or_workers"
+      ]
+    },
+    {
+      "source_value": "ROTARISMO Y MASONERIA",
+      "count": 20,
+      "percentage": 0.0868,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "service_club"
+      ]
+    },
+    {
+      "source_value": "ECONÓMICAS",
+      "count": 19,
+      "percentage": 0.0825,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "economic_or_financial"
+      ]
+    },
+    {
+      "source_value": "OTRAS DE ACCIÓN SANITARIA, EDUCATIVA Y SOCIAL",
+      "count": 19,
+      "percentage": 0.0825,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "health_or_condition_resource",
+        "social_support_resource"
+      ]
+    },
+    {
+      "source_value": "COLECCIONISMO",
+      "count": 18,
+      "percentage": 0.0781,
+      "mode": "source_assertion",
+      "semantics": {
+        "activities": [
+          "COLECCIONISMO"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "GANADERIA",
+      "count": 18,
+      "percentage": 0.0781,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "agricultural_or_rural_sector"
+      ]
+    },
+    {
+      "source_value": "MEDIOS DE COMUNICACION Y ESPECTACULOS",
+      "count": 18,
+      "percentage": 0.0781,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "technology_or_media",
+        "entertainment_context"
+      ]
+    },
+    {
+      "source_value": "DEFENSA DE LA VIDA HUMANA",
+      "count": 17,
+      "percentage": 0.0738,
+      "mode": "none",
+      "semantics": {},
+      "hints": []
+    },
+    {
+      "source_value": "EXCURSIONISMO",
+      "count": 17,
+      "percentage": 0.0738,
+      "mode": "candidate_set",
+      "semantics": {
+        "activities": [
+          "DEPORTE",
+          "ACTIVIDAD_FISICA",
+          "NATURALEZA"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "FÚTBOL",
+      "count": 17,
+      "percentage": 0.0738,
+      "mode": "source_assertion",
+      "semantics": {
+        "activities": [
+          "DEPORTE"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "PROFESIONALES",
+      "count": 17,
+      "percentage": 0.0738,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "professional_or_workers"
+      ]
+    },
+    {
+      "source_value": "DE PROTECCION Y ORIENTACION FAMILIAR",
+      "count": 16,
+      "percentage": 0.0695,
+      "mode": "candidate_set",
+      "semantics": {
+        "populations": [
+          "FAMILIAS"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "REIVINDICATIVAS",
+      "count": 16,
+      "percentage": 0.0695,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "rights_or_advocacy"
+      ]
+    },
+    {
+      "source_value": "SERVICIOS SANITARIOS",
+      "count": 15,
+      "percentage": 0.0651,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "health_context"
+      ]
+    },
+    {
+      "source_value": "CLUBES DE LOS LEONES",
+      "count": 14,
+      "percentage": 0.0608,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "volunteer_service"
+      ]
+    },
+    {
+      "source_value": "DEFICIENCIAS FÍSICAS",
+      "count": 14,
+      "percentage": 0.0608,
+      "mode": "candidate_set",
+      "semantics": {
+        "needs": [
+          "DISCAPACIDAD_FISICA"
+        ],
+        "populations": [
+          "PERSONAS_CON_DISCAPACIDAD"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "MINORIAS Y OTROS GRUPOS",
+      "count": 14,
+      "percentage": 0.0608,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "social_inclusion"
+      ]
+    },
+    {
+      "source_value": "OTROS MEDIOS DE COMUNICACION",
+      "count": 12,
+      "percentage": 0.0521,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "technology_or_media",
+        "entertainment_context"
+      ]
+    },
+    {
+      "source_value": "MUSEOS",
+      "count": 11,
+      "percentage": 0.0478,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "heritage_or_museum"
+      ]
+    },
+    {
+      "source_value": "OTROS PROFESIONALES TITULADOS",
+      "count": 11,
+      "percentage": 0.0478,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "professional_or_workers"
+      ]
+    },
+    {
+      "source_value": "PROFESIONALES DE LA ENSEÑANZA",
+      "count": 11,
+      "percentage": 0.0478,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "professional_or_workers",
+        "education_context"
+      ]
+    },
+    {
+      "source_value": "DEFICIENCIAS DE LA INTELIGENCIA",
+      "count": 10,
+      "percentage": 0.0434,
+      "mode": "strong_candidate",
+      "semantics": {
+        "needs": [
+          "DISCAPACIDAD_INTELECTUAL"
+        ],
+        "populations": [
+          "PERSONAS_CON_DISCAPACIDAD"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "FAMILIARES, CONSUMIDORES Y TERCERA EDAD",
+      "count": 10,
+      "percentage": 0.0434,
+      "mode": "candidate_set",
+      "semantics": {
+        "populations": [
+          "FAMILIAS",
+          "PERSONAS_MAYORES"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "OCIO",
+      "count": 10,
+      "percentage": 0.0434,
+      "mode": "source_assertion",
+      "semantics": {
+        "activities": [
+          "OCIO",
+          "TIEMPO_LIBRE"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "OTRAS HISTORICAS",
+      "count": 9,
+      "percentage": 0.0391,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "tradition_or_heritage"
+      ]
+    },
+    {
+      "source_value": "OTRAS DEPORTIVAS, RECREATIVAS Y JUVENILES",
+      "count": 8,
+      "percentage": 0.0347,
+      "mode": "candidate_set",
+      "semantics": {
+        "activities": [
+          "DEPORTE",
+          "OCIO",
+          "TIEMPO_LIBRE"
+        ],
+        "populations": [
+          "JUVENTUD"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "PADRES DE FAMILIA",
+      "count": 8,
+      "percentage": 0.0347,
+      "mode": "source_assertion",
+      "semantics": {
+        "populations": [
+          "FAMILIAS"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "PEÑAS Y CASINOS",
+      "count": 8,
+      "percentage": 0.0347,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "leisure_club"
+      ]
+    },
+    {
+      "source_value": "PROFESIONALES DEL ARTE Y LA LITERATURA",
+      "count": 8,
+      "percentage": 0.0347,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "professional_or_workers",
+        "cultural_association"
+      ]
+    },
+    {
+      "source_value": "CAZA",
+      "count": 7,
+      "percentage": 0.0304,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "agricultural_or_rural_sector"
+      ]
+    },
+    {
+      "source_value": "AMAS DE CASA",
+      "count": 6,
+      "percentage": 0.026,
+      "mode": "none",
+      "semantics": {},
+      "hints": []
+    },
+    {
+      "source_value": "DE MUNICIPIOS Y PROVINCIAS",
+      "count": 6,
+      "percentage": 0.026,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "neighbourhood_or_community"
+      ]
+    },
+    {
+      "source_value": "ETNOLOGICAS",
+      "count": 6,
+      "percentage": 0.026,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "tradition_or_heritage"
+      ]
+    },
+    {
+      "source_value": "OTRAS ECONOMICAS",
+      "count": 6,
+      "percentage": 0.026,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "economic_or_financial"
+      ]
+    },
+    {
+      "source_value": "OTRAS EDUCATIVAS",
+      "count": 6,
+      "percentage": 0.026,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "education_context"
+      ]
+    },
+    {
+      "source_value": "PESCA Y SUBACUATICAS",
+      "count": 6,
+      "percentage": 0.026,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "recreation_or_sport"
+      ]
+    },
+    {
+      "source_value": "REFERIDAS A TEMAS MILITARES",
+      "count": 6,
+      "percentage": 0.026,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "military_or_veterans"
+      ]
+    },
+    {
+      "source_value": "ESOTERICAS Y PARACIENCIAS",
+      "count": 5,
+      "percentage": 0.0217,
+      "mode": "none",
+      "semantics": {},
+      "hints": []
+    },
+    {
+      "source_value": "OTRAS REFERIDAS A ENFERMEDADES",
+      "count": 5,
+      "percentage": 0.0217,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "health_or_condition_resource"
+      ]
+    },
+    {
+      "source_value": "RESTAURACIÓN",
+      "count": 5,
+      "percentage": 0.0217,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "hospitality_or_gastronomy"
+      ]
+    },
+    {
+      "source_value": "ARCHIVOS DOCUMENTALES",
+      "count": 4,
+      "percentage": 0.0174,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "heritage_or_archive"
+      ]
+    },
+    {
+      "source_value": "FERIAS Y EXPOSICIONES",
+      "count": 4,
+      "percentage": 0.0174,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "event_or_exhibition"
+      ]
+    },
+    {
+      "source_value": "MONUMENTALES",
+      "count": 4,
+      "percentage": 0.0174,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "tradition_or_heritage"
+      ]
+    },
+    {
+      "source_value": "EXTRACTIVAS, INDUSTRIA Y CONSTRUCCION",
+      "count": 3,
+      "percentage": 0.013,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "professional_or_workers"
+      ]
+    },
+    {
+      "source_value": "OTRAS ECONÓMICAS Y PROFESIONALES",
+      "count": 3,
+      "percentage": 0.013,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "professional_or_workers"
+      ]
+    },
+    {
+      "source_value": "PROFESIONALES DE PRENSA, RADIO Y TELEVISION",
+      "count": 3,
+      "percentage": 0.013,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "professional_or_workers",
+        "technology_or_media"
+      ]
+    },
+    {
+      "source_value": "AGRUPACIONES DEL CARNAVAL",
+      "count": 2,
+      "percentage": 0.0087,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "festivity_context"
+      ]
+    },
+    {
+      "source_value": "ASOCIACIONES VINCULADAS A ENTIDADES INTERNACIONALES",
+      "count": 2,
+      "percentage": 0.0087,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "international_solidarity"
+      ]
+    },
+    {
+      "source_value": "EX-DEPORTISTAS",
+      "count": 2,
+      "percentage": 0.0087,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "sports_association"
+      ]
+    },
+    {
+      "source_value": "JUBILADOS Y PENSIONISTAS MILITARES",
+      "count": 2,
+      "percentage": 0.0087,
+      "mode": "strong_candidate",
+      "semantics": {
+        "populations": [
+          "PERSONAS_MAYORES"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "LUCHA CANARIA",
+      "count": 2,
+      "percentage": 0.0087,
+      "mode": "source_assertion",
+      "semantics": {
+        "activities": [
+          "DEPORTE"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "AYUDA A LOS SUBURBIOS Y PROMOCION SOCIAL DE VIVIENDAS",
+      "count": 1,
+      "percentage": 0.0043,
+      "mode": "candidate_set",
+      "semantics": {
+        "needs": [
+          "EXCLUSION_SOCIAL",
+          "POBREZA_NECESIDADES_BASICAS"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "BALONCESTO",
+      "count": 1,
+      "percentage": 0.0043,
+      "mode": "source_assertion",
+      "semantics": {
+        "activities": [
+          "DEPORTE"
+        ]
+      },
+      "hints": []
+    },
+    {
+      "source_value": "DE ASUNTOS FINANCIEROS Y DE SEGUROS",
+      "count": 1,
+      "percentage": 0.0043,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "economic_or_financial"
+      ]
+    },
+    {
+      "source_value": "DELEGACIONES EN ESPAÑA DE ASOCIACIONES EXTRANJERAS",
+      "count": 1,
+      "percentage": 0.0043,
+      "mode": "context",
+      "semantics": {},
+      "hints": [
+        "international_solidarity"
+      ]
+    },
+    {
+      "source_value": "REFERIDAS A GUARDERIAS Y JARDINES DE INFANCIA",
+      "count": 1,
+      "percentage": 0.0043,
+      "mode": "candidate_set",
+      "semantics": {
+        "populations": [
+          "INFANCIA"
+        ]
+      },
+      "hints": []
+    }
+  ]
+}

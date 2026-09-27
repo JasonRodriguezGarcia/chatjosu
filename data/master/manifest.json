@@ -1,0 +1,10 @@
+{
+  "format_version": 1,
+  "master_version": 3,
+  "source_dataset": "backend/data/Asociaciones_ONG_normalizadas.json",
+  "source_format_version": 1,
+  "source_normalization_version": 2,
+  "associations_total": 469,
+  "bootstrapped_from_canonical": true,
+  "invariant": "base + curation -> runtime dataset"
+}

@@ -1,0 +1,105 @@
+{
+  "format_version": 1,
+  "projection_version": "1.0",
+  "source_rows": 28091,
+  "relevance": {
+    "strict_candidates": 2665,
+    "rejected_non_strict": 25426
+  },
+  "tagging": {
+    "high_associations": 958,
+    "review_only": 210,
+    "unmapped": 1497,
+    "high_single_tag": 767,
+    "high_multiple_tags": 191,
+    "tag_assignments": 1213,
+    "by_tag": {
+      "PERSONAS_MAYORES": 239,
+      "DISCAPACIDAD_FISICA": 27,
+      "EXCLUSION_SOCIAL": 183,
+      "ADICCIONES_COMPORTAMENTALES": 2,
+      "SALUD_MENTAL": 45,
+      "PARALISIS_CEREBRAL": 6,
+      "CANCER": 15,
+      "FIBROSIS_QUISTICA": 4,
+      "PERSONAS_PRESAS": 7,
+      "POBREZA_NECESIDADES_BASICAS": 73,
+      "ALZHEIMER": 9,
+      "ESCLEROSIS_MULTIPLE": 4,
+      "LUPUS": 3,
+      "INSERCION_LABORAL": 53,
+      "DANO_CEREBRAL_ADQUIRIDO": 3,
+      "INMIGRACION_REFUGIO": 141,
+      "CELIAQUIA": 4,
+      "DISCAPACIDAD_INTELECTUAL": 16,
+      "ALCOHOLISMO": 34,
+      "CROHN_COLITIS": 3,
+      "LINFEDEMA_LIPEDEMA": 4,
+      "HEMOFILIA": 6,
+      "TRASTORNOS_ALIMENTARIOS": 5,
+      "ELA": 7,
+      "ACOGIMIENTO_FAMILIAR": 6,
+      "ENFERMEDADES_NEUROMUSCULARES": 4,
+      "DISCAPACIDAD": 63,
+      "MEDIACION_FAMILIAR": 11,
+      "ADOPCION": 6,
+      "PARKINSON": 6,
+      "DEPENDENCIA": 19,
+      "ACOSO_LABORAL": 4,
+      "ENFERMEDAD_RENAL": 5,
+      "NEUROFIBROMATOSIS": 1,
+      "TDAH": 5,
+      "ARTRITIS_ESPONDILITIS": 2,
+      "FIBROMIALGIA_FATIGA_CRONICA": 7,
+      "DISLEXIA": 5,
+      "DISCAPACIDAD_AUDITIVA": 13,
+      "SIN_HOGAR": 16,
+      "VIOLENCIA_GENERO": 86,
+      "ESPINA_BIFIDA_HIDROCEFALIA": 3,
+      "ADICCIONES_DROGAS": 12,
+      "SENSIBILIDAD_QUIMICA": 3,
+      "HEPATITIS": 2,
+      "ACOSO_ESCOLAR": 4,
+      "PSORIASIS": 1,
+      "AUTISMO": 16,
+      "RETINOSIS_PIGMENTARIA": 2,
+      "LUDOPATIA": 6,
+      "SOLEDAD_NO_DESEADA": 2,
+      "CANCER_INFANTIL": 4,
+      "DIABETES": 6
+    }
+  },
+  "territory": {
+    "resolved": 958,
+    "unresolved": 0,
+    "by_province": {
+      "VIZCAYA": 481,
+      "ALAVA": 213,
+      "GUIPUZCOA": 264
+    }
+  },
+  "contacts": {
+    "with_phone": 0,
+    "with_email": 1,
+    "with_website": 117,
+    "with_any_contact": 118,
+    "without_direct_contact": 840,
+    "with_official_registry_url": 958
+  },
+  "coordinates": {
+    "with_coordinates": 958,
+    "without_coordinates": 0
+  },
+  "dedupe": {
+    "new_candidate": 957,
+    "exact_duplicate": 0,
+    "probable_duplicate": 1
+  },
+  "quality": {
+    "missing_name": 0,
+    "missing_municipality": 0,
+    "missing_province": 0
+  },
+  "runtime_candidates": 958,
+  "generated_at": "2026-09-06T14:41:05.843Z"
+}

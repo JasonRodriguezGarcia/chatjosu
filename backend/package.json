@@ -9,7 +9,13 @@
   },
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "format": "prettier --write \"**/*.{js,json,md}\"",
+    "format:check": "prettier --check \"**/*.{js,json,md}\"",
+    "smoke:helpchat": "node scripts/smoke-helpchat-runtime.js",
+    "db:import-associations": "node scripts/import-normalized-associations-json.js data/Asociaciones_ONG_normalizadas.json",
+    "test:vitest": "vitest run tests/helpchat-conversation-clarification-v2.test.js tests/helpchat-conversation-context-people-v2.test.js tests/helpchat-conversation-context-v2.test.js tests/helpchat-conversation-memory-v2.test.js tests/helpchat-conversation-relations-v2.test.js tests/helpchat-conversation-runtime-v2.test.js tests/helpchat-conversation-scenarios-v2.test.js tests/helpchat-feedback-analyst-llm-service.test.js tests/helpchat-local-llm-service.test.js tests/helpchat-task-context-v1.test.js",
+    "test": "npm run test:vitest && node --test tests/helpchat-semantic-classifier.test.js tests/import-runtime-candidates-v1.test.js tests/helpchat-semantic-fast-gates.test.js tests/association-tag-mapper-v1.test.js"
   },
   "dependencies": {
     "cors": "^2.8.6",
@@ -19,6 +25,8 @@
     "pg": "^8.21.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.14"
+    "nodemon": "^3.1.14",
+    "prettier": "^3.9.0",
+    "vitest": "^4.1.10"
   }
 }

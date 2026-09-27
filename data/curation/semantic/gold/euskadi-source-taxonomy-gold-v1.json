@@ -1,0 +1,829 @@
+{
+  "format_version": 1,
+  "source_id": "euskadi_registro_asociaciones",
+  "purpose": "Regression evidence for Euskadi official taxonomy to HelpChat semantic mapping.",
+  "taxonomy_map": "data/curation/semantic/source-taxonomies/euskadi-taxonomy-map-v2.proposal.json",
+  "contract": {
+    "source_assertion": "May materialize only the explicitly mapped concepts.",
+    "strong_candidate": "Must remain candidate until record evidence confirms/refines.",
+    "candidate_set": "Must not materialize every candidate-set member.",
+    "context": "Must not create canonical HelpChat concepts by itself.",
+    "none": "Must not create semantic concepts by itself."
+  },
+  "cases": [
+    {
+      "source_value": "Deportivas (no competitivas)",
+      "expected_mode": "strong_candidate",
+      "expected_semantics": {
+        "activities": [
+          "DEPORTE"
+        ]
+      },
+      "expected_hints": [],
+      "source_count": 1228,
+      "evidence_samples": [
+        {
+          "source_record_id": "AS/A/01255/1988",
+          "name": "\"SOCIO-CULTURAL DEPORTIVA \"BASABE'KO LAGUNAK\"\"",
+          "sorting": "Cultura General",
+          "goal_type": "Deportivas (no competitivas)",
+          "rec_goal": "- Crear un ambiente social agradable dentro del pueblo y Valle de Valdegovía, por medio de campeonatos y festejos sociales. - Promover el ámbito cultural por medio de charlas, conferencias, conciertos y cualquier tipo de actividades culturales. - Rescatar y mantener las costumbres tradicionales del pueblo y Valle de Valdegovía. - Ayudar y fomentar las ideas de tipo cultural que surjan dentro del pueblo y Valle de Valdegovía, y las actividades artesanales."
+        },
+        {
+          "source_record_id": "AS/A/01320/1988",
+          "name": "ASOCIACION DE CAZADORES Y PESCADORES \"TOLOÑO\"",
+          "sorting": "Cultura General",
+          "goal_type": "Deportivas (no competitivas)",
+          "rec_goal": "- Prácticas deportivas de tiradas al plato, de caza y repoblación o similares, así como la pesca y otros similares, sin ánimo de lucro."
+        },
+        {
+          "source_record_id": "AS/A/01622/1989",
+          "name": "SOCIEDAD DEPORTIVA DE LA MONTAÑA ALAVESA\" \"SODEMA\"",
+          "sorting": "Cultura General",
+          "goal_type": "Deportivas (no competitivas)",
+          "rec_goal": "Defender, conservar y fomentar la caza, cooperando con la autoridad y s us agente en dicha finalidad.  Crear y fomentar la conservación de Cotos de Caza para la propagación de las especies cinegéticas y la práctica del deporte en los mismos. Custodia y guardería de la caza. Agrupar dentro de la Asociación, con carácter voluntario, a todos cuantos practiquen el deporte de la caza según el artículo 25`.  Perseguir y denunciar ante la autoridad toda infracción en materia de caza.  Fomentar nuestra actividad deportiva así como todas aquellas que estén relacionadas con nuestra actividad, tales como concursos de perros, tiro al plato, etc., sin que suponga una práctica habitual de competiciones deportivas."
+        }
+      ],
+      "audit_status": "manually_inspected"
+    },
+    {
+      "source_value": "De Padres de Alumnos",
+      "expected_mode": "source_assertion",
+      "expected_semantics": {
+        "populations": [
+          "FAMILIAS"
+        ]
+      },
+      "expected_hints": [],
+      "source_count": 1135,
+      "evidence_samples": [
+        {
+          "source_record_id": "A*.R.P.A.00261",
+          "name": "ASOCIACION DE PADRES Y MADRES DE ALUMNOS Y ALUMNAS \"AMPA BIZKARRETA\"",
+          "sorting": "Docente",
+          "goal_type": "De Padres de Alumnos",
+          "rec_goal": "- Orientar, estimular y asistir a los padres y madres en todo lo relacionado con la educación de sus hijos/as o pupilos/as.- Colaborar en las actividades educativas del Centro.- Promover la participación de los padres de los alumnos en la gestión del Centro.- Asimismo, constituirán fines de esta Asociación, la organización de actividades formativas complementarias en beneficio de padres y alumnos, entre ellas las encaminadas al fomento de la lengua y cultura vasca, y los que, respetando la normativa en vigor, decidan asumir, cuando así se establezca en los Estatutos."
+        },
+        {
+          "source_record_id": "A*.R.P.A.00393",
+          "name": "ASOCIACIÓN MADRES Y PADRES DE ALUMNOS \"GORBEA\" GURASO ELKARTEA",
+          "sorting": "Docente",
+          "goal_type": "De Padres de Alumnos",
+          "rec_goal": "- Orientar, estimular y asistir a los padres en todo lo relacionado con la educación de sus hijos o pupilos.- Colaborar en las actividades educativas del centro.- Promover la participación de los padres de alumn@s en la gestión del centro.- Asistir a madres y padres de los alumn@s en el ejercicio de su derecho a intervenir en el control y gestión del centro a través de la participación en los órganos colegiados del mismo.- Representar a los padres de alumn@s en los órganos de participación ciudadana, en la defensa de sus derechos.- Organizar actividades y servicios de tipo social, educativo, cultural, recreativo, deportivo y cuantas redunden en beneficio de la formación del alumnado, de l@s asociad@s y de los restantes miembros de la comunidad educativa, fomentando la lengua y la cultura vasca.- Facilitar ayudas cuando los medios económicos lo permitan a l@s alumn@s que lo precisen a juicio de la Junta Directiva.- Procurar asesoramiento sobre posibles subvenciones, obtención de ayudas "
+        },
+        {
+          "source_record_id": "AS/A/00071/1986",
+          "name": "BAIALDEA GURASO ELKARTEA",
+          "sorting": "Docente",
+          "goal_type": "De Padres de Alumnos",
+          "rec_goal": "- Agrupar a los padres, madres y tutores de alumnos/as para que mutuamente se presten apoyo en su tarea educadora.- Orientar, estimular y asistir a los padres y madres en todo lo relacionado con la educación de sus hijos/as o pupilos/as.- Colaborar en las actividades educativas del Centro y promover la participación de padres y madres en la gestión del Centro.- Organizar actividades formativas complementarias en beneficio de padres, madres y alumnos/as, entre ellas las encaminadas al fomento de la lengua y literatura vasca."
+        }
+      ],
+      "audit_status": "manually_inspected"
+    },
+    {
+      "source_value": "Tiempo Libre",
+      "expected_mode": "source_assertion",
+      "expected_semantics": {
+        "activities": [
+          "TIEMPO_LIBRE"
+        ]
+      },
+      "expected_hints": [],
+      "source_count": 915,
+      "evidence_samples": [
+        {
+          "source_record_id": "A*/B/01601/1989",
+          "name": "GRUPO DE OCIO Y TIEMPO LIBRE \"KIMUAK-IRRINTZI\"",
+          "sorting": "Cultura General",
+          "goal_type": "Tiempo Libre",
+          "rec_goal": "- Educar en el Tiempo Libre Infantil y Juvenil de una forma liberadora, integral y activa, colectiva y euskaldun.                               - Potenciar un desarrollo y crecimiento del niño-a/joven en todas sus dimensiones (creativa, política, cultural, etc.) al objeto de hacerle sujeto de su propio proceso."
+        },
+        {
+          "source_record_id": "A*.R.P.A.00434",
+          "name": "LA CORNAMUSA CLUB SOCIAL DE COMUNICACIONES",
+          "sorting": "Cultura General",
+          "goal_type": "Tiempo Libre",
+          "rec_goal": "Promover la realización de las actividades de las clases antes indicadas entre el personal de la corporación de Correos y Telecomunicaciones y sus familiares, con exclusión de cualquier finalidad profesional, políticas sindical, filosófica o lucrativa. A título enunciativo y no excluyente las actividades a desarrollar serán las apuntadas de carácter cultural en sus diversas manifestaciones, recreativas, deportivas, artísticas, turísticas, excursionistas, etc. La asociación se compromete a cumplir y hacer cumplir a sus asociados las normas que regulen el asociacionismo y las actividades que se desarrollen."
+        },
+        {
+          "source_record_id": "AS/A/00067/1986",
+          "name": "\"SAN PEDRO DE LAMUZA\"",
+          "sorting": "Cultura General",
+          "goal_type": "Tiempo Libre",
+          "rec_goal": "- Culturizar y formar en distintos aspectos a los vecinos del pueblo de Llodio, especialmente a los jóvenes, para lo cual se realizarán las siguientes actividades: Charlas de formación a cargo de peritos en diferentes temas. Formación de un grupo de tiempo libre. Acampadas de verano para niños y jóvenes. Montañismo para conocer la orografía de la zona y de Euskadi. Organización y participación en actividades deportivas, concretamente fútbol, futbito, baloncesto, balón-volea y atletismo."
+        }
+      ],
+      "audit_status": "manually_inspected"
+    },
+    {
+      "source_value": "Gastronómicas",
+      "expected_mode": "source_assertion",
+      "expected_semantics": {
+        "activities": [
+          "GASTRONOMIA"
+        ]
+      },
+      "expected_hints": [],
+      "source_count": 864,
+      "evidence_samples": [
+        {
+          "source_record_id": "AS/A/01304/1988",
+          "name": "\"SOCIEDAD GASTRONOMICA RECREATIVO-CULTURAL \"ETXADI\"\"",
+          "sorting": "Cultura General",
+          "goal_type": "Gastronómicas",
+          "rec_goal": "- Proporcionar a sus socios un lugar de esparcimiento, recreo y ocio, al igual que otras distracciones de lícito y decoroso entretenimiento, siendo ajeno a la Sociedad todo objeto o fín político o religioso. - Queda, por lo tanto, prohibido todo juego que no sea pura y exclusivamente de recreo, así como todo entretenimiento que esté en pugna con la urbanidad, el decoro y la educación."
+        },
+        {
+          "source_record_id": "AS/A/03600/1992",
+          "name": "SOCIEDAD GASTRONOMICA CULTURAL Y RECREATIVA \"LA FRAGUA\"",
+          "sorting": "Cultura General",
+          "goal_type": "Gastronómicas",
+          "rec_goal": "- Potenciar actuaciones gastrónomicas, culturales y recreativas.-Proporcionar un lugar de encuentro, de esparcimiento y recreo de los socios, a través de la promoción, fomento y práctica del arte culinario.-Fomentar la buena convivencia y las relaciones de amistad entre los socios."
+        },
+        {
+          "source_record_id": "AS/A/04022/1993",
+          "name": "SOCIEDAD GASTRONOMICA RECREATIVO CULTURAL \"EL HERRERO\"",
+          "sorting": "Cultura General",
+          "goal_type": "Gastronómicas",
+          "rec_goal": "- Principalmente proporcionar a sus socios un lugar de esparcimiento, recreo y ocio, al igual que otras distracciones de lícito y decoroso entretenimiento, siendo ajeno a la Sociedad todo objeto o fin político o religioso. Queda por lo tanto prohibido, todo juego que no sea pura y exclusivamente de recreo, así como todo entretenimiendo que esté en pugna con la urbanidad, el decoro y la educación."
+        }
+      ],
+      "audit_status": "manually_inspected"
+    },
+    {
+      "source_value": "Teatro",
+      "expected_mode": "source_assertion",
+      "expected_semantics": {
+        "activities": [
+          "TEATRO"
+        ]
+      },
+      "expected_hints": [],
+      "source_count": 609,
+      "evidence_samples": [
+        {
+          "source_record_id": "AS/A/00102/1986",
+          "name": "\"COLECTIVO DE TEATRO Y TITERES DE INVESTIGACION \"PAN CON CHOCOLATE\"",
+          "sorting": "Cultura General",
+          "goal_type": "Teatro",
+          "rec_goal": "- El objetivo principal del colectivo es crear un lugar cultural dentro del ámbito de espectadores de la ciudad, y dentro de éste, especialmente para el ámbito del espectador infantil. Así como la programación de cualquier tipo de actividades teatrales o parateatrales. (Actuaciones, cursos de creación y manipulación de títeres, el actor y la marioneta ...)"
+        },
+        {
+          "source_record_id": "AS/A/00238/1986",
+          "name": "\"GRUPO INFANTIL DE TEATRO \"SAMANIEGO\"\"",
+          "sorting": "Cultura General",
+          "goal_type": "Teatro",
+          "rec_goal": "- Adaptación a la Ley 3/1988. - La promoción del teatro realizado por y para los niños y jóvenes."
+        },
+        {
+          "source_record_id": "AS/A/00427/1987",
+          "name": "\"NO CERRAMOS A MEDIODIA\" TEATRO",
+          "sorting": "Cultura General",
+          "goal_type": "Teatro",
+          "rec_goal": "- Culturales y artísticos. A través del teatro, desarrollo de las capacidades personales y grupales hacia la creación y realización del arte dramático en Euskadi."
+        }
+      ],
+      "audit_status": "manually_inspected"
+    },
+    {
+      "source_value": "Promoción de la Mujer",
+      "expected_mode": "source_assertion",
+      "expected_semantics": {
+        "populations": [
+          "MUJERES"
+        ]
+      },
+      "expected_hints": [],
+      "source_count": 480,
+      "evidence_samples": [
+        {
+          "source_record_id": "AS/A/00643/1987",
+          "name": "ASOCIACION DE MUJERES LANTARTEA",
+          "sorting": "Socio-Económico",
+          "goal_type": "Promoción de la Mujer",
+          "rec_goal": "- Organizar actividades culturales diversas que favorezcan la promoción de la mujer en cualquier ámbito. - Trabajar e incidir en todos los facotres sociales marginantes de la mujer como sector social, y fomentar los servicios sociales encaminados a paliar y eliminar situaciones marginantes de la mujer en el área social."
+        },
+        {
+          "source_record_id": "AS/A/00927/1988",
+          "name": "ESCUELA DE MUJERES \"ANAITASUNA\"",
+          "sorting": "Socio-Económico",
+          "goal_type": "Promoción de la Mujer",
+          "rec_goal": "- Organizar actividades culturales diversas, tales como promoción de la mujer y en general, cuantas actividades culturales pueda desarrollar."
+        },
+        {
+          "source_record_id": "AS/A/00932/1988",
+          "name": "\"GRUPO SOCIO-CULTURAL \"HAIZE-BERRIA\"\"",
+          "sorting": "Socio-Económico",
+          "goal_type": "Promoción de la Mujer",
+          "rec_goal": "- Promoción de la mujer a través de la formación y el enriquecimiento personal, mejora del nivel cívico y desarrollo de las relaciones humanas."
+        }
+      ],
+      "audit_status": "manually_inspected"
+    },
+    {
+      "source_value": "Corales",
+      "expected_mode": "source_assertion",
+      "expected_semantics": {
+        "activities": [
+          "CANTO"
+        ]
+      },
+      "expected_hints": [],
+      "source_count": 437,
+      "evidence_samples": [
+        {
+          "source_record_id": "AS/A/00606/1987",
+          "name": "ASOCIACIÓN CORAL \"MANUEL IRADIER\"",
+          "sorting": "Cultura General",
+          "goal_type": "Corales",
+          "rec_goal": "- Adaptación a la Ley 3/1988. - Practicar el canto coral. - Obtner la divulgación y promoción cultural en el área musical. - Promocionar las relaciones con otros coros de semejante índole y se procurará las medidas de comunicación oportunas a tal fin."
+        },
+        {
+          "source_record_id": "AS/A/00785/1987",
+          "name": "\"CORAL \"LAGUN ARTEAN\"\"",
+          "sorting": "Cultura General",
+          "goal_type": "Corales",
+          "rec_goal": "- Desarrollar actividades relacionadas con la cultura musical, tanto en la promoción como en su divulgación, y principalmente en el canto y la música coral  crear y organizar grupos corales, instrumentales o mixtos, que realicen su propia actividad, ensayos, conciertos, etc., bajo el nombre de \"LAGUN ARTEAN\", promover y organizar conferencias, conciertos y cuantos otros actos relacionados con la cultura musical se consideren oportunos, tanto con sus propios medios como con la colaboración de grupos ajenos o independientes de la Asociación."
+        },
+        {
+          "source_record_id": "AS/A/00801/1987",
+          "name": "\"CORAL LANDATXO ERESIAK\"",
+          "sorting": "Cultura General",
+          "goal_type": "Corales",
+          "rec_goal": "- Practicar el canto coral. - Se trata de obtener la divulgación y promoción cultural en el área musical. - Se promocionarán, asímismo, las relaciones con otros coros de semejante índole y se procurarán las medidas de comunicación oportunas a tal fín."
+        }
+      ],
+      "audit_status": "manually_inspected"
+    },
+    {
+      "source_value": "Tercera Edad",
+      "expected_mode": "strong_candidate",
+      "expected_semantics": {
+        "populations": [
+          "PERSONAS_MAYORES"
+        ]
+      },
+      "expected_hints": [],
+      "source_count": 424,
+      "evidence_samples": [
+        {
+          "source_record_id": "A*/B/01602/1989",
+          "name": "ASOCIACIÓN PARA LA CULTURA Y EL OCIO DE LA TERCERA EDAD (ACOTE)",
+          "sorting": "Familiarista",
+          "goal_type": "Tercera Edad",
+          "rec_goal": "a) El fomento de la comunicación, unidad y solidaridad de todoslos mayores de 55 años, jubilados, prejubilados, pensionistas ydiscapacitados.b) Promover, gestionar y realizar servicios sociales y asistencialesen base a las necesidades que se demande por las personas ocolectivos, ante entidades de la Comunidad Autónoma del Paísvasco.e) Organizar actividades culturales, lúdicas y recreativas,tendentes a enriquecer la personalidad y solidaridad de sussocios y cubrir su tiempo de ocio, así como, desarrollar elestudio de medidas para la mejora de las condiciones de vidade la población y en especial de los asociados.d) Favorecer el conocimiento de las cuestiones que informen lavida social, cultural, económica, medio ambiental, etc,mediante una información educativa permanente."
+        },
+        {
+          "source_record_id": "A*.R.P.A.00279",
+          "name": "ASOCIACION PROVINCIAL DE PENSIONISTAS, JUBILADOS Y VIUDAS DE ALAVA \"LAS CUATRO TORRES\"",
+          "sorting": "Familiarista",
+          "goal_type": "Tercera Edad",
+          "rec_goal": "La promoción social de los socios y de los directamente afectados por las prestaciones de jubilación, vejez, viudedad, invalidez y orfandad, tanto derivadas del Régimen General como de los Regímenes Especiales de la Seguridad Social. Colaborar con las autoridades administrativas y laborales o instituciones y organismos competentes para la contribución a la resolución de los problemas de los asociados."
+        },
+        {
+          "source_record_id": "AS/A/00068/1986",
+          "name": "ASOCIACION DE JUBILADOS Y PENSIONISTAS \"SAN MARTIN\"",
+          "sorting": "Familiarista",
+          "goal_type": "Tercera Edad",
+          "rec_goal": "- La promoción social de los socios y de los directamente afectados por las prestaciones de jubilación, vejez, viudedad, invalidez, orfandad, tanto derivadas del Régimen General de la Seguridad Social, como de los Regímenes especiales de la misma."
+        }
+      ],
+      "audit_status": "manually_inspected"
+    },
+    {
+      "source_value": "Juveniles",
+      "expected_mode": "source_assertion",
+      "expected_semantics": {
+        "populations": [
+          "JUVENTUD"
+        ]
+      },
+      "expected_hints": [],
+      "source_count": 402,
+      "evidence_samples": [
+        {
+          "source_record_id": "AS/A/01343/1989",
+          "name": "CLUB JUVENIL \"GAZTE BERRIAK\"",
+          "sorting": "Juvenil",
+          "goal_type": "Juveniles",
+          "rec_goal": "Promover y animar a la formación y acción de los jóvenes en el aspecto cultural, social, de tiempo libre y religioso."
+        },
+        {
+          "source_record_id": "AS/A/01502/1989",
+          "name": "JUVENIL CULTURAL \"HAIZE BERRIAK-AIRES NUEVOS\"",
+          "sorting": "Juvenil",
+          "goal_type": "Juveniles",
+          "rec_goal": "Con carácter general la promoción, integración social o entretenimiento de la juventud y en particular, el estudio y práctica del teatro y espectáculos y la divulgación y promoción cultural en el área del espectáculo."
+        },
+        {
+          "source_record_id": "AS/A/01583/1989",
+          "name": "JUVENIL \"TXANTXANGORRI DE VITORIA-GASTEIZ\"",
+          "sorting": "Juvenil",
+          "goal_type": "Juveniles",
+          "rec_goal": "Con carácter general, la promoción, integración social o entretenimiento de la juventud y en particular la promoción de contactos con jóvenes de otras Comunidades o Estados para el desarrollo de actividades lúdicas, culturales y deportivas. Concienciación de los  jóvenes sobre los problemas de ecología y medio ambiente, especialmente los relativos a su degradación o destrucción."
+        }
+      ],
+      "audit_status": "manually_inspected"
+    },
+    {
+      "source_value": "Cinematografía",
+      "expected_mode": "source_assertion",
+      "expected_semantics": {
+        "activities": [
+          "CINE"
+        ]
+      },
+      "expected_hints": [],
+      "source_count": 218,
+      "evidence_samples": [
+        {
+          "source_record_id": "AS/A/00720/1987",
+          "name": "\"CINE CLUB UNIVERSITARIO \"ORHUM\"\"",
+          "sorting": "Cultura General",
+          "goal_type": "Cinematografía",
+          "rec_goal": "- Adaptación a la Ley 3/1988. - Centralizar en torno a sí, todas las actividades relacionadas con el mundo del cine, que pueden conretarse en las siguientes: 1) Organización de ciclos cinematográficos. 2) Organización de cineforums. 3) Realización y producción de vídeos, cortometrajes, e incluso largometrajes. 4) Creación de una Biblioteca y Filmoteca propias. 5) Concursos y certámentes (guiones, vídeos, cortos, ...). 6) Exposiciones relacionadas con el cine (carteles, fotos, ...). 7) Contactos con festivales cinematográficos. 8) Organización de charlas."
+        },
+        {
+          "source_record_id": "AS/A/01032/1988",
+          "name": "CULTURAL DE CINE \"ANDRA-MARI\"",
+          "sorting": "Cultura General",
+          "goal_type": "Cinematografía",
+          "rec_goal": "- Esencialmente culturales y sociales: Difundir la cultura en general, pero centrándose en aspectos más concretos como la cinematografía, la cultura autóctona, la apertura a otras expresiones culturales de nivel internacional, tener a punto un local en el que se puedan desarrollar otras actividaes sociales y culturales del pueblo, profundizar en el mundo del espectáculo audiovisual ..., sin olvidar que también es una actividad en el tiempo libre que rellena un hueco de ocio social."
+        },
+        {
+          "source_record_id": "AS/A/01205/1988",
+          "name": "ASOCIACION SOCIEDAD ALAVESA DE MEDIOS AUDIOVISUALES \"SAMA\"",
+          "sorting": "Cultura General",
+          "goal_type": "Cinematografía",
+          "rec_goal": "- Promover y desarrollar actividades en los campos audiovisuales sin ánimo de lucro."
+        }
+      ],
+      "audit_status": "manually_inspected"
+    },
+    {
+      "source_value": "De Tiempo Libre",
+      "expected_mode": "source_assertion",
+      "expected_semantics": {
+        "activities": [
+          "TIEMPO_LIBRE"
+        ]
+      },
+      "expected_hints": [],
+      "source_count": 178,
+      "evidence_samples": [
+        {
+          "source_record_id": "AS/A/00347/1987",
+          "name": "ASOCIACION CULTURAL Y TURISTICA EL CERRILLO",
+          "sorting": "Juvenil",
+          "goal_type": "De Tiempo Libre",
+          "rec_goal": "a) La promoción de actividades de tiempo libre infantil y juvenil.b) La promoción cultural y turística (en el más amplio sentido) del pueblo deNavaridas."
+        },
+        {
+          "source_record_id": "AS/A/00409/1987",
+          "name": "\"DE TIEMPO LIBRE INFANTIL Y JUVENIL ELEJALDE\"",
+          "sorting": "Juvenil",
+          "goal_type": "De Tiempo Libre",
+          "rec_goal": "- La promoción de un empleo sano, nacional y estimulante del tiempo libre por parte de los jóvenes a través de la promoción de actividades de todo tipo y de creación de instalaciones adecuadas."
+        },
+        {
+          "source_record_id": "AS/A/00410/1987",
+          "name": "\"CLUB SAMANIEGO\"",
+          "sorting": "Juvenil",
+          "goal_type": "De Tiempo Libre",
+          "rec_goal": "- Promover los Valores Humanos y Cristianos de los preadolescentes y adolescente.- Ofrecer un servicio cualificado de Educación en el Tiempo Libre, Animación Juvenil y Desarrollo Socio-Cultural.- Fomentar el empleo participativo y creativo del Tiempo Libre."
+        }
+      ],
+      "audit_status": "manually_inspected"
+    },
+    {
+      "source_value": "De Padres de Familia",
+      "expected_mode": "source_assertion",
+      "expected_semantics": {
+        "populations": [
+          "FAMILIAS"
+        ]
+      },
+      "expected_hints": [],
+      "source_count": 172,
+      "evidence_samples": [
+        {
+          "source_record_id": "AS/A/00042/1986",
+          "name": "\"DE PADRES DE LA GUARDERIA VIVENCIA\"",
+          "sorting": "Familiarista",
+          "goal_type": "De Padres de Familia",
+          "rec_goal": "- Colaborar con la Dirección del Centro en la formación de los alumnos. - Informar a los asociados de las incidencias en materia de estudios. - Realizar actividades pedagógicas y culturales. - Organizar conferencias, mesas redondas y charlas. - Desarrollar programas de educación familiar dirigidos a los padres."
+        },
+        {
+          "source_record_id": "AS/A/00046/1986",
+          "name": "\"DE FAMILIAS DE BARAMBIO\"",
+          "sorting": "Familiarista",
+          "goal_type": "De Padres de Familia",
+          "rec_goal": "- Promover y colaborar a la realización de obras de interés público. - Adquirir, alquilar y disfrutar de locales y terrenos, con destino a centros de reunión, deportes, etc. - Crear equipos deportivos, agrupaciones musicales, folklóricas, etc. - Asesorar a las familias de su demarcación, velar por la moralidad pública, organizar conferencias y cursillos u otros actos culturales y representar a sus asociados. - Pedir y ofrecer colaboración a jerarquías y autoridades, tanto civiles como eclesiásticas y cooperar con toda suerte de organismos e instituciones, etc."
+        },
+        {
+          "source_record_id": "AS/A/03349/1992",
+          "name": "DE PADRES \"ZUHAITZ EDER\"",
+          "sorting": "Familiarista",
+          "goal_type": "De Padres de Familia",
+          "rec_goal": "Primordialmente persigue culturizar a sus socios mediante la relación y el diálogo contínuo de los mismos, concertando para ello cuantas reuniones de trabajo, viajes de estudio, visitas a monumentos etc. sean precisos."
+        }
+      ],
+      "audit_status": "manually_inspected"
+    },
+    {
+      "source_value": "Grupos Feministas",
+      "expected_mode": "source_assertion",
+      "expected_semantics": {
+        "populations": [
+          "MUJERES"
+        ]
+      },
+      "expected_hints": [],
+      "source_count": 165,
+      "evidence_samples": [
+        {
+          "source_record_id": "AS/A/01273/1988",
+          "name": "ASOCIACION \"DE MUJERES PROGRESISTAS \"EUROPA\"\"",
+          "sorting": "Socio-Económico",
+          "goal_type": "Grupos Feministas",
+          "rec_goal": "- La defensa de los derechos de la mujer, su difusión en la opinión pública, y la colaboración en este campo con las Instituciones Públicas. - Información y asistencia laboral, jurídica y psicológica a todas las mujeres que lo soliciten. - El desarrollo, a través del asociacionismo, de una cultura de la solidaridad entre las mujeres. - El estudio de la situación de la mujer en nuestro ámbito territorial."
+        },
+        {
+          "source_record_id": "AS/A/01407/1989",
+          "name": "EMAKUME LANGILEAREN DEFENTSAN - EN DEFENSA DE LA MUJER TRABAJADORA",
+          "sorting": "Socio-Económico",
+          "goal_type": "Grupos Feministas",
+          "rec_goal": "a) Luchar contra la discriminación de las mujeres.b) Desarrollar programas de información sobre los derechos de la mujer trabajadora. c) Desarrollar programas de educación para proporcionar a las mujeres  conocimentos culturales y orientaciones profesionales. d) Defensa en todos los ámbitos sociales de los derechos de las mujeres."
+        },
+        {
+          "source_record_id": "AS/A/02808/1991",
+          "name": "DE MUJERES \"EMAKUME INTERNAZIONALISTAK\"",
+          "sorting": "Socio-Económico",
+          "goal_type": "Grupos Feministas",
+          "rec_goal": "- Promover la realización de estudios referidos a la problemática específica de la mujer en la vida cultural, política, jurídica, económica y social en el tercer mundo.  - Estimular y coordinar el desarrollo de programas de actividades concretas en torno a la problemática actual de la mujer en el tercer mundo.  - Fomentar la difusión del pensamiento feminista y de sus alternativas."
+        }
+      ],
+      "audit_status": "manually_inspected"
+    },
+    {
+      "source_value": "Promoción de Empleo",
+      "expected_mode": "strong_candidate",
+      "expected_semantics": {
+        "needs": [
+          "INSERCION_LABORAL"
+        ],
+        "functions": [
+          "EMPLEO_INSERCION"
+        ]
+      },
+      "expected_hints": [],
+      "source_count": 135,
+      "evidence_samples": [
+        {
+          "source_record_id": "AS/A/03844/1993",
+          "name": "DE AYUDA EN LA BUSQUEDA DE EMPLEO \"LANGAI\"",
+          "sorting": "Socio-Económico",
+          "goal_type": "Promoción de Empleo",
+          "rec_goal": "- Poner a disposición de las personas que se encuentran en situación de búsqueda de empleo, los recursos humanos y materiales necesarios para lograr su inserción laboral. - Promocionar información sobre el mercado laboral y formativo. - Formar en Técnicas de Búsqueda de Empleo. - Conseguir que LANGAY sea un centro de consulta y de trabajo habitual para aquellas personas que se encuentran en situación de búsqueda de empleo."
+        },
+        {
+          "source_record_id": "AS/A/03936/1993",
+          "name": "ASOCIACION \"PDA\" PROMOCIÓN Y DESARROLLO DE ANTOÑANA",
+          "sorting": "Socio-Económico",
+          "goal_type": "Promoción de Empleo",
+          "rec_goal": "Los FINES de esta Asociación son:- PROMOCIÓN DE ACTIVIDADES GENERADORAS DE DESARROLLO SOCIO-ECONOMICO EN ANTOÑANA Y COMARCA DE LA MONTAÑA ALAVESA."
+        },
+        {
+          "source_record_id": "AS/A/03967/1993",
+          "name": "DESARROLLO Y PROMOCION PARA LA IGUALDAD DE OPORTUNIDADES \"ANDRA-HAZI\"",
+          "sorting": "Socio-Económico",
+          "goal_type": "Promoción de Empleo",
+          "rec_goal": "- Desarrollo y promoción de los Recursos Humanos y de los potenciales infrautilizados, como por ejemplo los potenciales femeninos y de distintos colectivos en situación de marginación social o profesional."
+        }
+      ],
+      "audit_status": "manually_inspected"
+    },
+    {
+      "source_value": "Fotografía",
+      "expected_mode": "source_assertion",
+      "expected_semantics": {
+        "activities": [
+          "FOTOGRAFIA"
+        ]
+      },
+      "expected_hints": [],
+      "source_count": 111,
+      "evidence_samples": [
+        {
+          "source_record_id": "A*/B/01603/1989",
+          "name": "ARRIGORRIAGAKO ARGAZKI ELKARTE",
+          "sorting": "Cultura General",
+          "goal_type": "Fotografía",
+          "rec_goal": "Agrupar a todas las personas de Arrigorriaga (que así lo deseen) aficionados al Arte de la Fotografía."
+        },
+        {
+          "source_record_id": "AS/A/00153/1986",
+          "name": "\"GRUPO FOTOGRAFICO KULTUR-ETXEA\"",
+          "sorting": "Cultura General",
+          "goal_type": "Fotografía",
+          "rec_goal": "- Adaptación a la Ley 3/1988. - Fomentar la práctica y afición entre sus miembros a la fotografía."
+        },
+        {
+          "source_record_id": "AS/A/02807/1991",
+          "name": "FOTOGRAFICA DE JOVENES \"AFI\"",
+          "sorting": "Cultura General",
+          "goal_type": "Fotografía",
+          "rec_goal": "- Con carácter general, la promoción, integración social y entretenimiento de la juventud.  - En particular, dinamizar grupos a través del medio fotografico. Conocimiento de la técnica fotográfica básica. Educar visualmente la percepción. Ofrecer nuevas y atrayentes posibilidades de encarar la profesión fotografica. Descubrir el medio fotográfico dentro de la cultura de imágenes de nuestra sociedad. Conocimiento del mercado y las posibilidades profesionales que oferta la fotografía.ESTATUTOS ADAPTADOS A LA LEY 3/1.988."
+        }
+      ],
+      "audit_status": "manually_inspected"
+    },
+    {
+      "source_value": "Promoción de la Juventud",
+      "expected_mode": "source_assertion",
+      "expected_semantics": {
+        "populations": [
+          "JUVENTUD"
+        ]
+      },
+      "expected_hints": [],
+      "source_count": 111,
+      "evidence_samples": [
+        {
+          "source_record_id": "AS/A/00070/1986",
+          "name": "\"MOVIMIENTO SIN NOMBRE, \"M.S.N.\"\"",
+          "sorting": "Socio-Económico",
+          "goal_type": "Promoción de la Juventud",
+          "rec_goal": "- Ofrecer una visión humanista del contexto cotidiano del joven, buscando una profundización y consolidación de los valores humanos de nuestra sociedad. Potenciación educativa de valores humanos fundamentales, tales como la solidaridad, respeto mutuo, paz, alegría, etc. Trabajar con el objetivo de conseguir dignificar situaciones inhumanas en los ambientes más próximos que nos rodean. Solidaridad activa con los sociales marginados y desprotegidos."
+        },
+        {
+          "source_record_id": "AS/A/00170/1986",
+          "name": "ASOCIACIÓN DE PROMOCION DE LA JUVENTUD \"CLUB INDAR\"",
+          "sorting": "Socio-Económico",
+          "goal_type": "Promoción de la Juventud",
+          "rec_goal": "Prestación de servicios de asistencia social y de caracter cultural encaminados a la protección de la infancia y ed la juventud de hasta veinticinco años de edad, así como a la acción comunitaria y familiar, con especial atención a las familias de los jóvenes beneficiarios."
+        },
+        {
+          "source_record_id": "AS/A/00699/1987",
+          "name": "\"GASTE BATZORDEA\"",
+          "sorting": "Socio-Económico",
+          "goal_type": "Promoción de la Juventud",
+          "rec_goal": "- Fomentar la cooperación entre las/los jóvenes del pueblo de Abetxuko. - Organización de actividades tendentes a la unión de los colectivos juveniles de Abetxuko. - Buscar alternativas positivas para la ocupación del tiempo libre."
+        }
+      ],
+      "audit_status": "manually_inspected"
+    },
+    {
+      "source_value": "Ayuda a Ancianos",
+      "expected_mode": "strong_candidate",
+      "expected_semantics": {
+        "needs": [
+          "PERSONAS_MAYORES"
+        ],
+        "populations": [
+          "PERSONAS_MAYORES"
+        ]
+      },
+      "expected_hints": [],
+      "source_count": 64,
+      "evidence_samples": [
+        {
+          "source_record_id": "AS/A/04694/1994",
+          "name": "DE ATENCION PSICOLOGICA A LA PERSONA MAYOR \"AISIRA\"",
+          "sorting": "Carácter Benéfico Asistencial",
+          "goal_type": "Ayuda a Ancianos",
+          "rec_goal": "Promocionar la calidad de vida de las personas mayores.  Ofrecer asesoramiento pisológico al mayor, ante cualquier problemática que presente.  Dar apoyo y orientación a familiares y profesionales que trabajen en ámbitos relacionados con las personas mayores.  Favorecer la integración de los mayores en la comunidad potenciando su autonomía personal.  Responsabilizar a la administración y a la sociedad en general de la promoción de recursos que repercutan en el bienestar psicosocial de este colectivo."
+        },
+        {
+          "source_record_id": "AS/A/07972/1999",
+          "name": "\"ATSOA\" EQUIPO INTERDISCIPLINAR DE GERONTOLOGAS",
+          "sorting": "Carácter Benéfico Asistencial",
+          "goal_type": "Ayuda a Ancianos",
+          "rec_goal": "Mejorar la calidad de vida de las personas mayores y de sus familias, mediante intervenciones no farmacológicas. Potenciando al máximo las capacidades individuales de cada persona y fomentando comportamientos que favorezcan un estilo de vida saludable."
+        },
+        {
+          "source_record_id": "AS/A/09064/2001",
+          "name": "ASOCIACION ASCUDEAN FAMILIAS CUIDADORAS Y PERSONAS DEPENDIENTES",
+          "sorting": "Carácter Benéfico Asistencial",
+          "goal_type": "Ayuda a Ancianos",
+          "rec_goal": "Asesorami ento y orientación a la población en general inmersa en situaciones de cuidadoApoyo e intervención social en familias cuidadoras,en personas dependientes y con incapacidad temporalMejorar la calidad de vida tanto en materia sanitaria como social de las familias cuidadoras y de las personas en situación de dependencia.Crear espacios de difusión y divulgación para visibilizar socialmente la labor del cuidado, la situación de las familias cuidadoras y las personas en situación dedependencia,y que la sociedad en general pueda conocer la realidad.Fomentar la investigación social sobre los distintos aspectos en el cuidado de personas en situación de dependencia.Promoción del voluntariado y de la participación social en todos los ámbitos comunitarios.Promoción de la igualdad entre mujeres y hombres y fomento de la igualdad de oportunidadesFomento de la economía social y defensa de la eliminación de la economía sumergida en el ámbito laboral Promoción de las personas en riesgo de ex"
+        }
+      ],
+      "audit_status": "manually_inspected"
+    },
+    {
+      "source_value": "Micológicas",
+      "expected_mode": "source_assertion",
+      "expected_semantics": {
+        "activities": [
+          "MICOLOGIA"
+        ]
+      },
+      "expected_hints": [],
+      "source_count": 55,
+      "evidence_samples": [
+        {
+          "source_record_id": "AS/A/03771/1993",
+          "name": "RECREATIVA MICOLOGICA \"TXOKO BETSAIDE\"",
+          "sorting": "Cultura General",
+          "goal_type": "Micológicas",
+          "rec_goal": "- Primordialmente organizar salidas de recogida de setas y concursos micológicos, organizar comidas de hermandad y cualesquiera otros lícitos y decorosos para distracción y esparcimiento de sus asociados, proporcionándoles un lugar agradable para ello."
+        },
+        {
+          "source_record_id": "AS/A/07115/1997",
+          "name": "GRUPO MICOLÓGICO \"111\" MIKOLOGI TALDEA",
+          "sorting": "Cultura General",
+          "goal_type": "Micológicas",
+          "rec_goal": "- Estudio e investigación de las especies micológicas y de diversos ambientes de crecimiento.- Formación de un Herbario (Micoteca) con especies recolectadas.- Recopilación en Catálogo Micológicio de los Hongos estudiados.- Estudio ambiental de las especies en regresión.- Divulgación. (Cursillos, charlas orientativas, publicaciones).- Asesoramiento."
+        },
+        {
+          "source_record_id": "AS/A/10856/2003",
+          "name": "MICOLOGICA SOCIOCULTURAL \"ESNE GORRI\"",
+          "sorting": "Cultura General",
+          "goal_type": "Micológicas",
+          "rec_goal": "-Iniciar, orientar y ampliar conocimientos sobre micológica, a todas las personas que lo deseen, haciendo hincapié en la educación medioambiental de los jóvenes.-Creación de una conciencia respetuosa con el medioambiente.-Crear un centro sociocultural  de consulta, educativo, de estudio y un archivo de hongos.-Aprender a clasificar los hongos ayudándonos con bibliografía, consultas a expertos, y a otras Asociaciones, microscopía, ayuda con reactivos,etc...-Realización de distintos estudios que orienten posteriores iniciativas de gestión sostenible de los ecosistemas productores de hongos.-Modelos de gestión sostenible.Propuestas que generen beneficios reales para la población de Valdegovía aumentando así la consideración social sobre sus propios bosques y paisajes.-Establecer un sistema de manejo de los hongos, respentando las diferentes maneras de utilización de los bosques sin sobreexplotarlos, preservándolos e inculos mejorándolos para futuras generaciones.-Medidas para un turismo d"
+        }
+      ],
+      "audit_status": "manually_inspected"
+    },
+    {
+      "source_value": "Ayuda a Drogadictos",
+      "expected_mode": "source_assertion",
+      "expected_semantics": {
+        "needs": [
+          "ADICCIONES_DROGAS"
+        ]
+      },
+      "expected_hints": [],
+      "source_count": 47,
+      "evidence_samples": [
+        {
+          "source_record_id": "AS/A/03655/1992",
+          "name": "ASOCIACION DE DEPORTISTAS VASCOS CONTRA LA DROGA \"DEPORTIVAS SIN FRONTERAS\" DROGAREN AURKAKO EUSKAL KIROLARIEN \"MUGARIK GABEKO KIROLARIAK\"",
+          "sorting": "Carácter Benéfico Asistencial",
+          "goal_type": "Ayuda a Drogadictos",
+          "rec_goal": "1º AREA SOCIAL:Encargada de todo tipo de acciones encaminadas adivulgar y favorecer los valores que emanan de la prácticadeportiva, tanto desde la vertiente física como la intelectual y lasocial favoreciendo, principalmente, la participación en actossolidarios tanto en el ámbito de la practica deportiva como en lasocial.Se divide en dos Áreas:-Deportistas contra la droga: Investigación,estudio, análisis y opinión en lo concerniente a los deportistasvascos contra la droga.-Solidaridad Deportiva: encargada de creargrupos de actuación en aquellos ámbitos en los que presencia y/ocolaboración de Deportistas sin fronteras, sea la ayuda para objetoa alcanzar y que este coincida con los objetivos de la propiaAsociación.2º AREA DE FORMACIÓN:Encargada de la formación en los niveles inferiores, enel área de la práctica deportiva, mediante la realización de cursosde formación básica así como recursos de reciclaje y actualización.3º AREA DE INVESTIGACIÓN:Encargada del fomento de estudios que reduce"
+        },
+        {
+          "source_record_id": "AS/B/00147/1986",
+          "name": "DE AMIGOS DE ETORKINTZA",
+          "sorting": "Carácter Benéfico Asistencial",
+          "goal_type": "Ayuda a Drogadictos",
+          "rec_goal": "- Contribuir a la lucha contra la drogadicción, en su más amplio concepto y en todos sus aspectos, de modo especial, cooperando con la Fundación Benéfico-Social ETORKINTZA."
+        },
+        {
+          "source_record_id": "AS/B/00756/1987",
+          "name": "SOBRE LA PREVENCION DE DROGODEPENDENCIAS \"PAGORBE\" ELKARTEA",
+          "sorting": "Carácter Benéfico Asistencial",
+          "goal_type": "Ayuda a Drogadictos",
+          "rec_goal": "Por una parte, la investigación y desarrollo de aquellos métodos que contribuyan a dotar de perspectivas y alternativas a la problemática de la drogodependencia en el aspecto de la prevención  por otro lado, proporcionar atención, información, así como facilitar la reinserción social de ex-drogodependientes y jóvenes en alto riesgo, a través del asesoramiento en la utilización de los recursos socio-culturales existentes, de la potenciación de los aspectos culturales y de ocio del individuo, de la organización de actividades destinadas a la erradicación de las drogodependencias en nuestra sociedad.                                                                                                                                                                                                                                                                                                                                                                                                            "
+        }
+      ],
+      "audit_status": "manually_inspected"
+    },
+    {
+      "source_value": "Ayuda a Accid/Gru. Rescate",
+      "expected_mode": "context",
+      "expected_semantics": {},
+      "expected_hints": [
+        "emergency_or_rescue",
+        "accident_support"
+      ],
+      "source_count": 44,
+      "evidence_samples": [
+        {
+          "source_record_id": "AS/A/06136/1996",
+          "name": "DE AYUDA AL EMIGRANTE EN CARRETERA \"AT-TARIQ\"",
+          "sorting": "Carácter Benéfico Asistencial",
+          "goal_type": "Ayuda a Accid/Gru. Rescate",
+          "rec_goal": "Favorecer el paso de los emigrantes en carretera (mayoritariamente africanos) por el País Vasco a través de servicios de intérprete en caso de accidentes, averías u otras situaciones difíciles para ellos, así como proporcionar información sobre los trayectos a fin de evitar pérdidas. Ello unido a la creación, a lo largo del camino, de zonas de avituallamiento que faciliten el descanso."
+        },
+        {
+          "source_record_id": "AS/A/06675/1997",
+          "name": "GRUPO DE PROTECCION CIVIL ALEGRIA-DULANTZI \"EGUZKI LAUTADAKO\"",
+          "sorting": "Carácter Benéfico Asistencial",
+          "goal_type": "Ayuda a Accid/Gru. Rescate",
+          "rec_goal": "Dar respuesta adecuada en los casos de siniestro grave o catástrofe dentro del término municipal de Alegría-Dulantzi, analizar los riesgos más interesantes, cuantificando el alcance de los mismos, catalogar los medios y recursos llamados a intervenir para reducir y reparar las consecuencias de los siniestros, así como establecer la coordinación adecuada de medios en relación con los riesgos."
+        },
+        {
+          "source_record_id": "AS/A/14812/2009",
+          "name": "ASOCIACION GRUPO DE RESCATE CANINO DE ALAVA \"G.R.E.C.A.\"",
+          "sorting": "Carácter Benéfico Asistencial",
+          "goal_type": "Ayuda a Accid/Gru. Rescate",
+          "rec_goal": "Colaborar con  los organismos competentes en la búsqueda de personas desaparecidas.Preparación de los guías y figurantes, en temas relacionados con el rescate.Preparación de los perros para que formen un equipo con sus guías.Desarrollar actividades económicas de todo tipo, encaminadas a la realización de sus fines o a allegar recursos con ese objetivo.Adquirir y poseer bienes de todas clases y por cualquier título, así como celebrar actos y contratos de todo género.Ejercitar toda clase de accionews conforme a las leyes o a sus Estatutos."
+        }
+      ],
+      "audit_status": "manually_inspected"
+    },
+    {
+      "source_value": "Ayuda a Disminuídos Psíquicos",
+      "expected_mode": "strong_candidate",
+      "expected_semantics": {
+        "needs": [
+          "DISCAPACIDAD_INTELECTUAL"
+        ],
+        "populations": [
+          "PERSONAS_CON_DISCAPACIDAD"
+        ]
+      },
+      "expected_hints": [],
+      "source_count": 33,
+      "evidence_samples": [
+        {
+          "source_record_id": "AS/A/05115/1995",
+          "name": "ASOCIACION \"DOWN ARABA - ISABEL ORBE\"",
+          "sorting": "Carácter Benéfico Asistencial",
+          "goal_type": "Ayuda a Disminuídos Psíquicos",
+          "rec_goal": "La realización de cuantas actividades pueda mejorar la calidad de vida de las personas con síndrome de Down y sus familias, contribuyendo a su desarrollo personal y unamayor adquisición de derechos sociales e individuales."
+        },
+        {
+          "source_record_id": "AS/A/15873/2011",
+          "name": "ASOCIACIÓN DE OCIO Y TIEMPO LIBRE. ACCIÓN Y PARTICIPACIÓN COMUNITARIA PARA PERSONAS CON DISCAPACIDAD \"TALUR\"",
+          "sorting": "Carácter Benéfico Asistencial",
+          "goal_type": "Ayuda a Disminuídos Psíquicos",
+          "rec_goal": "l. Educación integral. Proporcionar a las personas usuarias una educación integral.2. Formación. Formar a aquellas personas que de manera profesional o personal tengan una relación directa o indirecta con personas con discapacidad.3. Ocio y tiempo libre. Convertir el ocio y tiempo libre en un instrumento para el enriquecimiento, desarrollo personal e integración social de las personas y especialmente de las personas con discapacidad.4. Asistencial. Ofrecer la posibilidad de contar con la presencia de un equipo profesional (acompañantes y coordinadores/as) para el apoyo y acompañamiento de personas con discapacidad intelectual en un espacio y tiempo pautado.5. Orientación. Prestar información y asesoramiento a las familias y a las personas usuarias sobre diferentes trámites, gestiones, servicios, recursos  así como orientación laboral, psicológica, mediación de conflictos o en otras materias.6. Sensibilización. Fomentar en matera de sensibilización el conocimiento y visibilización de la"
+        },
+        {
+          "source_record_id": "AS/A/18190/2014",
+          "name": "ASOCIACION EN FOMENTO DE LA INCLUSION PROYECTO HAR-EMAN",
+          "sorting": "Carácter Benéfico Asistencial",
+          "goal_type": "Ayuda a Disminuídos Psíquicos",
+          "rec_goal": "Promover la concienciación de la sociedad sobre las personas con discapacidad intelectual como agentes activos de la inisina y generadores de valores que fomentan la solidaridad y el bienestar social, así como fomentar la inclusión en todos los ámbitos de actividad."
+        }
+      ],
+      "audit_status": "manually_inspected"
+    },
+    {
+      "source_value": "Filatélicas/Numismáticas",
+      "expected_mode": "candidate_set",
+      "expected_semantics": {
+        "activities": [
+          "FILATELIA",
+          "COLECCIONISMO"
+        ]
+      },
+      "expected_hints": [],
+      "source_count": 31,
+      "evidence_samples": [
+        {
+          "source_record_id": "AS/A/02344/1990",
+          "name": "FILATELICA Y NUMISMATICA \"AFNA\"",
+          "sorting": "Cultura General",
+          "goal_type": "Filatélicas/Numismáticas",
+          "rec_goal": "Promover culturalmente la afición a la filatelia y numismática en Salvatierra y zona."
+        },
+        {
+          "source_record_id": "AS/A/02757/1991",
+          "name": "\"LAUDIO FILATELDI ELKARTEA-ASOCIACION FILATELICA LAUDIO\" (L.F.E.)",
+          "sorting": "Cultura General",
+          "goal_type": "Filatélicas/Numismáticas",
+          "rec_goal": "La divulgación de la Filatelia en el Valle de Llodio-Laudio."
+        },
+        {
+          "source_record_id": "AS/B/00369/1987",
+          "name": "NUMISMATICA Y VITOLFILICA",
+          "sorting": "Cultura General",
+          "goal_type": "Filatélicas/Numismáticas",
+          "rec_goal": "El estudio de la Numismática y la Vitolfilia y el fomento y ampliación de los conocimientos mediante todo tipo de actos culturales."
+        }
+      ],
+      "audit_status": "manually_inspected"
+    },
+    {
+      "source_value": "Ayuda a Alcohólicos",
+      "expected_mode": "source_assertion",
+      "expected_semantics": {
+        "needs": [
+          "ALCOHOLISMO"
+        ]
+      },
+      "expected_hints": [],
+      "source_count": 23,
+      "evidence_samples": [
+        {
+          "source_record_id": "AS/A/06996/1997",
+          "name": "DE AYUDA PRO ALCOHÓLICOS \"A.P.A.L.\"",
+          "sorting": "Carácter Benéfico Asistencial",
+          "goal_type": "Ayuda a Alcohólicos",
+          "rec_goal": "- Promover recursos de ocio y tiempo libre para la problación alcohólica de Llodio desde el marco de la prevención comunitaria, movilizando voluntades de personas alcohólicas rehabilitadas de Llodio en orden a promocionar y facilitar alternativas de estilo de vida saludable en nuestro pueblo."
+        },
+        {
+          "source_record_id": "AS/B/00056/1986",
+          "name": "LA AMISTAD",
+          "sorting": "Carácter Benéfico Asistencial",
+          "goal_type": "Ayuda a Alcohólicos",
+          "rec_goal": "- Crear una altervativa al tiempo de ocio realizándose éste con abstención absoluta del alcohol en la vida de relación social. -Promoción de actividades recreativas y culturales que supongan una altervativa al consumo de alcohol y otras drogas. -Promover las gestiones necesarias para una mayor eficacia en el logro de nuestros objetivos ante la Administración. -Información y formación social respecto a la problemática del alcohol y otras drogas."
+        },
+        {
+          "source_record_id": "AS/B/00057/1986",
+          "name": "DE ALCOHOLICOS REHABILITADOS SAN PEDRO \"ZONA MINERA\"",
+          "sorting": "Carácter Benéfico Asistencial",
+          "goal_type": "Ayuda a Alcohólicos",
+          "rec_goal": "Promover, orientar e impulsar el movimiento asociativo de los enfermos alcohólicos rehabilitados o en su rehabilitación, así como lograr el máximo interés de la Administración Pública, de los Organos no alcohólicos, de los profesionales competentes y de la Sociedad en general. Así mismo, la asociación tiene como objeto establecer relaciones de coordinación con las Asociaciones e Instituciones dedicadas a la protección de los enfermos alcohólicos, pudiendo adherirse a Instituciones Nacionales e Internacionales que promueben la atención al alcoholismo. Para conseguir la efectiva realización de su objeto la Asociación deberá cumplir los siguientes fines: - La abstención total y definitiva de los miembros que compongan la Asociación. - La dedicación de los miembros más incorporados a la tarea de la conquista individual de lo enfermos alcohólicos, para su rehabilitación.. - La formación de sus asociados, mediante reuniones frecuentes y periódicas, que vayan dirigidas, no solamente a la reha"
+        }
+      ],
+      "audit_status": "manually_inspected"
+    }
+  ]
+}

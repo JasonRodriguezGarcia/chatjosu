@@ -1,0 +1,3354 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+
+import {
+  createHelpchatUnderstandingRouter,
+  deriveClarificationDimension,
+} from "../services/helpchat-understanding-router.js";
+
+function fakeSemanticClassifier({
+  status = "resolved",
+  tag = {
+    tag_id: 7,
+    descripcion: "BIENESTAR SOCIAL",
+  },
+  diagnostics = {
+    top1: {
+      tag: "BIENESTAR SOCIAL",
+      score: 0.8,
+    },
+    top2: {
+      tag: "EXCLUSIÓN SOCIAL",
+      score: 0.6,
+    },
+    margin: 0.2,
+  },
+} = {}) {
+  return {
+    async classify({
+      conversationContext,
+    }) {
+      return {
+        status,
+        tag:
+          status === "resolved"
+            ? tag
+            : null,
+
+        context:
+          conversationContext,
+
+        needsClarification:
+          status !== "resolved",
+
+        provider: "embedding",
+        model: "fake",
+
+        diagnostics,
+        durationMs: 10,
+      };
+    },
+  };
+}
+
+test(
+  "anchor explícito resuelve sin embedding",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+
+            throw new Error(
+              "No debería ejecutarse."
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Mi padre tiene Alzheimer",
+        conversationContext: null,
+      });
+
+    assert.equal(
+      result.status,
+      "resolved"
+    );
+
+    assert.equal(
+      result.tag.descripcion,
+      "ALZHEIMER"
+    );
+
+    assert.equal(
+      result.provider,
+      "anchor"
+    );
+
+    assert.equal(
+      semanticCalls,
+      0
+    );
+  }
+);
+
+test(
+  "petición insuficiente pregunta sin embedding",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+
+            throw new Error(
+              "No debería ejecutarse."
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Necesito ayuda para mi padre",
+        conversationContext: null,
+      });
+
+    assert.equal(
+      result.status,
+      "needs_clarification"
+    );
+
+    assert.equal(
+      result.tag,
+      null
+    );
+
+    assert.equal(
+      result.missingDimension,
+      "need_type"
+    );
+
+    assert.equal(
+      semanticCalls,
+      0
+    );
+  }
+);
+
+test(
+  "embedding claro produce resolved",
+  async () => {
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier:
+          fakeSemanticClassifier(),
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Necesito orientación social",
+        conversationContext: null,
+      });
+
+    assert.equal(
+      result.status,
+      "resolved"
+    );
+
+    assert.equal(
+      result.tag.descripcion,
+      "BIENESTAR SOCIAL"
+    );
+
+    assert.equal(
+      result.provider,
+      "embedding"
+    );
+  }
+);
+
+test(
+  "embedding ambiguo produce aclaración",
+  async () => {
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier:
+          fakeSemanticClassifier({
+            status:
+              "needs_clarification",
+
+            diagnostics: {
+              top1: {
+                tag: "ALZHEIMER",
+                score: 0.61,
+              },
+
+              top2: {
+                tag: "SALUD MENTAL",
+                score: 0.60,
+              },
+
+              margin: 0.01,
+            },
+          }),
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Mi tío está perdiendo la cabeza",
+        conversationContext: null,
+      });
+
+    assert.equal(
+      result.status,
+      "needs_clarification"
+    );
+
+    assert.equal(
+      result.tag,
+      null
+    );
+
+    assert.equal(
+      result.missingDimension,
+      "symptom_domain"
+    );
+
+    assert.match(
+      result.clarificationQuestion,
+      /memoria|desorientación/i
+    );
+  }
+);
+
+test(
+  "preserva Context V1 normalizado",
+  async () => {
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier:
+          fakeSemanticClassifier(),
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Necesito orientación social",
+
+        conversationContext: {
+          version: 999,
+
+          subject: {
+            relationship:
+              " madre ",
+          },
+
+          activeNeeds: [
+            " apoyo social ",
+          ],
+        },
+      });
+
+    assert.equal(
+      result.context.version,
+      1
+    );
+
+    assert.equal(
+      result.context.subject.relationship,
+      "madre"
+    );
+
+    assert.deepEqual(
+      result.context.activeNeeds,
+      ["apoyo social"]
+    );
+  }
+);
+
+test(
+  "detecta dimensión cognitiva frente a salud mental",
+  () => {
+    assert.equal(
+      deriveClarificationDimension({
+        top1: {
+          tag: "ALZHEIMER",
+        },
+
+        top2: {
+          tag: "SALUD MENTAL",
+        },
+      }),
+      "symptom_domain"
+    );
+  }
+);
+
+test(
+  "varios anchors explícitos resuelven sin embedding",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+
+            throw new Error(
+              "No debería ejecutarse."
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "soy alcohólico y tengo depresión",
+        conversationContext: null,
+      });
+
+    assert.equal(
+      result.status,
+      "resolved"
+    );
+
+    assert.equal(
+      result.tag.descripcion,
+      "ALCOHOLISMO"
+    );
+
+    assert.deepEqual(
+      result.resolvedNeeds.map(
+        (need) =>
+          need.descripcion
+      ),
+      [
+        "ALCOHOLISMO",
+        "SALUD MENTAL",
+      ]
+    );
+
+    assert.equal(
+      result.provider,
+      "anchor"
+    );
+
+    assert.equal(
+      semanticCalls,
+      0
+    );
+  }
+);
+
+test(
+  "regresión exacta multi-need conserva alcohol trabajo y sueño sin semántica",
+  async () => {
+    const inputMessage =
+      "no sé qué hacer con mi vida he perdido el trabajo.\n" +
+      "tengo problemas de alcohol y no puedo dormir por las noches";
+
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+
+            throw new Error(
+              "SEMANTIC_SHOULD_NOT_RUN"
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage,
+        conversationContext: null,
+      });
+
+    assert.equal(
+      result.status,
+      "resolved"
+    );
+
+    assert.equal(
+      result.tag?.descripcion,
+      "ALCOHOLISMO"
+    );
+
+    assert.deepEqual(
+      new Set(
+        result.resolvedNeeds?.map(
+          (need) =>
+            need.descripcion
+        )
+      ),
+      new Set([
+        "ALCOHOLISMO",
+        "SALUD MENTAL",
+        "INSERCIÓN LABORAL",
+      ])
+    );
+
+    assert.equal(
+      result.provider,
+      "anchor"
+    );
+
+    assert.equal(
+      semanticCalls,
+      0
+    );
+  }
+);
+
+test(
+  "los starters genéricos piden aclaración sin usar embedding",
+  async () => {
+    let embeddingCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            embeddingCalls += 1;
+
+            throw new Error(
+              "embedding no debería ejecutarse",
+            );
+          },
+        },
+      });
+
+    for (
+      const inputMessage of [
+        "Busco orientación social",
+        "Necesito apoyo relacionado con una enfermedad",
+      ]
+    ) {
+      const result =
+        await router.understand({
+          inputMessage,
+
+          conversationContext: {
+            version: 1,
+            subject: {
+              relationship: null,
+            },
+            activeNeeds: [],
+            currentGoal: null,
+            facts: [],
+            constraints: [],
+            territory: {
+              province: "Gipuzkoa",
+              municipality: null,
+            },
+            resourcesShown: [],
+          },
+        });
+
+      assert.equal(
+        result.status,
+        "needs_clarification",
+      );
+
+      assert.equal(
+        result.needsClarification,
+        true,
+      );
+
+      assert.equal(
+        result.provider,
+        "rule",
+      );
+
+      assert.equal(
+        result.model,
+        "semantic-fast-gates-v1",
+      );
+
+      assert.equal(
+        result.tag,
+        null,
+      );
+    }
+
+    assert.equal(
+      embeddingCalls,
+      0,
+    );
+  },
+);
+
+test(
+  "una aclaración need_type expone quick replies sin llamar al embedding",
+  async () => {
+    let embeddingCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            embeddingCalls += 1;
+
+            throw new Error(
+              "embedding no debería ejecutarse",
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Busco orientación social",
+
+        conversationContext: {
+          version: 1,
+          subject: {
+            relationship: null,
+          },
+          activeNeeds: [],
+          currentGoal: null,
+          facts: [],
+          constraints: [],
+          territory: {
+            province:
+              "Gipuzkoa",
+            municipality:
+              null,
+          },
+          resourcesShown: [],
+        },
+      });
+
+    assert.equal(
+      result.status,
+      "needs_clarification"
+    );
+
+    assert.equal(
+      result.missingDimension,
+      "need_type"
+    );
+
+    assert.deepEqual(
+      result.quickReplies.map(
+        (reply) =>
+          reply.label
+      ),
+      [
+        "Empleo",
+        "Salud o enfermedad",
+        "Salud emocional",
+        "Alcohol u otras adicciones",
+        "Otra situación",
+      ]
+    );
+
+    assert.equal(
+      embeddingCalls,
+      0
+    );
+  }
+);
+
+test(
+  "controlled employment resuelve sin embedding",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+            throw new Error(
+              "semantic classifier no debería ejecutarse",
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Necesito orientación sobre empleo",
+        conversationContext: null,
+        controlledReply: {
+          type: "need_domain",
+          value: "employment",
+        },
+      });
+
+    assert.equal(
+      result.status,
+      "resolved",
+    );
+
+    assert.equal(
+      result.tag.descripcion,
+      "INSERCIÓN LABORAL",
+    );
+
+    assert.equal(
+      result.provider,
+      "controlled_reply",
+    );
+
+    assert.equal(
+      result.model,
+      "controlled-replies-v1",
+    );
+
+    assert.equal(
+      semanticCalls,
+      0,
+    );
+  },
+);
+
+test(
+  "controlled health pide detalle sin embedding",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+            throw new Error(
+              "semantic classifier no debería ejecutarse",
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Necesito orientación sobre salud o una enfermedad",
+        conversationContext: null,
+        controlledReply: {
+          type: "need_domain",
+          value: "health",
+        },
+      });
+
+    assert.equal(
+      result.status,
+      "needs_clarification",
+    );
+
+    assert.equal(
+      result.missingDimension,
+      "health_detail",
+    );
+
+    assert.match(
+      result.clarificationQuestion,
+      /enfermedad|problema de salud/i,
+    );
+
+    assert.equal(
+      result.provider,
+      "controlled_reply",
+    );
+
+    assert.equal(
+      semanticCalls,
+      0,
+    );
+  },
+);
+
+test(
+  "controlled reply desconocida no puede forzar resolución",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+
+            return {
+              status:
+                "needs_clarification",
+              tag: null,
+              context: {
+                version: 1,
+                subject: {
+                  relationship: null,
+                },
+                activeNeeds: [],
+                currentGoal: null,
+                facts: [],
+                constraints: [],
+                territory: {
+                  province: null,
+                  municipality: null,
+                },
+                resourcesShown: [],
+              },
+              needsClarification:
+                true,
+              provider:
+                "embedding",
+              model:
+                "fake-embedding",
+              diagnostics: {
+                top1: null,
+                top2: null,
+              },
+            };
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "una frase libre no controlada",
+        conversationContext: null,
+        controlledReply: {
+          type: "need_domain",
+          value: "invented",
+        },
+      });
+
+    assert.equal(
+      semanticCalls,
+      1,
+    );
+
+    assert.equal(
+      result.status,
+      "needs_clarification",
+    );
+
+    assert.equal(
+      result.provider,
+      "embedding",
+    );
+  },
+);
+
+test(
+  "clarification graph avanza de need_type a salud emocional sin embedding",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+            throw new Error(
+              "semantic classifier no debería ejecutarse",
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Necesito orientación sobre salud emocional",
+        conversationContext: null,
+        controlledReply: {
+          type:
+            "clarification_choice",
+          node:
+            "need_type",
+          choice:
+            "emotional_health",
+        },
+      });
+
+    assert.equal(
+      result.status,
+      "needs_clarification",
+    );
+
+    assert.equal(
+      result.missingDimension,
+      "mental_health_detail",
+    );
+
+    assert.equal(
+      result.provider,
+      "clarification_graph",
+    );
+
+    assert.deepEqual(
+      result.quickReplies.map(
+        (reply) =>
+          reply.label,
+      ),
+      [
+        "Ánimo o ansiedad",
+        "Sueño",
+        "Cambios de conducta",
+        "Otra situación",
+      ],
+    );
+
+    assert.equal(
+      semanticCalls,
+      0,
+    );
+  },
+);
+
+test(
+  "clarification graph resuelve sueño dentro de salud emocional sin embedding",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+            throw new Error(
+              "semantic classifier no debería ejecutarse",
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Lo que más preocupa es el sueño",
+        conversationContext: null,
+        controlledReply: {
+          type:
+            "clarification_choice",
+          node:
+            "mental_health_detail",
+          choice:
+            "sleep",
+        },
+      });
+
+    assert.equal(
+      result.status,
+      "resolved",
+    );
+
+    assert.equal(
+      result.tag.descripcion,
+      "SALUD MENTAL",
+    );
+
+    assert.equal(
+      result.provider,
+      "clarification_graph",
+    );
+
+    assert.deepEqual(
+      result.resolvedNeeds,
+      [
+        {
+          tag_id: 31,
+          descripcion:
+            "SALUD MENTAL",
+          source:
+            "clarification_graph",
+        },
+      ],
+    );
+
+    assert.equal(
+      semanticCalls,
+      0,
+    );
+  },
+);
+
+test(
+  "clarification graph lleva cambios de conducta a una pregunta más específica",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+            throw new Error(
+              "semantic classifier no debería ejecutarse",
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Lo que más preocupa son los cambios de conducta",
+        conversationContext: null,
+        controlledReply: {
+          type:
+            "clarification_choice",
+          node:
+            "mental_health_detail",
+          choice:
+            "behavior_changes",
+        },
+      });
+
+    assert.equal(
+      result.status,
+      "needs_clarification",
+    );
+
+    assert.equal(
+      result.missingDimension,
+      "mental_behavior_detail",
+    );
+
+    assert.match(
+      result.clarificationQuestion,
+      /cambios de conducta/i,
+    );
+
+    assert.deepEqual(
+      result.clarificationTransition,
+      {
+        sourceNode:
+          "mental_health_detail",
+        action: {
+          type:
+            "goto",
+          node:
+            "mental_behavior_detail",
+          resolvedNeeds: [
+            {
+              tag_id: 31,
+              descripcion:
+                "SALUD MENTAL",
+            },
+          ],
+        },
+      },
+    );
+
+    assert.equal(
+      semanticCalls,
+      0,
+    );
+  },
+);
+
+test(
+  "una choice no puede reutilizarse en otro nodo para forzar resolución",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify({
+            conversationContext,
+          }) {
+            semanticCalls += 1;
+
+            return {
+              status:
+                "needs_clarification",
+              tag: null,
+              context:
+                conversationContext,
+              provider:
+                "embedding",
+              model:
+                "fake-embedding",
+              diagnostics: {
+                top1: null,
+                top2: null,
+              },
+            };
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Sueño",
+        conversationContext: null,
+        controlledReply: {
+          type:
+            "clarification_choice",
+          node:
+            "need_type",
+          choice:
+            "sleep",
+        },
+      });
+
+    assert.equal(
+      semanticCalls,
+      1,
+    );
+
+    assert.equal(
+      result.status,
+      "needs_clarification",
+    );
+
+    assert.notEqual(
+      result.provider,
+      "clarification_graph",
+    );
+  },
+);
+
+test(
+  "clarification graph exposes its canonical transition metadata",
+  async () => {
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            throw new Error(
+              "semantic classifier no debería ejecutarse",
+            );
+          },
+        },
+      });
+
+    const next =
+      await router.understand({
+        inputMessage:
+          "Necesito orientación sobre salud emocional",
+        conversationContext: null,
+        controlledReply: {
+          type:
+            "clarification_choice",
+          node:
+            "need_type",
+          choice:
+            "emotional_health",
+        },
+      });
+
+    assert.deepEqual(
+      next.clarificationTransition,
+      {
+        sourceNode:
+          "need_type",
+        action: {
+          type: "goto",
+          node:
+            "mental_health_detail",
+        },
+      },
+    );
+
+    const resolved =
+      await router.understand({
+        inputMessage:
+          "Lo que más preocupa es el sueño",
+        conversationContext: null,
+        controlledReply: {
+          type:
+            "clarification_choice",
+          node:
+            "mental_health_detail",
+          choice:
+            "sleep",
+        },
+      });
+
+    assert.equal(
+      resolved
+        .clarificationTransition
+        .sourceNode,
+      "mental_health_detail",
+    );
+
+    assert.equal(
+      resolved
+        .clarificationTransition
+        .action
+        .type,
+      "resolve_need",
+    );
+  },
+);
+
+test(
+  "a graph-backed clarification exposes pending clarification state",
+  async () => {
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            throw new Error(
+              "embedding no debería ejecutarse para este starter",
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Necesito ayuda para un familiar",
+        conversationContext: null,
+      });
+
+    assert.equal(
+      result.status,
+      "needs_clarification",
+    );
+
+    assert.deepEqual(
+      result.clarificationState,
+      {
+        node: "need_type",
+        mode: "choice",
+      },
+    );
+  },
+);
+
+test(
+  "free text can resolve a pending need_type choice without embedding",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+
+            throw new Error(
+              "embedding no debería ejecutarse",
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Es por su salud emocional",
+        conversationContext: null,
+        pendingClarification: {
+          node: "need_type",
+          personId: "person_1",
+          mode: "choice",
+        },
+      });
+
+    assert.equal(
+      semanticCalls,
+      0,
+    );
+
+    assert.equal(
+      result.status,
+      "needs_clarification",
+    );
+
+    assert.equal(
+      result.provider,
+      "clarification_text",
+    );
+
+    assert.deepEqual(
+      result.clarificationTransition,
+      {
+        sourceNode:
+          "need_type",
+        action: {
+          type: "goto",
+          node:
+            "mental_health_detail",
+        },
+      },
+    );
+  },
+);
+
+test(
+  "free text can advance a pending emotional-health clarification",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+
+            throw new Error(
+              "embedding no debería ejecutarse",
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Ha cambiado mucho su comportamiento",
+        conversationContext: null,
+        pendingClarification: {
+          node:
+            "mental_health_detail",
+          personId:
+            "person_1",
+          mode:
+            "choice",
+        },
+      });
+
+    assert.equal(
+      semanticCalls,
+      0,
+    );
+
+    assert.equal(
+      result.status,
+      "needs_clarification",
+    );
+
+    assert.equal(
+      result.provider,
+      "clarification_text",
+    );
+
+    assert.deepEqual(
+      result.clarificationTransition,
+      {
+        sourceNode:
+          "mental_health_detail",
+        action: {
+          type:
+            "goto",
+          node:
+            "mental_behavior_detail",
+          resolvedNeeds: [
+            {
+              tag_id: 31,
+              descripcion:
+                "SALUD MENTAL",
+            },
+          ],
+        },
+      },
+    );
+  },
+);
+
+test(
+  "ambiguous pending text is not forced into a graph choice",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify({
+            conversationContext,
+          }) {
+            semanticCalls += 1;
+
+            return {
+              status:
+                "needs_clarification",
+              tag: null,
+              context:
+                conversationContext,
+              provider:
+                "embedding",
+              model:
+                "fake",
+              diagnostics: {
+                top1: null,
+                top2: null,
+              },
+            };
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Tiene ansiedad y tampoco consigue dormir",
+        conversationContext: null,
+        pendingClarification: {
+          node:
+            "mental_health_detail",
+          personId:
+            "person_1",
+          mode:
+            "choice",
+        },
+      });
+
+    assert.equal(
+      semanticCalls,
+      1,
+    );
+
+    assert.notEqual(
+      result.provider,
+      "clarification_text",
+    );
+  },
+);
+
+test(
+  "choice-less graph nodes expose free-text pending mode",
+  async () => {
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            throw new Error(
+              "embedding no debería ejecutarse",
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Lo que más preocupa son los cambios de conducta",
+        conversationContext: null,
+        controlledReply: {
+          type: "clarification_choice",
+          node:
+            "mental_health_detail",
+          choice:
+            "behavior_changes",
+        },
+      });
+
+    assert.equal(
+      result.status,
+      "needs_clarification",
+    );
+
+    assert.deepEqual(
+      result.clarificationState,
+      {
+        node:
+          "mental_behavior_detail",
+        mode:
+          "free_text",
+      },
+    );
+  },
+);
+
+test(
+  "behavior detail advances to broad mental-health support without diagnosing",
+  async () => {
+    let semanticCalls = 0;
+    let localLlmCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+
+            throw new Error(
+              "semantic classification should not run"
+            );
+          },
+        },
+
+        localLlmService: {
+          model: "fake-local",
+
+          async classify() {
+            localLlmCalls += 1;
+
+            throw new Error(
+              "local LLM should not run"
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "cambios de humor repentino cambio de conducta o principios o maneras de hacer cosas",
+        conversationContext: null,
+        pendingClarification: {
+          node:
+            "mental_behavior_detail",
+          personId:
+            "person_1",
+          mode:
+            "free_text",
+        },
+      });
+
+    assert.equal(
+      semanticCalls,
+      0,
+    );
+
+    assert.equal(
+      localLlmCalls,
+      0,
+    );
+
+    assert.equal(
+      result.status,
+      "resolved",
+    );
+
+    assert.deepEqual(
+      result.tag,
+      {
+        tag_id: 31,
+        descripcion:
+          "SALUD MENTAL",
+      },
+    );
+
+    assert.deepEqual(
+      result.clarificationTransition,
+      {
+        sourceNode:
+          "mental_behavior_detail",
+        action: {
+          type:
+            "resolve_need",
+          resolvedNeeds: [
+            {
+              tag_id: 31,
+              descripcion:
+                "SALUD MENTAL",
+            },
+          ],
+        },
+      },
+    );
+  },
+);
+
+test(
+  "insufficient behavior detail does not invent a mental-health resolution",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify({
+            conversationContext,
+          }) {
+            semanticCalls += 1;
+
+            return {
+              status:
+                "needs_clarification",
+              tag: null,
+              context:
+                conversationContext,
+              provider:
+                "embedding",
+              model:
+                "fake",
+              diagnostics: {
+                candidates: [],
+              },
+            };
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "no sé",
+        conversationContext: null,
+        pendingClarification: {
+          node:
+            "mental_behavior_detail",
+          personId:
+            "person_1",
+          mode:
+            "free_text",
+        },
+      });
+
+    assert.notEqual(
+      result.status,
+      "resolved",
+    );
+
+    assert.equal(
+      result.tag,
+      null,
+    );
+
+    assert.equal(
+      semanticCalls,
+      1,
+    );
+  },
+);
+
+test(
+  "insufficient optional behavior detail retains an existing broad need and advances",
+  async () => {
+    let semanticCalls = 0;
+    let localLlmCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+
+            throw new Error(
+              "semantic classification should not run",
+            );
+          },
+        },
+
+        localLlmService: {
+          model:
+            "fake-local",
+
+          async classify() {
+            localLlmCalls += 1;
+
+            throw new Error(
+              "local LLM should not run",
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "no sé",
+        conversationContext: null,
+        relationalContext: {
+          version: 2,
+          people: [
+            {
+              id:
+                "person_1",
+              relationship:
+                "hermano",
+              needs: [
+                "SALUD MENTAL",
+              ],
+            },
+          ],
+          currentFocus:
+            "person_1",
+          pendingClarification: {
+            node:
+              "mental_behavior_detail",
+            personId:
+              "person_1",
+            mode:
+              "free_text",
+          },
+        },
+        pendingClarification: {
+          node:
+            "mental_behavior_detail",
+          personId:
+            "person_1",
+          mode:
+            "free_text",
+        },
+      });
+
+    assert.equal(
+      result.status,
+      "resolved",
+    );
+
+    assert.deepEqual(
+      result.tag,
+      {
+        tag_id: 31,
+        descripcion:
+          "SALUD MENTAL",
+      },
+    );
+
+    assert.equal(
+      result.provider,
+      "conversation_policy",
+    );
+
+    assert.equal(
+      result.diagnostics?.reason,
+      "optional_detail_unavailable",
+    );
+
+    assert.deepEqual(
+      result.clarificationTransition,
+      {
+        sourceNode:
+          "mental_behavior_detail",
+        action: {
+          type:
+            "resolve_need",
+          resolvedNeeds: [
+            {
+              tag_id: 31,
+              descripcion:
+                "SALUD MENTAL",
+            },
+          ],
+        },
+      },
+    );
+
+    assert.equal(
+      semanticCalls,
+      0,
+    );
+
+    assert.equal(
+      localLlmCalls,
+      0,
+    );
+  },
+);
+
+test(
+  "free text in pending addiction_detail advances inside the addiction branch",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+
+            throw new Error(
+              "global embedding should not run",
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "con otra conducta",
+        conversationContext:
+          null,
+        pendingClarification: {
+          node:
+            "addiction_detail",
+          personId:
+            "self",
+          mode:
+            "choice",
+        },
+      });
+
+    assert.equal(
+      semanticCalls,
+      0,
+    );
+
+    assert.equal(
+      result.status,
+      "needs_clarification",
+    );
+
+    assert.equal(
+      result.provider,
+      "clarification_text",
+    );
+
+    assert.equal(
+      result.missingDimension,
+      "addiction_behavior_detail",
+    );
+
+    assert.equal(
+      result.clarificationState.node,
+      "addiction_behavior_detail",
+    );
+
+    assert.equal(
+      result.clarificationState.mode,
+      "free_text",
+    );
+
+    assert.equal(
+      result.clarificationTransition
+        .action.type,
+      "goto",
+    );
+
+    assert.equal(
+      result.clarificationTransition
+        .action.node,
+      "addiction_behavior_detail",
+    );
+  },
+);
+
+test(
+  "pending health_detail uses only its bounded semantic catalog",
+  async () => {
+    let semanticCalls = 0;
+    let receivedAllowedTagIds = null;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify({
+            conversationContext,
+            allowedTagIds,
+          }) {
+            semanticCalls += 1;
+            receivedAllowedTagIds =
+              allowedTagIds;
+
+            return {
+              status:
+                "resolved",
+              tag: {
+                tag_id: 13,
+                descripcion:
+                  "DIABETES",
+              },
+              context:
+                conversationContext,
+              needsClarification:
+                false,
+              provider:
+                "embedding",
+              model:
+                "fake",
+              diagnostics: {
+                top1: {
+                  tagId: 13,
+                  tag:
+                    "DIABETES",
+                  score: 0.9,
+                },
+                top2: null,
+                candidates: [
+                  {
+                    tagId: 13,
+                    tag:
+                      "DIABETES",
+                    score: 0.9,
+                  },
+                ],
+              },
+            };
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Le han diagnosticado diabetes",
+        conversationContext:
+          null,
+        pendingClarification: {
+          node:
+            "health_detail",
+          personId:
+            "self",
+          mode:
+            "free_text",
+        },
+      });
+
+    assert.equal(
+      semanticCalls,
+      1,
+    );
+
+    assert.ok(
+      receivedAllowedTagIds
+        .includes(13),
+    );
+
+    assert.equal(
+      receivedAllowedTagIds
+        .includes(25),
+      false,
+    );
+
+    assert.equal(
+      receivedAllowedTagIds
+        .includes(2),
+      false,
+    );
+
+    assert.equal(
+      result.status,
+      "resolved",
+    );
+
+    assert.equal(
+      result.tag.descripcion,
+      "DIABETES",
+    );
+
+    assert.deepEqual(
+      result.clarificationTransition,
+      {
+        sourceNode:
+          "health_detail",
+        action: {
+          type:
+            "resolve_need",
+          resolvedNeeds: [
+            {
+              tag_id: 13,
+              descripcion:
+                "DIABETES",
+            },
+          ],
+        },
+      },
+    );
+  },
+);
+
+test(
+  "pending health_detail cannot escape to a global alcohol anchor",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify({
+            conversationContext,
+            allowedTagIds,
+          }) {
+            semanticCalls += 1;
+
+            assert.equal(
+              allowedTagIds
+                .includes(2),
+              false,
+            );
+
+            return {
+              status:
+                "needs_clarification",
+              tag: null,
+              context:
+                conversationContext,
+              needsClarification:
+                true,
+              provider:
+                "embedding",
+              model:
+                "fake",
+              diagnostics: {
+                top1: null,
+                top2: null,
+                candidates: [],
+              },
+            };
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Es por alcohol",
+        conversationContext:
+          null,
+        pendingClarification: {
+          node:
+            "health_detail",
+          personId:
+            "self",
+          mode:
+            "free_text",
+        },
+      });
+
+    assert.equal(
+      semanticCalls,
+      0,
+    );
+
+    assert.equal(
+      result.status,
+      "needs_clarification",
+    );
+
+    assert.equal(
+      result.tag,
+      null,
+    );
+
+    assert.equal(
+      result.provider,
+      "health_statement_authority",
+    );
+
+
+    assert.equal(
+      result.missingDimension,
+      "health_detail",
+    );
+
+    assert.notEqual(
+      result.provider,
+      "anchor",
+    );
+  },
+);
+
+test(
+  "pending behavioral addiction with no catalog does not call semantic classification",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+
+            throw new Error(
+              "semantic classification should not run",
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "No puede dejar las apuestas online",
+        conversationContext:
+          null,
+        pendingClarification: {
+          node:
+            "addiction_behavior_detail",
+          personId:
+            "person_1",
+          mode:
+            "free_text",
+        },
+      });
+
+    assert.equal(
+      semanticCalls,
+      0,
+    );
+
+    assert.equal(
+      result.status,
+      "needs_clarification",
+    );
+
+    assert.equal(
+      result.tag,
+      null,
+    );
+
+    assert.equal(
+      result.provider,
+      "open_clarification_policy",
+    );
+
+    assert.equal(
+      result.missingDimension,
+      "addiction_behavior_detail",
+    );
+
+    assert.equal(
+      result.diagnostics.reason,
+      "no_operational_catalog",
+    );
+
+    assert.deepEqual(
+      result.diagnostics
+        .allowedTagIds,
+      [],
+    );
+  },
+);
+
+test(
+  "pending substance addiction with no catalog cannot fall through to alcohol",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+
+            throw new Error(
+              "semantic classification should not run",
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Consume cocaína",
+        conversationContext:
+          null,
+        pendingClarification: {
+          node:
+            "addiction_substance_detail",
+          personId:
+            "self",
+          mode:
+            "free_text",
+        },
+      });
+
+    assert.equal(
+      semanticCalls,
+      0,
+    );
+
+    assert.equal(
+      result.status,
+      "needs_clarification",
+    );
+
+    assert.equal(
+      result.tag,
+      null,
+    );
+
+    assert.equal(
+      result.provider,
+      "open_clarification_policy",
+    );
+
+    assert.equal(
+      result.missingDimension,
+      "addiction_substance_detail",
+    );
+
+    assert.equal(
+      result.diagnostics.reason,
+      "no_operational_catalog",
+    );
+  },
+);
+
+test(
+  "necesito orientación pide need_type sin embedding",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+
+            throw new Error(
+              "embedding no debería ejecutarse",
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Necesito orientación",
+        conversationContext:
+          null,
+      });
+
+    assert.equal(
+      semanticCalls,
+      0,
+    );
+
+    assert.equal(
+      result.status,
+      "needs_clarification",
+    );
+
+    assert.equal(
+      result.tag,
+      null,
+    );
+
+    assert.equal(
+      result.provider,
+      "rule",
+    );
+
+    assert.equal(
+      result.missingDimension,
+      "need_type",
+    );
+  },
+);
+
+test(
+  "ambiguous open health clarification escalates only its bounded shortlist to local llm",
+  async () => {
+    let localCalls = 0;
+    let receivedCandidates = null;
+    let receivedTaskContext = null;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify({
+            conversationContext,
+            allowedTagIds,
+          }) {
+            assert.equal(
+              allowedTagIds.includes(9),
+              true,
+            );
+
+            assert.equal(
+              allowedTagIds.includes(10),
+              true,
+            );
+
+            return {
+              status:
+                "needs_clarification",
+              tag: null,
+              context:
+                conversationContext,
+              provider:
+                "embedding",
+              model:
+                "fake-embedding",
+              diagnostics: {
+                top1: {
+                  tagId: 10,
+                  tag:
+                    "CÁNCER INFANTIL",
+                  score: 0.7594,
+                },
+                top2: {
+                  tagId: 9,
+                  tag:
+                    "CÁNCER",
+                  score: 0.7429,
+                },
+                candidates: [
+                  {
+                    tagId: 10,
+                    tag:
+                      "CÁNCER INFANTIL",
+                    score: 0.7594,
+                  },
+                  {
+                    tagId: 9,
+                    tag:
+                      "CÁNCER",
+                    score: 0.7429,
+                  },
+                ],
+                margin: 0.0165,
+              },
+            };
+          },
+        },
+
+        localLlmService: {
+          model:
+            "qwen3:8b",
+
+          async classify({
+            taskContext,
+            candidates,
+          }) {
+            localCalls += 1;
+            receivedCandidates =
+              candidates;
+            receivedTaskContext =
+              taskContext;
+
+            return {
+              status:
+                "resolved",
+              tag: {
+                tag_id: 9,
+                descripcion:
+                  "CÁNCER",
+              },
+              provider:
+                "ollama",
+              model:
+                "qwen3:8b",
+              durationMs: 35,
+            };
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Le han diagnosticado diabetes",
+        conversationContext:
+          null,
+        relationalContext: {
+          version: 2,
+          people: [
+            {
+              id: "self",
+              relationship:
+                "self",
+              needs: [],
+              facts: [],
+              constraints: [],
+            },
+          ],
+          currentFocus:
+            "self",
+          currentGoal: null,
+          pendingClarification: {
+            node:
+              "health_detail",
+            personId:
+              "self",
+            mode:
+              "free_text",
+          },
+          territory: {
+            province: null,
+            municipality: null,
+          },
+          resourcesShown: [],
+        },
+        pendingClarification: {
+          node:
+            "health_detail",
+          personId:
+            "self",
+          mode:
+            "free_text",
+        },
+      });
+
+    assert.equal(
+      localCalls,
+      1,
+    );
+
+    assert.deepEqual(
+      receivedCandidates.map(
+        (candidate) =>
+          candidate.tagId,
+      ),
+      [
+        10,
+        9,
+      ],
+    );
+
+    assert.equal(
+      receivedTaskContext.task,
+      "resolve_open_clarification",
+    );
+
+    assert.equal(
+      receivedTaskContext.node,
+      "health_detail",
+    );
+
+    assert.equal(
+      receivedTaskContext
+        .focus.relationship,
+      "self",
+    );
+
+    assert.equal(
+      result.status,
+      "resolved",
+    );
+
+    assert.equal(
+      result.provider,
+      "ollama",
+    );
+
+    assert.equal(
+      result.tag.descripcion,
+      "CÁNCER",
+    );
+
+    assert.equal(
+      result
+        .clarificationTransition
+        .sourceNode,
+      "health_detail",
+    );
+  },
+);
+
+
+
+test(
+  "explicit cancer resolves general cancer without embedding or local llm",
+  async () => {
+    for (
+      const inputMessage of [
+        "Cancer",
+        "Me han detectado un cancer",
+        "Me han detectado un cáncer",
+      ]
+    ) {
+      let semanticCalls = 0;
+      let localCalls = 0;
+
+      const router =
+        createHelpchatUnderstandingRouter({
+          semanticClassifier: {
+            async classify() {
+              semanticCalls += 1;
+
+              throw new Error(
+                "semantic must not run",
+              );
+            },
+          },
+
+          localLlmService: {
+            async classify() {
+              localCalls += 1;
+
+              throw new Error(
+                "local llm must not run",
+              );
+            },
+          },
+        });
+
+      const result =
+        await router.understand({
+          inputMessage,
+          conversationContext:
+            null,
+          pendingClarification: {
+            node:
+              "health_detail",
+            personId:
+              "self",
+            mode:
+              "free_text",
+          },
+        });
+
+      assert.equal(
+        semanticCalls,
+        0,
+      );
+
+      assert.equal(
+        localCalls,
+        0,
+      );
+
+      assert.equal(
+        result.status,
+        "resolved",
+      );
+
+      assert.equal(
+        result.tag.tag_id,
+        9,
+      );
+
+      assert.equal(
+        result.tag.descripcion,
+        "CÁNCER",
+      );
+
+      assert.equal(
+        result.provider,
+        "conversation_policy",
+      );
+
+      assert.equal(
+        result.needsClarification,
+        false,
+      );
+
+      assert.equal(
+        result.diagnostics
+          ?.reason,
+        "explicit_cancer_resolved_general",
+      );
+    }
+  },
+);
+
+test(
+  "known age does not change explicit cancer into a different need",
+  async () => {
+    for (
+      const age of [
+        "12",
+        "72",
+      ]
+    ) {
+      let semanticCalls = 0;
+
+      const router =
+        createHelpchatUnderstandingRouter({
+          semanticClassifier: {
+            async classify() {
+              semanticCalls += 1;
+
+              throw new Error(
+                "semantic must not run",
+              );
+            },
+          },
+        });
+
+      const result =
+        await router.understand({
+          inputMessage:
+            "Cancer",
+          conversationContext:
+            null,
+          relationalContext: {
+            version: 2,
+            people: [
+              {
+                id:
+                  "self",
+                relationship:
+                  "self",
+                resolvedDimensions: {
+                  age,
+                },
+              },
+            ],
+            currentFocus:
+              "self",
+          },
+          pendingClarification: {
+            node:
+              "health_detail",
+            personId:
+              "self",
+            mode:
+              "free_text",
+          },
+        });
+
+      assert.equal(
+        semanticCalls,
+        0,
+      );
+
+      assert.equal(
+        result.status,
+        "resolved",
+      );
+
+      assert.equal(
+        result.tag.tag_id,
+        9,
+      );
+
+      assert.equal(
+        result.tag.descripcion,
+        "CÁNCER",
+      );
+
+      assert.equal(
+        result.diagnostics
+          ?.reason,
+        "explicit_cancer_resolved_general",
+      );
+    }
+  },
+);
+
+test(
+  "cancer audience ambiguity collapses to general cancer when local llm declines",
+  async () => {
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify({
+            conversationContext,
+          }) {
+            return {
+              status:
+                "needs_clarification",
+              tag: null,
+              context:
+                conversationContext,
+              provider:
+                "embedding",
+              model:
+                "fake",
+              diagnostics: {
+                candidates: [
+                  {
+                    tagId: 10,
+                    tag:
+                      "CÁNCER INFANTIL",
+                    score:
+                      0.7594,
+                  },
+                  {
+                    tagId: 9,
+                    tag:
+                      "CÁNCER",
+                    score:
+                      0.7429,
+                  },
+                ],
+              },
+            };
+          },
+        },
+
+        localLlmService: {
+          model:
+            "qwen3:8b",
+
+          async classify() {
+            return {
+              status:
+                "needs_clarification",
+              tag: null,
+              provider:
+                "ollama",
+              model:
+                "qwen3:8b",
+              durationMs:
+                25,
+            };
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Le han diagnosticado una enfermedad",
+        conversationContext:
+          null,
+        pendingClarification: {
+          node:
+            "health_detail",
+          personId:
+            "self",
+          mode:
+            "free_text",
+        },
+      });
+
+    assert.equal(
+      result.status,
+      "resolved",
+    );
+
+    assert.equal(
+      result.tag.tag_id,
+      9,
+    );
+
+    assert.equal(
+      result.tag.descripcion,
+      "CÁNCER",
+    );
+
+    assert.equal(
+      result.provider,
+      "conversation_policy",
+    );
+
+    assert.equal(
+      result.diagnostics
+        ?.reason,
+      "cancer_audience_variant_collapsed",
+    );
+
+    assert.equal(
+      result.diagnostics
+        ?.localLlm
+        ?.status,
+      "needs_clarification",
+    );
+  },
+);
+
+test(
+  "cancer audience ambiguity collapses to general cancer when local llm fails",
+  async () => {
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify({
+            conversationContext,
+          }) {
+            return {
+              status:
+                "needs_clarification",
+              tag: null,
+              context:
+                conversationContext,
+              provider:
+                "embedding",
+              model:
+                "fake",
+              diagnostics: {
+                candidates: [
+                  {
+                    tagId: 10,
+                    tag:
+                      "CÁNCER INFANTIL",
+                    score:
+                      0.7594,
+                  },
+                  {
+                    tagId: 9,
+                    tag:
+                      "CÁNCER",
+                    score:
+                      0.7429,
+                  },
+                ],
+              },
+            };
+          },
+        },
+
+        localLlmService: {
+          model:
+            "qwen3:8b",
+
+          async classify() {
+            const error =
+              new Error(
+                "timeout",
+              );
+
+            error.code =
+              "LOCAL_LLM_TIMEOUT";
+
+            throw error;
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Le han diagnosticado una enfermedad",
+        conversationContext:
+          null,
+        pendingClarification: {
+          node:
+            "health_detail",
+          personId:
+            "self",
+          mode:
+            "free_text",
+        },
+      });
+
+    assert.equal(
+      result.status,
+      "resolved",
+    );
+
+    assert.equal(
+      result.tag.tag_id,
+      9,
+    );
+
+    assert.equal(
+      result.tag.descripcion,
+      "CÁNCER",
+    );
+
+    assert.equal(
+      result.diagnostics
+        ?.reason,
+      "cancer_audience_variant_collapsed",
+    );
+
+    assert.equal(
+      result.diagnostics
+        ?.localLlm
+        ?.code,
+      "LOCAL_LLM_TIMEOUT",
+    );
+  },
+);
+
+
+
+test(
+  "clear bounded embedding resolution does not call local llm",
+  async () => {
+    let localCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify({
+            conversationContext,
+          }) {
+            return {
+              status:
+                "resolved",
+              tag: {
+                tag_id: 13,
+                descripcion:
+                  "DIABETES",
+              },
+              context:
+                conversationContext,
+              provider:
+                "embedding",
+              model:
+                "fake",
+              diagnostics: {
+                candidates: [
+                  {
+                    tagId: 13,
+                    tag:
+                      "DIABETES",
+                    score: 0.8,
+                  },
+                ],
+              },
+            };
+          },
+        },
+
+        localLlmService: {
+          async classify() {
+            localCalls += 1;
+            throw new Error(
+              "local llm should not run",
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Tengo diabetes",
+        conversationContext:
+          null,
+        pendingClarification: {
+          node:
+            "health_detail",
+          personId:
+            "self",
+          mode:
+            "free_text",
+        },
+      });
+
+    assert.equal(
+      localCalls,
+      0,
+    );
+
+    assert.equal(
+      result.tag.descripcion,
+      "DIABETES",
+    );
+  },
+);
+
+test(
+  "open node without operational catalog does not call local llm",
+  async () => {
+    let semanticCalls = 0;
+    let localCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+            throw new Error(
+              "semantic should not run",
+            );
+          },
+        },
+
+        localLlmService: {
+          async classify() {
+            localCalls += 1;
+            throw new Error(
+              "local llm should not run",
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "No puede dejar las apuestas",
+        conversationContext:
+          null,
+        pendingClarification: {
+          node:
+            "addiction_behavior_detail",
+          personId:
+            "self",
+          mode:
+            "free_text",
+        },
+      });
+
+    assert.equal(
+      semanticCalls,
+      0,
+    );
+
+    assert.equal(
+      localCalls,
+      0,
+    );
+
+    assert.equal(
+      result.diagnostics.reason,
+      "no_operational_catalog",
+    );
+  },
+);
+
+
+
+
+
+
+
+test(
+  "local llm technical failure stays inside open clarification boundary",
+  async () => {
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify({
+            conversationContext,
+          }) {
+            return {
+              status:
+                "needs_clarification",
+              tag: null,
+              context:
+                conversationContext,
+              provider:
+                "embedding",
+              model:
+                "fake",
+              diagnostics: {
+                candidates: [
+                  {
+                    tagId: 4,
+                    tag:
+                      "ALZHEIMER",
+                    score: 0.63,
+                  },
+                  {
+                    tagId: 31,
+                    tag:
+                      "SALUD MENTAL",
+                    score: 0.62,
+                  },
+                ],
+              },
+            };
+          },
+        },
+
+        localLlmService: {
+          model:
+            "qwen3:8b",
+
+          async classify() {
+            const error =
+              new Error(
+                "timeout",
+              );
+
+            error.code =
+              "LOCAL_LLM_TIMEOUT";
+
+            throw error;
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Le han diagnosticado un trastorno neurológico",
+        conversationContext:
+          null,
+        pendingClarification: {
+          node:
+            "health_detail",
+          personId:
+            "self",
+          mode:
+            "free_text",
+        },
+      });
+
+    assert.equal(
+      result.status,
+      "needs_clarification",
+    );
+
+    assert.equal(
+      result.provider,
+      "local_llm_error",
+    );
+
+    assert.equal(
+      result.diagnostics
+        .localLlm.code,
+      "LOCAL_LLM_TIMEOUT",
+    );
+  },
+);
+
+test(
+  "behavioral addiction reenters mental health when the answer describes mood changes",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+            throw new Error(
+              "semantic classification should not run"
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "tiene cambios bruscos de humor y temperamento",
+        conversationContext:
+          null,
+        pendingClarification: {
+          node:
+            "addiction_behavior_detail",
+          personId:
+            "person_1",
+          mode:
+            "free_text",
+        },
+      });
+
+    assert.equal(
+      semanticCalls,
+      0,
+    );
+
+    assert.equal(
+      result.status,
+      "needs_clarification",
+    );
+
+    assert.equal(
+      result.missingDimension,
+      "mental_health_detail",
+    );
+
+    assert.equal(
+      result.provider,
+      "open_clarification_reentry",
+    );
+
+    assert.deepEqual(
+      result.quickReplies.map(
+        (reply) =>
+          reply.id,
+      ),
+      [
+        "mood_anxiety",
+        "sleep",
+        "behavior_changes",
+        "mental_other",
+      ],
+    );
+
+    assert.deepEqual(
+      result.clarificationTransition,
+      {
+        sourceNode:
+          "addiction_behavior_detail",
+        action: {
+          type: "goto",
+          node:
+            "mental_health_detail",
+        },
+      },
+    );
+  },
+);
+
+test(
+  "health symptoms do not resolve to a diagnosis without a declared condition",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+
+            return {
+              status:
+                "resolved",
+              tag: {
+                tag_id: 13,
+                descripcion:
+                  "DIABETES",
+              },
+              provider:
+                "embedding",
+              model:
+                "fake",
+            };
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "no puede dormir y bebe mucho",
+        conversationContext:
+          null,
+        pendingClarification: {
+          node:
+            "health_detail",
+          personId:
+            "person_1",
+          mode:
+            "free_text",
+        },
+      });
+
+    assert.equal(
+      semanticCalls,
+      0,
+    );
+
+    assert.equal(
+      result.status,
+      "needs_clarification",
+    );
+
+    assert.equal(
+      result.tag,
+      null,
+    );
+
+    assert.equal(
+      result.provider,
+      "health_statement_authority",
+    );
+
+    assert.equal(
+      result.missingDimension,
+      "health_detail",
+    );
+
+    assert.match(
+      result.clarificationQuestion,
+      /enfermedad|diagnóstico|síntomas/i,
+    );
+
+    assert.deepEqual(
+      result.clarificationState,
+      {
+        node:
+          "health_detail",
+        mode:
+          "free_text",
+        dimension:
+          "diagnosis_status",
+      },
+    );
+  },
+);
+
+test(
+  "answering that symptoms are still being observed does not repeat the diagnosis-status question",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify({
+            conversationContext,
+          }) {
+            semanticCalls += 1;
+
+            return {
+              status:
+                "needs_clarification",
+              tag: null,
+              context:
+                conversationContext,
+              provider:
+                "embedding",
+              model:
+                "fake",
+              diagnostics: {
+                candidates: [],
+              },
+            };
+          },
+        },
+      });
+
+    const previousQuestion =
+      "¿Os han indicado ya alguna enfermedad o diagnóstico, o de momento estáis observando estos síntomas?";
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "observando estos síntomas",
+        conversationContext:
+          null,
+        pendingClarification: {
+          node:
+            "health_detail",
+          personId:
+            "person_1",
+          mode:
+            "free_text",
+        },
+      });
+
+    assert.notEqual(
+      result.clarificationQuestion,
+      previousQuestion,
+    );
+
+    assert.notEqual(
+      result.diagnostics?.reason,
+      "condition_not_declared",
+    );
+
+    assert.equal(
+      semanticCalls,
+      0,
+    );
+
+    assert.equal(
+      result.missingDimension,
+      "goal",
+    );
+
+    assert.deepEqual(
+      result.clarificationTransition,
+      {
+        sourceNode:
+          "health_detail",
+        action: {
+          type:
+            "resolve_dimension",
+          dimension:
+            "diagnosis_status",
+          value:
+            "not_confirmed",
+        },
+      },
+    );
+  },
+);
+
+test(
+  "health hypotheses cannot resolve to a diagnosis",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify() {
+            semanticCalls += 1;
+
+            throw new Error(
+              "semantic classification should not run"
+            );
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "No sé si puede ser diabetes",
+        conversationContext:
+          null,
+        pendingClarification: {
+          node:
+            "health_detail",
+          personId:
+            "self",
+          mode:
+            "free_text",
+        },
+      });
+
+    assert.equal(
+      semanticCalls,
+      0,
+    );
+
+    assert.equal(
+      result.status,
+      "needs_clarification",
+    );
+
+    assert.equal(
+      result.tag,
+      null,
+    );
+  },
+);
+
+test(
+  "declared diabetes still reaches bounded semantic classification",
+  async () => {
+    let semanticCalls = 0;
+
+    const router =
+      createHelpchatUnderstandingRouter({
+        semanticClassifier: {
+          async classify({
+            conversationContext,
+            allowedTagIds,
+          }) {
+            semanticCalls += 1;
+
+            assert.equal(
+              allowedTagIds.includes(13),
+              true,
+            );
+
+            return {
+              status:
+                "resolved",
+              tag: {
+                tag_id: 13,
+                descripcion:
+                  "DIABETES",
+              },
+              context:
+                conversationContext,
+              needsClarification:
+                false,
+              provider:
+                "embedding",
+              model:
+                "fake",
+              diagnostics: {
+                candidates: [],
+              },
+            };
+          },
+        },
+      });
+
+    const result =
+      await router.understand({
+        inputMessage:
+          "Le han diagnosticado diabetes",
+        conversationContext:
+          null,
+        pendingClarification: {
+          node:
+            "health_detail",
+          personId:
+            "self",
+          mode:
+            "free_text",
+        },
+      });
+
+    assert.equal(
+      semanticCalls,
+      1,
+    );
+
+    assert.equal(
+      result.status,
+      "resolved",
+    );
+
+    assert.equal(
+      result.tag.descripcion,
+      "DIABETES",
+    );
+  },
+);

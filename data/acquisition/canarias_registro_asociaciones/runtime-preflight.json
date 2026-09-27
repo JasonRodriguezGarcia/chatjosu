@@ -1,0 +1,56 @@
+{
+  "format_version": 1,
+  "projection_version": "1.0",
+  "source_rows": 23036,
+  "relevance": {
+    "strict_candidates": 471,
+    "rejected_non_strict": 22565
+  },
+  "tagging": {
+    "high_associations": 9,
+    "review_only": 0,
+    "unmapped": 462,
+    "high_single_tag": 9,
+    "high_multiple_tags": 0,
+    "tag_assignments": 9,
+    "by_tag": {
+      "ALCOHOLISMO": 3,
+      "LUDOPATIA": 1,
+      "TRASTORNOS_ALIMENTARIOS": 1,
+      "INMIGRACION_REFUGIO": 3,
+      "ACOSO_ESCOLAR": 1
+    }
+  },
+  "territory": {
+    "resolved": 9,
+    "unresolved": 0,
+    "by_province": {
+      "LAS PALMAS": 8,
+      "SANTA CRUZ DE TENERIFE": 1
+    }
+  },
+  "contacts": {
+    "with_phone": 4,
+    "with_email": 0,
+    "with_website": 0,
+    "with_any_contact": 4,
+    "without_direct_contact": 5,
+    "with_official_registry_url": 0
+  },
+  "coordinates": {
+    "with_coordinates": 0,
+    "without_coordinates": 9
+  },
+  "dedupe": {
+    "new_candidate": 9,
+    "exact_duplicate": 0,
+    "probable_duplicate": 0
+  },
+  "quality": {
+    "missing_name": 0,
+    "missing_municipality": 0,
+    "missing_province": 0
+  },
+  "runtime_candidates": 9,
+  "generated_at": "2026-09-04T20:57:13.405Z"
+}

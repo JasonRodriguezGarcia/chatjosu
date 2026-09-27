@@ -1,0 +1,265 @@
+{
+  "format_version": 1,
+  "territories": [
+    {
+      "ine_code": "01",
+      "province_key": "ALAVA",
+      "name": "Araba/Álava"
+    },
+    {
+      "ine_code": "02",
+      "province_key": "ALBACETE",
+      "name": "Albacete"
+    },
+    {
+      "ine_code": "03",
+      "province_key": "ALICANTE",
+      "name": "Alicante/Alacant"
+    },
+    {
+      "ine_code": "04",
+      "province_key": "ALMERIA",
+      "name": "Almería"
+    },
+    {
+      "ine_code": "05",
+      "province_key": "AVILA",
+      "name": "Ávila"
+    },
+    {
+      "ine_code": "06",
+      "province_key": "BADAJOZ",
+      "name": "Badajoz"
+    },
+    {
+      "ine_code": "07",
+      "province_key": "ILLES BALEARS",
+      "name": "Balears, Illes"
+    },
+    {
+      "ine_code": "08",
+      "province_key": "BARCELONA",
+      "name": "Barcelona"
+    },
+    {
+      "ine_code": "09",
+      "province_key": "BURGOS",
+      "name": "Burgos"
+    },
+    {
+      "ine_code": "10",
+      "province_key": "CACERES",
+      "name": "Cáceres"
+    },
+    {
+      "ine_code": "11",
+      "province_key": "CADIZ",
+      "name": "Cádiz"
+    },
+    {
+      "ine_code": "12",
+      "province_key": "CASTELLON",
+      "name": "Castellón/Castelló"
+    },
+    {
+      "ine_code": "13",
+      "province_key": "CIUDAD REAL",
+      "name": "Ciudad Real"
+    },
+    {
+      "ine_code": "14",
+      "province_key": "CORDOBA",
+      "name": "Córdoba"
+    },
+    {
+      "ine_code": "15",
+      "province_key": "A CORUNA",
+      "name": "Coruña, A"
+    },
+    {
+      "ine_code": "16",
+      "province_key": "CUENCA",
+      "name": "Cuenca"
+    },
+    {
+      "ine_code": "17",
+      "province_key": "GIRONA",
+      "name": "Girona"
+    },
+    {
+      "ine_code": "18",
+      "province_key": "GRANADA",
+      "name": "Granada"
+    },
+    {
+      "ine_code": "19",
+      "province_key": "GUADALAJARA",
+      "name": "Guadalajara"
+    },
+    {
+      "ine_code": "20",
+      "province_key": "GUIPUZCOA",
+      "name": "Gipuzkoa"
+    },
+    {
+      "ine_code": "21",
+      "province_key": "HUELVA",
+      "name": "Huelva"
+    },
+    {
+      "ine_code": "22",
+      "province_key": "HUESCA",
+      "name": "Huesca"
+    },
+    {
+      "ine_code": "23",
+      "province_key": "JAEN",
+      "name": "Jaén"
+    },
+    {
+      "ine_code": "24",
+      "province_key": "LEON",
+      "name": "León"
+    },
+    {
+      "ine_code": "25",
+      "province_key": "LLEIDA",
+      "name": "Lleida"
+    },
+    {
+      "ine_code": "26",
+      "province_key": "LA RIOJA",
+      "name": "Rioja, La"
+    },
+    {
+      "ine_code": "27",
+      "province_key": "LUGO",
+      "name": "Lugo"
+    },
+    {
+      "ine_code": "28",
+      "province_key": "MADRID",
+      "name": "Madrid"
+    },
+    {
+      "ine_code": "29",
+      "province_key": "MALAGA",
+      "name": "Málaga"
+    },
+    {
+      "ine_code": "30",
+      "province_key": "MURCIA",
+      "name": "Murcia"
+    },
+    {
+      "ine_code": "31",
+      "province_key": "NAVARRA",
+      "name": "Navarra"
+    },
+    {
+      "ine_code": "32",
+      "province_key": "OURENSE",
+      "name": "Ourense"
+    },
+    {
+      "ine_code": "33",
+      "province_key": "ASTURIAS",
+      "name": "Asturias"
+    },
+    {
+      "ine_code": "34",
+      "province_key": "PALENCIA",
+      "name": "Palencia"
+    },
+    {
+      "ine_code": "35",
+      "province_key": "LAS PALMAS",
+      "name": "Palmas, Las"
+    },
+    {
+      "ine_code": "36",
+      "province_key": "PONTEVEDRA",
+      "name": "Pontevedra"
+    },
+    {
+      "ine_code": "37",
+      "province_key": "SALAMANCA",
+      "name": "Salamanca"
+    },
+    {
+      "ine_code": "38",
+      "province_key": "SANTA CRUZ DE TENERIFE",
+      "name": "Santa Cruz de Tenerife"
+    },
+    {
+      "ine_code": "39",
+      "province_key": "CANTABRIA",
+      "name": "Cantabria"
+    },
+    {
+      "ine_code": "40",
+      "province_key": "SEGOVIA",
+      "name": "Segovia"
+    },
+    {
+      "ine_code": "41",
+      "province_key": "SEVILLA",
+      "name": "Sevilla"
+    },
+    {
+      "ine_code": "42",
+      "province_key": "SORIA",
+      "name": "Soria"
+    },
+    {
+      "ine_code": "43",
+      "province_key": "TARRAGONA",
+      "name": "Tarragona"
+    },
+    {
+      "ine_code": "44",
+      "province_key": "TERUEL",
+      "name": "Teruel"
+    },
+    {
+      "ine_code": "45",
+      "province_key": "TOLEDO",
+      "name": "Toledo"
+    },
+    {
+      "ine_code": "46",
+      "province_key": "VALENCIA",
+      "name": "Valencia/València"
+    },
+    {
+      "ine_code": "47",
+      "province_key": "VALLADOLID",
+      "name": "Valladolid"
+    },
+    {
+      "ine_code": "48",
+      "province_key": "VIZCAYA",
+      "name": "Bizkaia"
+    },
+    {
+      "ine_code": "49",
+      "province_key": "ZAMORA",
+      "name": "Zamora"
+    },
+    {
+      "ine_code": "50",
+      "province_key": "ZARAGOZA",
+      "name": "Zaragoza"
+    },
+    {
+      "ine_code": "51",
+      "province_key": "CEUTA",
+      "name": "Ceuta"
+    },
+    {
+      "ine_code": "52",
+      "province_key": "MELILLA",
+      "name": "Melilla"
+    }
+  ]
+}
