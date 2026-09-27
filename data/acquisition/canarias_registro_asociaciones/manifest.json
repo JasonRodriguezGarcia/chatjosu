@@ -1,0 +1,48 @@
+{
+  "format_version": 1,
+  "source_id": "canarias_registro_asociaciones",
+  "publisher": "Gobierno de Canarias",
+  "source_url": "https://datos.canarias.es/catalogos/general/dataset/2c3c9915-3fae-4085-9f82-bd01911c1126/resource/94cf0ff3-521b-4526-9609-520e6d2379ba/download/resultado_asociaciones_20012021.csv",
+  "acquired_at": "2026-09-04T11:22:00Z",
+  "raw_file": "data/acquisition/canarias_registro_asociaciones/raw/resultado_asociaciones_20012021.csv",
+  "sha256": "b31d33a20a0f157e8775a24901e3a8284ba74f2f3a6e9b4e882d1e2a5edb095a",
+  "bytes": 5541381,
+  "mime_type": "text/csv",
+  "persistence": "raw_snapshot_only",
+  "ckan_dataset_id": "2c3c9915-3fae-4085-9f82-bd01911c1126",
+  "ckan_resource_id": "94cf0ff3-521b-4526-9609-520e6d2379ba",
+  "source_issued": "2020-12-03",
+  "source_modified": "2026-09-01",
+  "auxiliary_files": [
+    {
+      "raw_file": "data/acquisition/canarias_registro_asociaciones/raw/diccionario_datos_asociaciones-de-canaria.csv",
+      "sha256": "c40659b92e9fcaec83c6c4b054d1c8c955f2b171348f8635189af4c8665b8cca",
+      "bytes": 2089,
+      "source_url": "https://datos.canarias.es/catalogos/general/dataset/2c3c9915-3fae-4085-9f82-bd01911c1126/resource/728a4712-5ae0-49b8-b0ba-4c142a906a90/download/diccionario_datos_asociaciones-de-canaria.csv"
+    },
+    {
+      "raw_file": "data/acquisition/canarias_registro_asociaciones/raw/resultado_asociaciones_20012021.ods",
+      "sha256": "124bd41d51bf0b4963c6f77e3d0cdeaccd6e2e2eef6b9617f9fba50a22b96de9",
+      "bytes": 2025360,
+      "source_url": "https://datos.canarias.es/catalogos/general/dataset/2c3c9915-3fae-4085-9f82-bd01911c1126/resource/b0c2fc8c-cd55-4bc6-8b9b-c68a0a4094b9/download/resultado_asociaciones_20012021.ods"
+    }
+  ],
+  "field_dictionary": {
+    "id": "Codigo de la asociacion (numero, interno de la fuente)",
+    "registro": "Numero de registro canario (jerarquico, p. ej. G1/S1/9-65/TF)",
+    "nif": "NIF; sentinel _U = desconocido",
+    "denominacion": "Denominacion de la asociacion",
+    "ambito": "ambito de actuacion: AUTONOMICO|INSULAR|MUNICIPAL|PROVINCIAL|LOCAL|NACIONAL|COMARCAL",
+    "seccion": "seccion del registro: Asociaciones|Federaciones|Nacionales/Extranjeras|Registro Especial",
+    "actividades": "actividades (multi, separadas por ;)",
+    "fecha_constitucion": "DD/MM/AAAA; sentinel _U",
+    "direccion_nombre_via": "nombre de la via",
+    "direccion_provincia_nombre": "provincia (SANTA CRUZ DE TENERIFE | LAS PALMAS)",
+    "direccion_isla_nombre": "isla (nivel geografico canonico opcional)",
+    "direccion_municipio_nombre": "municipio",
+    "direccion_codigo_postal": "CP; sentinel _U",
+    "telefono": "telefono de contacto (puede contener varios)",
+    "dominio_internet": "dominio de internet",
+    "email": "email (puede contener varios)"
+  }
+}
